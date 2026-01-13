@@ -1,0 +1,152 @@
+// ============================================
+// ORDER MODEL - MongoDB Schema
+// ============================================
+
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Order as OrderType, ServiceType, OrderStatus, VerificationStatus } from '@/types';
+
+// Document interface
+export interface OrderDocument extends Omit<OrderType, '_id'>, Document {}
+
+// Schema definition
+const OrderSchema = new Schema<OrderDocument>(
+  {
+    orderNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true
+    },
+    
+    // Customer Info
+    name: {
+      type: String,
+      required: [true, 'Nama wajib diisi'],
+      trim: true,
+      index: true
+    },
+    phone: {
+      type: String,
+      required: [true, 'Nomor telepon wajib diisi'],
+      trim: true,
+      index: true
+    },
+    address: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    
+    // Order Details
+    itemType: {
+      type: String,
+      required: [true, 'Jenis barang wajib dipilih'],
+      enum: {
+        values: ['sepatu', 'tas', 'helm', 'sofa', 'karpet', 'gorden', 'other'] as ServiceType[],
+        message: 'Jenis barang tidak valid'
+      }
+    },
+    customItemType: {
+      type: String,
+      trim: true
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: [1, 'Jumlah minimal 1'],
+      default: 1
+    },
+    estimatedPrice: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    finalPrice: {
+      type: Number,
+      min: 0
+    },
+    
+    // Status Flow
+    status: {
+      type: String,
+      enum: ['pending', 'in_progress', 'finished', 'delivered', 'picked_up'] as OrderStatus[],
+      default: 'pending',
+      index: true
+    },
+    
+    // Verification (Anti-spam layer)
+    verification: {
+      status: {
+        type: String,
+        enum: ['unverified', 'approved', 'rejected'] as VerificationStatus[],
+        default: 'unverified',
+        index: true
+      },
+      verifiedAt: {
+        type: Date
+      }
+    },
+    
+    // Photos (proof of work)
+    proofOfWork: {
+      beforePhotos: { type: [String], default: [] },
+      afterPhotos: { type: [String], default: [] }
+    },
+    
+    // Admin notes
+    notes: {
+      type: String,
+      default: ''
+    },
+    
+    // Finished timestamp
+    finishedAt: {
+      type: Date
+    },
+    
+    // TTL Auto-deletion
+    expireAt: {
+      type: Date
+      // Note: index is defined separately with TTL options below
+    }
+  },
+  {
+    timestamps: true, // Adds createdAt and updatedAt
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
+);
+
+// TTL Index: Auto-delete documents after expireAt
+OrderSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+
+// Compound indexes for common queries
+OrderSchema.index({ 'verification.status': 1, createdAt: -1 });
+OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ name: 'text', phone: 'text' }); // Text search
+
+// Pre-save middleware
+OrderSchema.pre('save', function () {
+  // Set expireAt when order is finished (30 days TTL)
+  if (this.status === 'finished' && !this.expireAt) {
+    this.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    this.finishedAt = new Date();
+  }
+});
+
+// Static methods
+OrderSchema.statics.findPending = function () {
+  return this.find({ 'verification.status': 'unverified' })
+    .sort({ createdAt: -1 });
+};
+
+OrderSchema.statics.findApproved = function () {
+  return this.find({ 'verification.status': 'approved' })
+    .sort({ createdAt: -1 });
+};
+
+// Prevent model recompilation in development
+const Order: Model<OrderDocument> = 
+  mongoose.models.Order || mongoose.model<OrderDocument>('Order', OrderSchema);
+
+export default Order;

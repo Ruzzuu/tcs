@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* ============================================
+   CUSTOM THEME CONFIGURATION
+   Based on existing HTML design
+   ============================================ */
+
+:root {
+  /* Core Colors */
+  --primary: #1152d4;
+  --primary-hover: #0d3fa8;
+  
+  /* Light Mode */
+  --background-light: #f6f6f8;
+  --background-dark: #101622;
+  --surface-light: #ffffff;
+  --surface-dark: #1a2230;
+  --text-main: #111318;
+  --text-sub: #616f89;
+  --border-light: #dbdfe6;
+  --border-dark: #2a3441;
+  
+  /* Status Colors */
+  --status-pending: #f59e0b;
+  --status-progress: #1152d4;
+  --status-finished: #10b981;
+  --status-unverified: #f97316;
+  
+  /* WhatsApp */
+  --whatsapp: #25D366;
+  --whatsapp-dark: #128C7E;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-background-light: var(--background-light);
+  --color-background-dark: var(--background-dark);
+  --color-surface-light: var(--surface-light);
+  --color-surface-dark: var(--surface-dark);
+  --color-text-main: var(--text-main);
+  --color-text-sub: var(--text-sub);
+  --color-border-light: var(--border-light);
+  --color-border-dark: var(--border-dark);
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
+}
+
+/* Light mode (default) */
+body {
+  background: var(--background-light);
+  color: var(--text-main);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Dark mode */
+.dark body {
+  background: var(--background-dark);
+  color: #ffffff;
+}
+
+/* Custom scrollbar hide */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Material Icons Support */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Form input styles */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: rgba(17, 82, 212, 0.5);
+}
+
+/* Button active state */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Card shadow */
+.card-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Status badge base */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Skeleton loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
