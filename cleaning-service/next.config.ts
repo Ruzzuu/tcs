@@ -1,12 +1,10 @@
 import type { NextConfig } from "next";
+// @ts-expect-error - next-pwa doesn't have types
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  turbopack: {
-    root: "C:\\Users\\fairu\\home\\z_ai\\cleaning-service",
-  },
 };
 
 const pwaConfig = withPWA({
