@@ -546,7 +546,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Footer Actions */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-[#101622]/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 flex gap-3 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4 bg-white/90 dark:bg-[#101622]/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 flex gap-3 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button
           onClick={handleGenerateNota}
           disabled={generatingNota}
