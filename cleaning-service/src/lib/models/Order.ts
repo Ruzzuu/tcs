@@ -42,7 +42,7 @@ const OrderSchema = new Schema<OrderDocument>(
       type: String,
       required: [true, 'Jenis barang wajib dipilih'],
       enum: {
-        values: ['sepatu', 'tas', 'helm', 'sofa', 'karpet', 'gorden', 'other'] as ServiceType[],
+        values: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[],
         message: 'Jenis barang tidak valid'
       }
     },
@@ -87,10 +87,16 @@ const OrderSchema = new Schema<OrderDocument>(
       }
     },
     
-    // Photos (proof of work)
+    // Photos (proof of work) - Cloudinary URLs + public_ids
     proofOfWork: {
-      beforePhotos: { type: [String], default: [] },
-      afterPhotos: { type: [String], default: [] }
+      beforePhotos: [{
+        url: { type: String },
+        publicId: { type: String }
+      }],
+      afterPhotos: [{
+        url: { type: String },
+        publicId: { type: String }
+      }]
     },
     
     // Admin notes

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Order, OrderStatus } from '@/types';
+import { Order, OrderStatus, CloudinaryImage } from '@/types';
 import { 
   formatCurrency, 
   formatDate, 
@@ -31,25 +31,46 @@ export default function OrderDetailPage() {
   const [status, setStatus] = useState<OrderStatus>('pending');
   const [notes, setNotes] = useState('');
   const [finalPrice, setFinalPrice] = useState<number | undefined>();
-  const [proofOfWork, setProofOfWork] = useState<{ beforePhotos: string[], afterPhotos: string[] }>({ beforePhotos: [], afterPhotos: [] });
+  const [proofOfWork, setProofOfWork] = useState<{ beforePhotos: CloudinaryImage[], afterPhotos: CloudinaryImage[] }>({ beforePhotos: [], afterPhotos: [] });
+  const [uploading, setUploading] = useState<'before' | 'after' | null>(null);
 
-  // File upload handler for proof of work images
+  // File upload handler for proof of work images - Uploads to Cloudinary
   const handleImageUpload = async (type: 'before' | 'after', file: File) => {
+    if (!orderId) return;
+    
+    setUploading(type);
     try {
-      // Convert to base64 for local storage (or you can upload to cloud storage)
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      formData.append('orderId', orderId);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const newImage: CloudinaryImage = {
+          url: result.data.url,
+          publicId: result.data.publicId,
+        };
+
         if (type === 'before') {
-          setProofOfWork(prev => ({ ...prev, beforePhotos: [base64] }));
+          setProofOfWork(prev => ({ ...prev, beforePhotos: [newImage] }));
         } else {
-          setProofOfWork(prev => ({ ...prev, afterPhotos: [base64] }));
+          setProofOfWork(prev => ({ ...prev, afterPhotos: [newImage] }));
         }
-      };
-      reader.readAsDataURL(file);
+      } else {
+        alert(result.error || 'Gagal upload gambar');
+      }
     } catch (err) {
       console.error('Failed to upload image:', err);
       alert('Gagal upload gambar. Silakan coba lagi.');
+    } finally {
+      setUploading(null);
     }
   };
 
@@ -348,10 +369,10 @@ export default function OrderDetailPage() {
           {/* Before */}
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">Sebelum</span>
-            {proofOfWork.beforePhotos.length > 0 ? (
+            {proofOfWork.beforePhotos.length > 0 && proofOfWork.beforePhotos[0]?.url ? (
               <div className="relative aspect-square w-full rounded-xl bg-gray-100 overflow-hidden border border-gray-200 dark:border-gray-700">
                 <img 
-                  src={proofOfWork.beforePhotos[0]} 
+                  src={proofOfWork.beforePhotos[0].url} 
                   alt="Before" 
                   className="w-full h-full object-cover"
                 />
@@ -363,19 +384,32 @@ export default function OrderDetailPage() {
                 </button>
               </div>
             ) : (
-              <label className="relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer">
+              <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   capture="environment"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={uploading === 'before'}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleImageUpload('before', file);
                   }}
                 />
-                <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
-                <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
+                {uploading === 'before' ? (
+                  <>
+                    <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="text-xs text-[#1152d4]">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
+                    <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
+                  </>
+                )}
               </label>
             )}
           </div>
@@ -383,10 +417,10 @@ export default function OrderDetailPage() {
           {/* After */}
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">Sesudah</span>
-            {proofOfWork.afterPhotos.length > 0 ? (
+            {proofOfWork.afterPhotos.length > 0 && proofOfWork.afterPhotos[0]?.url ? (
               <div className="relative aspect-square w-full rounded-xl bg-gray-100 overflow-hidden border border-gray-200 dark:border-gray-700">
                 <img 
-                  src={proofOfWork.afterPhotos[0]} 
+                  src={proofOfWork.afterPhotos[0].url} 
                   alt="After" 
                   className="w-full h-full object-cover"
                 />
@@ -398,19 +432,32 @@ export default function OrderDetailPage() {
                 </button>
               </div>
             ) : (
-              <label className="relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer">
+              <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   capture="environment"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={uploading === 'after'}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleImageUpload('after', file);
                   }}
                 />
-                <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
-                <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
+                {uploading === 'after' ? (
+                  <>
+                    <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="text-xs text-[#1152d4]">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
+                    <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
+                  </>
+                )}
               </label>
             )}
           </div>

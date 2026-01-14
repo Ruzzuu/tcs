@@ -87,9 +87,41 @@ function OrderCard({ order }: { order: Order }) {
   const statusColor = getStatusColor(order.status);
   const avatarColor = getAvatarColor(order.name);
   const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
+  
+  // Check for proof of work - handle both new Cloudinary format and legacy base64
+  const beforePhoto = order.proofOfWork?.beforePhotos?.[0];
+  const afterPhoto = order.proofOfWork?.afterPhotos?.[0];
+  const beforeUrl = typeof beforePhoto === 'object' && beforePhoto?.url ? beforePhoto.url : (typeof beforePhoto === 'string' ? beforePhoto : null);
+  const afterUrl = typeof afterPhoto === 'object' && afterPhoto?.url ? afterPhoto.url : (typeof afterPhoto === 'string' ? afterPhoto : null);
+  const hasProofOfWork = beforeUrl || afterUrl;
 
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
+      {/* Proof of Work Preview */}
+      {hasProofOfWork && (
+        <div className="flex gap-2 -mx-1 -mt-1 mb-1">
+          {beforeUrl && (
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <img 
+                src={beforeUrl} 
+                alt="Before" 
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">Before</span>
+            </div>
+          )}
+          {afterUrl && (
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <img 
+                src={afterUrl} 
+                alt="After" 
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">After</span>
+            </div>
+          )}
+        </div>
+      )}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
           <div className={`${avatarColor} rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm`}>
@@ -101,6 +133,12 @@ function OrderCard({ order }: { order: Order }) {
               <span className="text-xs text-gray-500 dark:text-gray-400">{serviceName}</span>
               <span className="text-xs text-gray-300">•</span>
               <span className="text-xs text-gray-500 dark:text-gray-400">Qty: {order.quantity}</span>
+              {hasProofOfWork && (
+                <>
+                  <span className="text-xs text-gray-300">•</span>
+                  <span className="material-symbols-outlined text-[12px] text-green-500">photo_camera</span>
+                </>
+              )}
             </div>
           </div>
         </div>

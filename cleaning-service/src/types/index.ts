@@ -2,6 +2,12 @@
 // TYPE DEFINITIONS
 // ============================================
 
+// Cloudinary Image type
+export interface CloudinaryImage {
+  url: string;
+  publicId: string;
+}
+
 export interface Order {
   _id: string;
   orderNumber: string;
@@ -26,10 +32,10 @@ export interface Order {
     verifiedAt?: Date;
   };
   
-  // Proof of Work
+  // Proof of Work (Cloudinary URLs)
   proofOfWork?: {
-    beforePhotos: string[];
-    afterPhotos: string[];
+    beforePhotos: CloudinaryImage[];
+    afterPhotos: CloudinaryImage[];
   };
 
   // Custom Item

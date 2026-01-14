@@ -13,8 +13,10 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  const [dateFilter, setDateFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -33,6 +35,11 @@ export default function OrdersPage() {
         params.set('search', searchQuery);
       }
 
+      if (dateFilter) {
+        params.set('startDate', dateFilter);
+        params.set('endDate', dateFilter);
+      }
+
       const response = await fetch(`/api/orders?${params}`);
       const result = await response.json();
 
@@ -47,7 +54,7 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery]);
+  }, [page, statusFilter, searchQuery, dateFilter]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -56,6 +63,31 @@ export default function OrdersPage() {
 
     return () => clearTimeout(debounce);
   }, [fetchOrders, searchQuery]);
+
+  const handleDelete = async (orderId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) return;
+    
+    setDeletingId(orderId);
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'DELETE'
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        setOrders(prev => prev.filter(o => o._id !== orderId));
+      } else {
+        alert(result.error || 'Gagal menghapus pesanan');
+      }
+    } catch {
+      alert('Gagal terhubung ke server');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const statusOptions: Array<{ value: OrderStatus | 'all'; label: string; icon: string }> = [
     { value: 'all', label: 'Semua', icon: 'list_alt' },
@@ -74,20 +106,41 @@ export default function OrdersPage() {
       </div>
 
       {/* Search */}
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-          <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">search</span>
+      <div className="flex gap-2">
+        <div className="relative group flex-1">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+            <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">search</span>
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
+            className="w-full pl-10 pr-4 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all"
+            placeholder="Cari nama, telepon, atau nomor order..."
+          />
         </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setPage(1);
-          }}
-          className="w-full pl-10 pr-4 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all"
-          placeholder="Cari nama, telepon, atau nomor order..."
-        />
+        <div className="relative">
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => {
+              setDateFilter(e.target.value);
+              setPage(1);
+            }}
+            className="h-full px-3 py-2 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer"
+          />
+          {dateFilter && (
+            <button
+              onClick={() => setDateFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Status Filter */}
@@ -153,42 +206,65 @@ export default function OrdersPage() {
           const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
 
           return (
-            <Link
+            <div
               key={order._id}
-              href={`/admin/orders/${order._id}`}
               className="flex items-center gap-4 p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className={`${avatarColor} rounded-full h-12 w-12 flex items-center justify-center font-bold text-sm shrink-0`}>
-                {getInitials(order.name)}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-[#111318] dark:text-white truncate">{order.name}</h3>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor.bg} ${statusColor.text}`}>
-                    {getStatusLabel(order.status)}
+              <Link
+                href={`/admin/orders/${order._id}`}
+                className="flex items-center gap-4 flex-1 min-w-0"
+              >
+                <div className={`${avatarColor} rounded-full h-12 w-12 flex items-center justify-center font-bold text-sm shrink-0`}>
+                  {getInitials(order.name)}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-[#111318] dark:text-white truncate">{order.name}</h3>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor.bg} ${statusColor.text}`}>
+                      {getStatusLabel(order.status)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                    {serviceName} • Qty: {order.quantity}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-1">
+                    #{order.orderNumber} • {formatRelativeTime(order.createdAt)}
+                  </p>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-[#111318] dark:text-white">
+                    {formatCurrency(order.finalPrice || order.estimatedPrice)}
+                  </p>
+                  <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-[#25D366]">
+                    <span className="material-symbols-outlined text-[14px]">chat</span>
+                    WA
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                  {serviceName} • Qty: {order.quantity}
-                </p>
-                <p className="text-[10px] text-gray-400 mt-1">
-                  #{order.orderNumber} • {formatRelativeTime(order.createdAt)}
-                </p>
-              </div>
+              </Link>
 
-              <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-[#111318] dark:text-white">
-                  {formatCurrency(order.finalPrice || order.estimatedPrice)}
-                </p>
-                <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-[#25D366]">
-                  <span className="material-symbols-outlined text-[14px]">chat</span>
-                  WA
-                </span>
-              </div>
+              {/* Delete Button */}
+              <button
+                onClick={(e) => handleDelete(order._id, e)}
+                disabled={deletingId === order._id}
+                className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0 disabled:opacity-50"
+                title="Hapus pesanan"
+              >
+                {deletingId === order._id ? (
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                ) : (
+                  <span className="material-symbols-outlined text-[20px]">delete</span>
+                )}
+              </button>
 
-              <span className="material-symbols-outlined text-gray-400">chevron_right</span>
-            </Link>
+              <Link href={`/admin/orders/${order._id}`}>
+                <span className="material-symbols-outlined text-gray-400">chevron_right</span>
+              </Link>
+            </div>
           );
         })}
       </div>

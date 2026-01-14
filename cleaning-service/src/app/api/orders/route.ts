@@ -33,8 +33,24 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter by order status
-    if (status && ['pending', 'in_progress', 'finished'].includes(status)) {
+    if (status && ['pending', 'in_progress', 'finished', 'delivered', 'picked_up'].includes(status)) {
       query.status = status;
+    }
+
+    // Filter by date range
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        query.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        // Add 1 day to include the end date
+        const end = new Date(endDate);
+        end.setDate(end.getDate() + 1);
+        query.createdAt.$lt = end;
+      }
     }
 
     // Search by name or phone or item

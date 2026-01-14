@@ -78,35 +78,39 @@ export default function CustomerFormPage() {
     setError(null);
 
     try {
-      // Submit the first item (main order)
-      // For multi-item, you could submit each as separate orders or extend the API
-      const mainItem = items[0];
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          phone,
-          address,
-          itemType: mainItem.itemType,
-          customItemType: mainItem.customItemType,
-          quantity: mainItem.quantity,
-          notes: items.map((item, idx) => {
-            const serviceName = item.itemType === 'other' 
-              ? item.customItemType 
-              : SERVICES[item.itemType as ServiceType]?.name || item.itemType;
-            return `Item ${idx + 1}: ${serviceName} x${item.quantity}${item.notes ? ` (${item.notes})` : ''}`;
-          }).join('\n'),
-          estimatedPrice
-        })
+      // Submit each item as a separate order
+      const orderPromises = items.map(async (item) => {
+        const itemPrice = item.itemType === 'other' 
+          ? 0 
+          : (SERVICES[item.itemType as ServiceType]?.price || 0) * item.quantity;
+        
+        return fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            phone,
+            address,
+            itemType: item.itemType,
+            customItemType: item.customItemType,
+            quantity: item.quantity,
+            notes: item.notes || '',
+            estimatedPrice: itemPrice
+          })
+        });
       });
 
-      const data = await response.json();
+      const responses = await Promise.all(orderPromises);
+      const results = await Promise.all(responses.map(r => r.json()));
 
-      if (response.ok && data.success) {
+      // Check if all orders were created successfully
+      const allSuccess = results.every(r => r.success);
+
+      if (allSuccess) {
         router.push('/form/success');
       } else {
-        setError(data.error || 'Terjadi kesalahan. Silakan coba lagi.');
+        const failedResults = results.filter(r => !r.success);
+        setError(failedResults[0]?.error || 'Terjadi kesalahan. Silakan coba lagi.');
       }
     } catch {
       setError('Gagal mengirim data. Periksa koneksi internet Anda.');
