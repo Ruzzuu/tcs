@@ -1,6 +1,5 @@
 {
-  "buildCommand": "cd cleaning-service && npm run build",
-  "outputDirectory": "cleaning-service/.next",
-  "installCommand": "cd cleaning-service && npm install",
-  "framework": "nextjs"
+  "version": 2,
+  "framework": "nextjs",
+  "rootDirectory": "cleaning-service"
 }
