@@ -94,6 +94,9 @@ function OrderCard({ order }: { order: Order }) {
   const beforeUrl = typeof beforePhoto === 'object' && beforePhoto?.url ? beforePhoto.url : (typeof beforePhoto === 'string' ? beforePhoto : null);
   const afterUrl = typeof afterPhoto === 'object' && afterPhoto?.url ? afterPhoto.url : (typeof afterPhoto === 'string' ? afterPhoto : null);
   const hasProofOfWork = beforeUrl || afterUrl;
+  
+  // Get nota image URL for WhatsApp (prioritize nota over after photo)
+  const notaUrl = order.notaImage?.url || null;
 
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
@@ -158,7 +161,7 @@ function OrderCard({ order }: { order: Order }) {
         </span>
         <div className="flex items-center gap-2">
           <a
-            href={generateStatusBasedWhatsAppLink(order, afterUrl || undefined)}
+            href={generateStatusBasedWhatsAppLink(order, notaUrl || undefined)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"

@@ -68,9 +68,9 @@ export const WA_TEMPLATES = {
   orderCompleted: (order: Order, notaImageUrl?: string) => {
     let message = `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`;
     
-    // Append nota/proof image URL if available (WhatsApp will auto-preview)
+    // Append nota image URL if available (WhatsApp will auto-preview)
     if (notaImageUrl) {
-      message += `\n\nFoto hasil pengerjaan:\n${notaImageUrl}`;
+      message += `\n\nNota Layanan:\n${notaImageUrl}`;
     }
     
     return message;

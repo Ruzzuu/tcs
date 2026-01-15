@@ -160,15 +160,53 @@ export default function OrderDetailPage() {
       // Restore original style
       notaElement.style.cssText = originalStyle || 'position: fixed; left: -9999px;';
 
-      const imageUrl = canvas.toDataURL('image/png');
-      
-      // Create download link
-      const link = document.createElement('a');
-      link.download = `nota-${order.orderNumber}.png`;
-      link.href = imageUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Convert canvas to blob for upload
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), 'image/png', 1.0);
+      });
+
+      // Upload to Cloudinary via our API
+      const formData = new FormData();
+      formData.append('file', blob, `nota-${order.orderNumber}.png`);
+      formData.append('type', 'nota');
+      formData.append('orderId', orderId);
+
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (uploadResult.success && uploadResult.data) {
+        // Update order with nota image URL
+        const updateResponse = await fetch(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            notaImage: {
+              url: uploadResult.data.url,
+              publicId: uploadResult.data.publicId
+            }
+          })
+        });
+
+        const updateResult = await updateResponse.json();
+        if (updateResult.success) {
+          setOrder(updateResult.data);
+          alert('Nota berhasil dibuat dan disimpan! Link nota sudah siap untuk WhatsApp.');
+        }
+
+        // Also download locally
+        const link = document.createElement('a');
+        link.download = `nota-${order.orderNumber}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
     } catch (err) {
       console.error('Failed to generate nota:', err);
       alert('Gagal membuat nota. Silakan coba lagi.');
@@ -274,7 +312,7 @@ export default function OrderDetailPage() {
 
           {/* Phone */}
           <a
-            href={generateStatusBasedWhatsAppLink(order, proofOfWork.afterPhotos[0]?.url)}
+            href={generateStatusBasedWhatsAppLink(order, order.notaImage?.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"

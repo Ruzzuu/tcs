@@ -38,6 +38,9 @@ export interface Order {
     afterPhotos: CloudinaryImage[];
   };
 
+  // Nota Image (Cloudinary URL)
+  notaImage?: CloudinaryImage;
+
   // Custom Item
   customItemType?: string;
   

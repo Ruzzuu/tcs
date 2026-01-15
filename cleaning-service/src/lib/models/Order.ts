@@ -98,6 +98,12 @@ const OrderSchema = new Schema<OrderDocument>(
         publicId: { type: String }
       }]
     },
+
+    // Nota Image - Cloudinary URL
+    notaImage: {
+      url: { type: String },
+      publicId: { type: String }
+    },
     
     // Admin notes
     notes: {
