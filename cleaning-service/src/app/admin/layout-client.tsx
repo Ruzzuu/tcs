@@ -3,20 +3,53 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
+// Public routes that don't need the admin shell (header, nav)
+const publicAuthRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/recovery'];
+
+function AdminLayoutContent({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { admin, isLoading, logout } = useAuth();
+  const [showLogoutMenu, setShowLogoutMenu] = useState(false);
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: 'dashboard' },
     { href: '/admin/pending', label: 'Verifikasi', icon: 'pending_actions' },
     { href: '/admin/orders', label: 'Pesanan', icon: 'list_alt' },
   ];
+
+  // Check if current route is a public auth route
+  const isPublicAuthRoute = publicAuthRoutes.some(route => pathname?.startsWith(route));
+
+  // If on a public auth route, just render children without the admin shell
+  if (isPublicAuthRoute) {
+    return <>{children}</>;
+  }
+
+  // If still loading auth state, show loading spinner
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+      </div>
+    );
+  }
+
+  // If not authenticated, the AuthContext will redirect to login
+  // But we should still not render the admin shell
+  if (!admin) {
+    return (
+      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+      </div>
+    );
+  }
 
   const isActive = (href: string) => {
     if (href === '/admin') {
@@ -68,8 +101,40 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <button className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-transparent text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
             <span className="material-symbols-outlined">notifications</span>
           </button>
-          <div className="h-8 w-8 rounded-full bg-[#1152d4]/20 flex items-center justify-center text-[#1152d4] font-bold text-xs border border-[#1152d4]/10">
-            AD
+          
+          {/* User Menu with Logout */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowLogoutMenu(!showLogoutMenu)}
+              className="h-8 w-8 rounded-full bg-[#1152d4]/20 flex items-center justify-center text-[#1152d4] font-bold text-xs border border-[#1152d4]/10 hover:bg-[#1152d4]/30 transition-colors cursor-pointer"
+            >
+              {admin?.username?.slice(0, 2).toUpperCase() || 'AD'}
+            </button>
+            
+            {showLogoutMenu && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowLogoutMenu(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1a202c] rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800">
+                    <p className="text-sm font-medium text-[#111318] dark:text-white truncate">{admin?.username}</p>
+                    <p className="text-xs text-[#616f89] truncate">{admin?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowLogoutMenu(false);
+                      logout();
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-lg">logout</span>
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -146,5 +211,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
       ) : null}
     </div>
+  );
+}
+
+// Main export with AuthProvider wrapper
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  return (
+    <AuthProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AuthProvider>
   );
 }
