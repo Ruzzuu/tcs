@@ -124,25 +124,27 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {children}
       </main>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1a202c] border-t border-gray-100 dark:border-gray-800 px-4 py-2 lg:hidden z-40">
-        <div className="flex items-center justify-around">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors ${
-                isActive(item.href)
-                  ? 'text-[#1152d4]'
-                  : 'text-[#616f89]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      {/* Mobile Bottom Navigation - Hide on order detail pages */}
+      {!pathname.includes('/admin/orders/') || pathname === '/admin/orders' ? (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1a202c] border-t border-gray-100 dark:border-gray-800 px-4 py-2 lg:hidden z-40">
+          <div className="flex items-center justify-around">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors ${
+                  isActive(item.href)
+                    ? 'text-[#1152d4]'
+                    : 'text-[#616f89]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </nav>
+      ) : null}
     </div>
   );
 }
