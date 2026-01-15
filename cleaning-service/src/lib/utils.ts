@@ -56,17 +56,17 @@ export const WA_TEMPLATES = {
     `Halo ${order.name}, terima kasih telah menghubungi ${BUSINESS_INFO.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity}\n- Estimasi: ${formatCurrency(order.estimatedPrice)}\n\nApakah data sudah benar?`,
   
   orderInProgress: (order: Order) =>
-    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sedang kami proses. Kami akan kabari setelah selesai. Terima kasih 🙏`,
+    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sedang kami proses. Kami akan kabari setelah selesai. Terima kasih \u{1F64F}`,
   
   orderFinished: (order: Order) =>
-    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai! 🎉\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice)}\n\nSilakan cek nota yang kami kirim.`,
+    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai! \u{1F389}\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice)}\n\nSilakan cek nota yang kami kirim.`,
   
   // New status-based templates for admin dashboard
   orderPending: (order: Order) =>
-    `Halo Kak ${order.name} 👋\nTerima kasih sudah mempercayakan perawatan sepatu ke *Teman Cuci Sepatu*.\n\nSaat ini sepatu Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2–3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya 🙏`,
+    `Halo Kak ${order.name} \u{1F44B}\nTerima kasih sudah mempercayakan perawatan sepatu ke *Teman Cuci Sepatu*.\n\nSaat ini sepatu Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2–3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya \u{1F64F}`,
   
   orderCompleted: (order: Order, notaImageUrl?: string) => {
-    let message = `Halo Kak ${order.name} 👋\nKabar baik dari *Teman Cuci Sepatu* 😊\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\nKami lampirkan *nota layanan* sebagai rincian pengerjaan dan biaya.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu* 🙏`;
+    let message = `Halo Kak ${order.name} \u{1F44B}\nKabar baik dari *Teman Cuci Sepatu* \u{1F60A}\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\nKami lampirkan *nota layanan* sebagai rincian pengerjaan dan biaya.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu* \u{1F64F}`;
     
     // Append nota image URL if available (WhatsApp will auto-preview)
     if (notaImageUrl) {
