@@ -112,25 +112,37 @@ function OrderCard({ order }: { order: Order }) {
   };
   
   // Handle sending nota - download image then open WhatsApp
-  const handleSendNota = async () => {
+  const handleSendNota = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!notaUrl) return;
     
     try {
-      // Download the nota image first
+      // Fetch the image as blob to force download (bypass CORS)
+      const response = await fetch(notaUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Create download link
       const link = document.createElement('a');
-      link.href = notaUrl;
+      link.href = blobUrl;
       link.download = `nota-${order.orderNumber}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      // Small delay then open WhatsApp
+      // Clean up blob URL
+      URL.revokeObjectURL(blobUrl);
+      
+      // Small delay then open WhatsApp to customer number
       setTimeout(() => {
         window.open(getNotaWhatsAppLink(), '_blank');
       }, 500);
     } catch (err) {
-      console.error('Error sending nota:', err);
-      window.open(notaUrl, '_blank');
+      console.error('Error downloading nota:', err);
+      // Fallback: just open WhatsApp
+      window.open(getNotaWhatsAppLink(), '_blank');
     }
   };
 
