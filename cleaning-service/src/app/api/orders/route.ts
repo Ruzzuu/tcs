@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { name, phone, address, itemType, quantity, customItemType } = body;
+    const { name, phone, address, itemType, quantity, customItemType, customerNotes } = body;
 
     // Validation
     const errors: string[] = [];
@@ -148,6 +148,7 @@ export async function POST(request: NextRequest) {
       customItemType: itemType === 'other' ? customItemType?.trim() : undefined, 
       quantity,
       estimatedPrice,
+      customerNotes: customerNotes?.trim() || '',
       status: 'pending',
       verification: {
         status: 'unverified'

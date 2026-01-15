@@ -94,7 +94,7 @@ export default function CustomerFormPage() {
             itemType: item.itemType,
             customItemType: item.customItemType,
             quantity: item.quantity,
-            notes: item.notes || '',
+            customerNotes: item.notes || '', // Customer notes from form
             estimatedPrice: itemPrice
           })
         });

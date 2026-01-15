@@ -45,7 +45,8 @@ export interface Order {
   customItemType?: string;
   
   // Notes
-  notes: string;
+  customerNotes?: string; // Notes from customer when ordering
+  notes: string; // Admin internal notes
   
   // Timestamps
   createdAt: Date;

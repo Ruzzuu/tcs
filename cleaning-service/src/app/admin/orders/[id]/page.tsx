@@ -398,7 +398,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Customer Notes */}
-      {order.notes && (
+      {order.customerNotes && (
         <div className="px-4 mt-6">
           <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
             Catatan Customer
@@ -413,7 +413,7 @@ export default function OrderDetailPage() {
                   Catatan dari customer:
                 </p>
                 <p className="text-sm text-amber-900 dark:text-amber-200 whitespace-pre-wrap break-words">
-                  {order.notes}
+                  {order.customerNotes}
                 </p>
               </div>
             </div>

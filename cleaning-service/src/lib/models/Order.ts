@@ -105,7 +105,13 @@ const OrderSchema = new Schema<OrderDocument>(
       publicId: { type: String }
     },
     
-    // Admin notes
+    // Customer notes (from order form)
+    customerNotes: {
+      type: String,
+      default: ''
+    },
+    
+    // Admin notes (internal)
     notes: {
       type: String,
       default: ''
