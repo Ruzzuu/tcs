@@ -22,6 +22,7 @@ export default function AdminLoginPage() {
       try {
         const res = await fetch('/api/auth/verify', {
           credentials: 'include',
+          cache: 'no-store',
         });
         const data = await res.json();
         if (data.authenticated) {

@@ -35,7 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshAuth = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/verify', {
-        credentials: 'include', // Ensure cookies are sent
+        credentials: 'include',
+        cache: 'no-store',
       });
       const data = await res.json();
 
