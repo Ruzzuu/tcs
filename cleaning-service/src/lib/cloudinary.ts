@@ -19,6 +19,7 @@ export const CLOUDINARY_FOLDERS = {
   BEFORE: 'cleaning-app/orders/before',
   AFTER: 'cleaning-app/orders/after',
   INVOICES: 'cleaning-app/invoices',
+  NOTA: 'cleaning-app/nota',
 } as const;
 
 // Allowed file types

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
     
     // Get file and metadata
     const file = formData.get('file') as File | null;
-    const type = formData.get('type') as 'before' | 'after' | 'invoice' | null;
+    const type = formData.get('type') as 'before' | 'after' | 'invoice' | 'nota' | null;
     const orderId = formData.get('orderId') as string | null;
 
     // Validation
@@ -38,9 +38,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
       );
     }
 
-    if (!type || !['before', 'after', 'invoice'].includes(type)) {
+    if (!type || !['before', 'after', 'invoice', 'nota'].includes(type)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid type. Must be: before, after, or invoice' },
+        { success: false, error: 'Invalid type. Must be: before, after, invoice, or nota' },
         { status: 400 }
       );
     }
@@ -83,6 +83,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
         break;
       case 'invoice':
         folder = CLOUDINARY_FOLDERS.INVOICES;
+        break;
+      case 'nota':
+        folder = CLOUDINARY_FOLDERS.NOTA;
         break;
       default:
         folder = CLOUDINARY_FOLDERS.BEFORE;
