@@ -30,12 +30,17 @@ export async function GET(request: NextRequest): Promise<NextResponse<VerifyResp
   };
 
   try {
+    // Debug: log environment
+    console.log('[Verify] ENV Check - JWT_SECRET:', !!process.env.JWT_SECRET);
+    console.log('[Verify] ENV Check - MONGODB_URI:', !!process.env.MONGODB_URI);
+    
     // Read cookie directly from request
     const token = request.cookies.get('admin_session')?.value;
     
-    // Debug: log cookie presence (not the actual token for security)
+    // Debug: log all cookies
+    const allCookies = request.cookies.getAll();
+    console.log('[Verify] All cookies:', allCookies.map(c => c.name));
     console.log('[Verify] Cookie present:', !!token);
-    console.log('[Verify] JWT_SECRET set:', !!process.env.JWT_SECRET);
     
     if (!token) {
       console.log('[Verify] No token found in cookies');
@@ -44,25 +49,35 @@ export async function GET(request: NextRequest): Promise<NextResponse<VerifyResp
 
     const payload = verifyAuthToken(token);
     console.log('[Verify] Token verification result:', !!payload);
+    if (payload) {
+      console.log('[Verify] Payload adminId:', payload.adminId);
+    }
     
     if (!payload) {
-      console.log('[Verify] Token verification failed');
+      console.log('[Verify] Token verification failed - invalid JWT');
       return NextResponse.json({ authenticated: false }, { headers });
     }
 
+    console.log('[Verify] Connecting to MongoDB...');
     await connectDB();
+    console.log('[Verify] MongoDB connected');
 
     const admin = await Admin.findById(payload.adminId).select('username email sessionVersion');
+    console.log('[Verify] Admin found:', !!admin);
     
     if (!admin) {
+      console.log('[Verify] Admin not found in database');
       return NextResponse.json({ authenticated: false }, { headers });
     }
 
     // Check if session version matches (for invalidating sessions)
+    console.log('[Verify] Session version check:', admin.sessionVersion, '===', payload.sessionVersion);
     if (admin.sessionVersion !== payload.sessionVersion) {
+      console.log('[Verify] Session version mismatch');
       return NextResponse.json({ authenticated: false }, { headers });
     }
 
+    console.log('[Verify] SUCCESS - Admin authenticated:', admin.username);
     return NextResponse.json({
       authenticated: true,
       admin: {
