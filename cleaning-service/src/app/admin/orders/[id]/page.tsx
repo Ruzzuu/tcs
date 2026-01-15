@@ -397,6 +397,30 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
+      {/* Customer Notes */}
+      {order.notes && (
+        <div className="px-4 mt-6">
+          <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
+            Catatan Customer
+          </h3>
+          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center rounded-lg shrink-0 size-10">
+                <span className="material-symbols-outlined text-[20px]">sticky_note_2</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">
+                  Catatan dari customer:
+                </p>
+                <p className="text-sm text-amber-900 dark:text-amber-200 whitespace-pre-wrap break-words">
+                  {order.notes}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Proof of Work */}
       <div className="px-4 mt-6">
         <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
