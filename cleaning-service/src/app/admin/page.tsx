@@ -98,7 +98,7 @@ function OrderCard({ order }: { order: Order }) {
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
   
-  // Generate WhatsApp link for nota
+  // Generate WhatsApp link for nota (fallback for desktop)
   const getNotaWhatsAppLink = () => {
     let cleanPhone = order.phone.replace(/[\s\-()]/g, '');
     if (cleanPhone.startsWith('0')) {
@@ -111,7 +111,7 @@ function OrderCard({ order }: { order: Order }) {
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
   };
   
-  // Handle sending nota - download image then open WhatsApp
+  // Handle sending nota - use Web Share API for mobile (image attached directly!)
   const handleSendNota = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -119,28 +119,39 @@ function OrderCard({ order }: { order: Order }) {
     if (!notaUrl) return;
     
     try {
-      // Fetch the image as blob to force download (bypass CORS)
+      // Fetch the nota image as blob
       const response = await fetch(notaUrl);
       const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
       
-      // Create download link
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `nota-${order.orderNumber}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Create a File object from blob
+      const file = new File([blob], `nota-${order.orderNumber}.png`, { type: 'image/png' });
       
-      // Clean up blob URL
-      URL.revokeObjectURL(blobUrl);
-      
-      // Small delay then open WhatsApp to customer number
-      setTimeout(() => {
-        window.open(getNotaWhatsAppLink(), '_blank');
-      }, 500);
+      // Check if Web Share API with files is supported (mobile)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Mobile: Use Web Share API - image will be attached directly!
+        await navigator.share({
+          files: [file],
+          title: `Nota ${order.orderNumber}`,
+          text: `Halo Kak ${order.name}, berikut nota layanan dari Teman Cuci Sepatu. Total: Rp ${order.finalPrice?.toLocaleString('id-ID') || order.estimatedPrice.toLocaleString('id-ID')}`,
+        });
+      } else {
+        // Desktop fallback: Download image + open WhatsApp
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `nota-${order.orderNumber}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+        
+        // Open WhatsApp after download
+        setTimeout(() => {
+          window.open(getNotaWhatsAppLink(), '_blank');
+        }, 500);
+      }
     } catch (err) {
-      console.error('Error downloading nota:', err);
+      console.error('Error sending nota:', err);
       // Fallback: just open WhatsApp
       window.open(getNotaWhatsAppLink(), '_blank');
     }
