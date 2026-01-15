@@ -31,8 +31,10 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Redirect - middleware will handle auth check
-        window.location.href = '/admin';
+        // Wait for cookie to be properly set by browser before redirect
+        setTimeout(() => {
+          window.location.replace('/admin');
+        }, 200);
         return;
       } else {
         setError(data.message || 'Login gagal');

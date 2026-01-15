@@ -13,8 +13,8 @@ const publicRoutes = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Skip non-admin routes
-  if (!pathname.startsWith('/admin')) {
+  // Skip non-admin routes and API routes
+  if (!pathname.startsWith('/admin') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
   
@@ -25,12 +25,13 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('admin_session')?.value;
   
   // If accessing protected admin route without token, redirect to login
-  if (!isPublicRoute && pathname.startsWith('/admin') && !token) {
+  if (!isPublicRoute && !token) {
     const loginUrl = new URL('/admin/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
   
-  // If accessing login page with valid token, redirect to admin dashboard
+  // If accessing login page with token, redirect to admin dashboard
+  // But only for exact /admin/login path to avoid loops
   if (pathname === '/admin/login' && token) {
     const adminUrl = new URL('/admin', request.url);
     return NextResponse.redirect(adminUrl);
@@ -40,5 +41,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [
+    // Match admin routes but exclude API and static files
+    '/admin/:path*',
+  ],
 };
