@@ -9,7 +9,6 @@ import Admin from '@/lib/models/Admin';
 import {
   verifyPassword,
   generateAuthToken,
-  setAuthCookie,
   checkRateLimit,
   clearRateLimit,
 } from '@/lib/auth';
@@ -86,13 +85,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     admin.lastLoginAt = new Date();
     await admin.save();
 
-    // Generate token and set cookie
+    // Generate token
     const token = generateAuthToken(admin._id.toString(), admin.sessionVersion);
-    console.log('[Login] Generated token for admin:', admin.username);
-    await setAuthCookie(token);
-    console.log('[Login] Cookie set successfully');
+    
+    // Create response and set cookie directly on it
+    const response = NextResponse.json({ success: true });
+    response.cookies.set('admin_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    });
 
-    return NextResponse.json({ success: true });
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
