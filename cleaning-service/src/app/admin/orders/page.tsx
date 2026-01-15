@@ -237,10 +237,7 @@ export default function OrdersPage() {
                   <p className="text-sm font-bold text-[#111318] dark:text-white">
                     {formatCurrency(order.finalPrice || order.estimatedPrice)}
                   </p>
-                  <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-[#25D366]">
-                    <span className="material-symbols-outlined text-[14px]">chat</span>
-                    WA
-                  </span>
+                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
                 </div>
               </Link>
 
