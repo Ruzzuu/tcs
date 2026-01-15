@@ -90,9 +90,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     
     // Create response and set cookie directly on it
     const response = NextResponse.json({ success: true });
+    
+    // Set cookie with proper settings for Vercel
     response.cookies.set('admin_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // Always true for Vercel HTTPS
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',

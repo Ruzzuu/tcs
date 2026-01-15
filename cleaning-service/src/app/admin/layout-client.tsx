@@ -41,15 +41,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     );
   }
 
-  // If not authenticated after loading, redirect to login
+  // If not authenticated after loading, show login message instead of redirect loop
   if (!admin) {
-    // Redirect to login
-    if (typeof window !== 'undefined') {
-      window.location.href = '/admin/login';
-    }
     return (
-      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center flex-col gap-4">
+        <p className="text-gray-600">Silakan login terlebih dahulu</p>
+        <a href="/admin/login" className="px-6 py-3 bg-[#1152d4] text-white rounded-xl hover:bg-blue-700">
+          Login
+        </a>
       </div>
     );
   }
