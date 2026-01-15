@@ -5,7 +5,7 @@
 // ============================================
 // Public page - allows admin to login
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -14,28 +14,6 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  // Check if already authenticated on mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/verify', {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-        const data = await res.json();
-        if (data.authenticated) {
-          window.location.replace('/admin');
-          return;
-        }
-      } catch (e) {
-        console.error('Auth check failed:', e);
-      }
-      setIsCheckingAuth(false);
-    };
-    checkAuth();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +31,7 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Force reload to ensure cookie is read properly
+        // Redirect to admin - full page reload ensures cookie is sent
         window.location.href = '/admin';
         return;
       } else {
@@ -66,15 +44,6 @@ export default function AdminLoginPage() {
       setIsLoading(false);
     }
   };
-
-  // Show loading while checking auth
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center p-6">
