@@ -98,37 +98,38 @@ function OrderCard({ order }: { order: Order }) {
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
   
-  // Handle sending nota image to WhatsApp
+  // Generate WhatsApp link for nota
+  const getNotaWhatsAppLink = () => {
+    let cleanPhone = order.phone.replace(/[\s\-()]/g, '');
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '62' + cleanPhone.slice(1);
+    }
+    cleanPhone = cleanPhone.replace(/^\+/, '');
+    
+    const message = `Halo Kak ${order.name},\nBerikut nota layanan dari *Teman Cuci Sepatu*.\n\nTotal Biaya: *Rp ${order.finalPrice?.toLocaleString('id-ID') || order.estimatedPrice.toLocaleString('id-ID')}*\n\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`;
+    
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+  };
+  
+  // Handle sending nota - download image then open WhatsApp
   const handleSendNota = async () => {
     if (!notaUrl) return;
     
     try {
-      // Fetch the image and convert to blob
-      const response = await fetch(notaUrl);
-      const blob = await response.blob();
-      const file = new File([blob], `nota-${order.orderNumber}.png`, { type: 'image/png' });
+      // Download the nota image first
+      const link = document.createElement('a');
+      link.href = notaUrl;
+      link.download = `nota-${order.orderNumber}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      // Check if Web Share API is supported with files
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: `Nota ${order.orderNumber}`,
-          text: `Nota layanan untuk ${order.name}`
-        });
-      } else {
-        // Fallback: download the image
-        const link = document.createElement('a');
-        link.href = notaUrl;
-        link.download = `nota-${order.orderNumber}.png`;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        alert('Gambar nota sudah didownload. Silakan kirim manual ke WhatsApp.');
-      }
+      // Small delay then open WhatsApp
+      setTimeout(() => {
+        window.open(getNotaWhatsAppLink(), '_blank');
+      }, 500);
     } catch (err) {
-      console.error('Error sharing nota:', err);
-      // Fallback: open image in new tab
+      console.error('Error sending nota:', err);
       window.open(notaUrl, '_blank');
     }
   };
