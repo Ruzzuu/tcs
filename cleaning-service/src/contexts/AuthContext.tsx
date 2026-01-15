@@ -6,7 +6,6 @@
 // Provides authentication state across admin pages
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
 
 interface Admin {
   id: string;
@@ -30,7 +29,6 @@ const publicRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-pa
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const pathname = usePathname();
 
   const refreshAuth = useCallback(async () => {
     try {
@@ -57,20 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshAuth();
   }, [refreshAuth]);
 
-  useEffect(() => {
-    // Only redirect if not loading and not on a public route already
-    // Let the layout handle showing appropriate content
-    if (isLoading) return;
-
-    const isPublicRoute = publicRoutes.some(route => pathname?.startsWith(route));
-
-    if (!admin && !isPublicRoute && pathname?.startsWith('/admin')) {
-      // Not authenticated and trying to access protected route
-      // Use window.location for a clean redirect
-      window.location.href = '/admin/login';
-    }
-    // Don't auto-redirect from login to admin - let the login page handle that
-  }, [admin, isLoading, pathname]);
+  // Remove automatic redirects - let components handle their own redirects
+  // This prevents redirect loops
 
   const logout = useCallback(async () => {
     try {

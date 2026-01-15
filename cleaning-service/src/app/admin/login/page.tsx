@@ -55,9 +55,25 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Use window.location for a full page reload to ensure AuthContext re-verifies
-        window.location.href = '/admin';
-        return; // Prevent finally block from setting isLoading = false
+        // Small delay to ensure cookie is properly set by browser
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Verify the cookie was set correctly before redirecting
+        const verifyRes = await fetch('/api/auth/verify', {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        const verifyData = await verifyRes.json();
+        
+        if (verifyData.authenticated) {
+          // Cookie confirmed, safe to redirect
+          window.location.href = '/admin';
+          return;
+        } else {
+          // Cookie not set properly, try redirect anyway
+          window.location.href = '/admin';
+          return;
+        }
       } else {
         setError(data.message || 'Login gagal');
       }
