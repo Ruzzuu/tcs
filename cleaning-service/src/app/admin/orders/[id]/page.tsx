@@ -312,7 +312,7 @@ export default function OrderDetailPage() {
 
           {/* Phone */}
           <a
-            href={generateStatusBasedWhatsAppLink(order, order.notaImage?.url)}
+            href={generateStatusBasedWhatsAppLink(order)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"

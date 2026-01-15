@@ -95,8 +95,43 @@ function OrderCard({ order }: { order: Order }) {
   const afterUrl = typeof afterPhoto === 'object' && afterPhoto?.url ? afterPhoto.url : (typeof afterPhoto === 'string' ? afterPhoto : null);
   const hasProofOfWork = beforeUrl || afterUrl;
   
-  // Get nota image URL for WhatsApp (prioritize nota over after photo)
+  // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
+  
+  // Handle sending nota image to WhatsApp
+  const handleSendNota = async () => {
+    if (!notaUrl) return;
+    
+    try {
+      // Fetch the image and convert to blob
+      const response = await fetch(notaUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `nota-${order.orderNumber}.png`, { type: 'image/png' });
+      
+      // Check if Web Share API is supported with files
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `Nota ${order.orderNumber}`,
+          text: `Nota layanan untuk ${order.name}`
+        });
+      } else {
+        // Fallback: download the image
+        const link = document.createElement('a');
+        link.href = notaUrl;
+        link.download = `nota-${order.orderNumber}.png`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert('Gambar nota sudah didownload. Silakan kirim manual ke WhatsApp.');
+      }
+    } catch (err) {
+      console.error('Error sharing nota:', err);
+      // Fallback: open image in new tab
+      window.open(notaUrl, '_blank');
+    }
+  };
 
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
@@ -160,8 +195,19 @@ function OrderCard({ order }: { order: Order }) {
           {getStatusLabel(order.status)}
         </span>
         <div className="flex items-center gap-2">
+          {/* Nota Button - Only show for finished orders with nota */}
+          {order.status === 'finished' && notaUrl && (
+            <button
+              onClick={handleSendNota}
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              title="Kirim nota ke WhatsApp"
+            >
+              <span className="material-symbols-outlined text-[16px]">receipt_long</span>
+              <span className="text-xs font-bold">Nota</span>
+            </button>
+          )}
           <a
-            href={generateStatusBasedWhatsAppLink(order, notaUrl || undefined)}
+            href={generateStatusBasedWhatsAppLink(order)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
