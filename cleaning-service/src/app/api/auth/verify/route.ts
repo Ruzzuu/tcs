@@ -33,12 +33,20 @@ export async function GET(request: NextRequest): Promise<NextResponse<VerifyResp
     // Read cookie directly from request
     const token = request.cookies.get('admin_session')?.value;
     
+    // Debug: log cookie presence (not the actual token for security)
+    console.log('[Verify] Cookie present:', !!token);
+    console.log('[Verify] JWT_SECRET set:', !!process.env.JWT_SECRET);
+    
     if (!token) {
+      console.log('[Verify] No token found in cookies');
       return NextResponse.json({ authenticated: false }, { headers });
     }
 
     const payload = verifyAuthToken(token);
+    console.log('[Verify] Token verification result:', !!payload);
+    
     if (!payload) {
+      console.log('[Verify] Token verification failed');
       return NextResponse.json({ authenticated: false }, { headers });
     }
 
