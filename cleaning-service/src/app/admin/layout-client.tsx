@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 }
 
 // Public routes that don't need the admin shell (header, nav)
-const publicAuthRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/recovery'];
+const publicAuthRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/recovery', '/admin/seed'];
 
 function AdminLayoutContent({ children }: AdminLayoutProps) {
   const pathname = usePathname();
