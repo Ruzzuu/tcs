@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order } from '@/types';
-import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateWhatsAppLink, WA_TEMPLATES } from '@/lib/utils';
+import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateStatusBasedWhatsAppLink } from '@/lib/utils';
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
@@ -158,7 +158,7 @@ function OrderCard({ order }: { order: Order }) {
         </span>
         <div className="flex items-center gap-2">
           <a
-            href={generateWhatsAppLink(order.phone, WA_TEMPLATES.orderInProgress(order))}
+            href={generateStatusBasedWhatsAppLink(order, afterUrl || undefined)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"

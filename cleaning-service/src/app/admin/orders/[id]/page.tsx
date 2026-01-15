@@ -9,8 +9,7 @@ import {
   formatPhoneNumber, 
   getStatusColor, 
   getStatusLabel,
-  generateWhatsAppLink,
-  WA_TEMPLATES
+  generateStatusBasedWhatsAppLink
 } from '@/lib/utils';
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
@@ -275,7 +274,7 @@ export default function OrderDetailPage() {
 
           {/* Phone */}
           <a
-            href={generateWhatsAppLink(order.phone, WA_TEMPLATES.orderInProgress(order))}
+            href={generateStatusBasedWhatsAppLink(order, proofOfWork.afterPhotos[0]?.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"

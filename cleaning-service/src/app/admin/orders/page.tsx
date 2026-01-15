@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Order, OrderStatus } from '@/types';
-import { formatCurrency, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateWhatsAppLink } from '@/lib/utils';
+import { formatCurrency, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel } from '@/lib/utils';
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 

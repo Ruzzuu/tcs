@@ -59,8 +59,48 @@ export const WA_TEMPLATES = {
     `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sedang kami proses. Kami akan kabari setelah selesai. Terima kasih 🙏`,
   
   orderFinished: (order: Order) =>
-    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai! 🎉\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice)}\n\nSilakan cek nota yang kami kirim.`
+    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai! 🎉\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice)}\n\nSilakan cek nota yang kami kirim.`,
+  
+  // New status-based templates for admin dashboard
+  orderPending: (order: Order) =>
+    `Halo Kak ${order.name} 👋\nTerima kasih sudah mempercayakan perawatan sepatu ke *Teman Cuci Sepatu*.\n\nSaat ini sepatu Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2–3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya 🙏`,
+  
+  orderCompleted: (order: Order, notaImageUrl?: string) => {
+    let message = `Halo Kak ${order.name} 👋\nKabar baik dari *Teman Cuci Sepatu* 😊\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\nKami lampirkan *nota layanan* sebagai rincian pengerjaan dan biaya.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu* 🙏`;
+    
+    // Append nota image URL if available (WhatsApp will auto-preview)
+    if (notaImageUrl) {
+      message += `\n\n${notaImageUrl}`;
+    }
+    
+    return message;
+  }
 };
+
+/**
+ * Get WhatsApp message based on order status
+ * This function returns the appropriate message template based on order status
+ */
+export function getWhatsAppMessageByStatus(order: Order, notaImageUrl?: string): string {
+  switch (order.status) {
+    case 'pending':
+      return WA_TEMPLATES.orderPending(order);
+    case 'finished':
+      return WA_TEMPLATES.orderCompleted(order, notaImageUrl);
+    default:
+      // Keep existing behavior for other statuses
+      return WA_TEMPLATES.orderInProgress(order);
+  }
+}
+
+/**
+ * Generate WhatsApp link based on order status
+ * Convenience function that combines phone formatting and status-based messaging
+ */
+export function generateStatusBasedWhatsAppLink(order: Order, notaImageUrl?: string): string {
+  const message = getWhatsAppMessageByStatus(order, notaImageUrl);
+  return generateWhatsAppLink(order.phone, message);
+}
 
 /**
  * Validate Indonesian phone number
