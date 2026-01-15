@@ -6,7 +6,7 @@
 // Provides authentication state across admin pages
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface Admin {
   id: string;
@@ -30,12 +30,13 @@ const publicRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-pa
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
   const pathname = usePathname();
 
   const refreshAuth = useCallback(async () => {
     try {
-      const res = await fetch('/api/auth/verify');
+      const res = await fetch('/api/auth/verify', {
+        credentials: 'include', // Ensure cookies are sent
+      });
       const data = await res.json();
 
       if (data.authenticated && data.admin) {
@@ -56,29 +57,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshAuth]);
 
   useEffect(() => {
-    // Skip redirect logic while loading
+    // Only redirect if not loading and not on a public route already
+    // Let the layout handle showing appropriate content
     if (isLoading) return;
 
     const isPublicRoute = publicRoutes.some(route => pathname?.startsWith(route));
 
     if (!admin && !isPublicRoute && pathname?.startsWith('/admin')) {
       // Not authenticated and trying to access protected route
-      router.replace('/admin/login');
-    } else if (admin && isPublicRoute) {
-      // Authenticated but on public route - redirect to admin
-      router.replace('/admin');
+      // Use window.location for a clean redirect
+      window.location.href = '/admin/login';
     }
-  }, [admin, isLoading, pathname, router]);
+    // Don't auto-redirect from login to admin - let the login page handle that
+  }, [admin, isLoading, pathname]);
 
   const logout = useCallback(async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       setAdmin(null);
-      router.replace('/admin/login');
+      window.location.href = '/admin/login';
     } catch (error) {
       console.error('Logout error:', error);
     }
-  }, [router]);
+  }, []);
 
   return (
     <AuthContext.Provider

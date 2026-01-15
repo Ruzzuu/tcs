@@ -6,11 +6,9 @@
 // Public page - allows admin to login
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [identifier, setIdentifier] = useState(''); // email or username
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,10 +20,14 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/verify');
+        const res = await fetch('/api/auth/verify', {
+          credentials: 'include',
+        });
         const data = await res.json();
         if (data.authenticated) {
-          router.replace('/admin');
+          // Use window.location for consistent redirect behavior
+          window.location.href = '/admin';
+          return;
         }
       } catch (error) {
         console.error('Auth check error:', error);
@@ -34,7 +36,7 @@ export default function AdminLoginPage() {
       }
     };
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,12 +48,15 @@ export default function AdminLoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password }),
+        credentials: 'include',
       });
 
       const data = await res.json();
 
       if (data.success) {
-        router.replace('/admin');
+        // Use window.location for a full page reload to ensure AuthContext re-verifies
+        window.location.href = '/admin';
+        return; // Prevent finally block from setting isLoading = false
       } else {
         setError(data.message || 'Login gagal');
       }

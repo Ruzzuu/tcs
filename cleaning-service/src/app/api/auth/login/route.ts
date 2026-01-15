@@ -88,7 +88,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
 
     // Generate token and set cookie
     const token = generateAuthToken(admin._id.toString(), admin.sessionVersion);
+    console.log('[Login] Generated token for admin:', admin.username);
     await setAuthCookie(token);
+    console.log('[Login] Cookie set successfully');
 
     return NextResponse.json({ success: true });
   } catch (error) {
