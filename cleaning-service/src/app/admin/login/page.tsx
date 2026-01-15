@@ -5,7 +5,7 @@
 // ============================================
 // Public page - allows admin to login
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -14,30 +14,6 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [checkingAuth, setCheckingAuth] = useState(true);
-
-  // Check if already logged in
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/verify', {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-        const data = await res.json();
-        if (data.authenticated) {
-          // Use window.location for consistent redirect behavior
-          window.location.href = '/admin';
-          return;
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-    checkAuth();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,25 +31,9 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Small delay to ensure cookie is properly set by browser
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Verify the cookie was set correctly before redirecting
-        const verifyRes = await fetch('/api/auth/verify', {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-        const verifyData = await verifyRes.json();
-        
-        if (verifyData.authenticated) {
-          // Cookie confirmed, safe to redirect
-          window.location.href = '/admin';
-          return;
-        } else {
-          // Cookie not set properly, try redirect anyway
-          window.location.href = '/admin';
-          return;
-        }
+        // Redirect - middleware will handle auth check
+        window.location.href = '/admin';
+        return;
       } else {
         setError(data.message || 'Login gagal');
       }
@@ -84,14 +44,6 @@ export default function AdminLoginPage() {
       setIsLoading(false);
     }
   };
-
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center p-6">
