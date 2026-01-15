@@ -230,7 +230,7 @@ export default function PendingPage() {
       </div>
 
       {/* Filter Chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+      <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar -mx-4 px-4">
         <button
           onClick={() => setFilter('all')}
           className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-5 shadow-sm transition-transform active:scale-95 ${

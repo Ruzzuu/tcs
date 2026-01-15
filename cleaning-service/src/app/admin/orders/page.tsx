@@ -144,7 +144,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Status Filter */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
         {statusOptions.map(option => (
           <button
             key={option.value}
