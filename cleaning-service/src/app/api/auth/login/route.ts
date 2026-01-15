@@ -15,24 +15,29 @@ import {
 } from '@/lib/auth';
 
 interface LoginRequest {
-  username: string;
+  identifier?: string;  // email or username (from login page)
+  username?: string;    // legacy support
   password: string;
 }
 
 interface LoginResponse {
   success: boolean;
+  message?: string;
   error?: string;
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<LoginResponse>> {
   try {
     const body: LoginRequest = await request.json();
-    const { username, password } = body;
+    const { identifier, username, password } = body;
+    
+    // Support both 'identifier' and 'username' fields
+    const loginIdentifier = identifier || username;
 
     // Validation
-    if (!username || !password) {
+    if (!loginIdentifier || !password) {
       return NextResponse.json(
-        { success: false, error: 'Username dan password diperlukan' },
+        { success: false, message: 'Username/email dan password diperlukan' },
         { status: 400 }
       );
     }
@@ -41,22 +46,26 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        { success: false, error: 'Terlalu banyak percobaan. Coba lagi dalam 15 menit.' },
+        { success: false, message: 'Terlalu banyak percobaan. Coba lagi dalam 15 menit.' },
         { status: 429 }
       );
     }
 
     await connectDB();
 
-    // Find admin by username (case-insensitive)
+    // Find admin by username OR email (case-insensitive)
+    const searchValue = loginIdentifier.toLowerCase().trim();
     const admin = await Admin.findOne({ 
-      username: username.toLowerCase().trim() 
+      $or: [
+        { username: searchValue },
+        { email: searchValue }
+      ]
     });
 
     // Generic error message to prevent user enumeration
     if (!admin) {
       return NextResponse.json(
-        { success: false, error: 'Username atau password salah' },
+        { success: false, message: 'Username atau password salah' },
         { status: 401 }
       );
     }
@@ -65,7 +74,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     const isValid = await verifyPassword(password, admin.passwordHash);
     if (!isValid) {
       return NextResponse.json(
-        { success: false, error: 'Username atau password salah' },
+        { success: false, message: 'Username atau password salah' },
         { status: 401 }
       );
     }
