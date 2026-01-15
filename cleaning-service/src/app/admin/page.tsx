@@ -98,63 +98,15 @@ function OrderCard({ order }: { order: Order }) {
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
   
-  // Generate WhatsApp link for nota (fallback for desktop)
-  const getNotaWhatsAppLink = () => {
-    let cleanPhone = order.phone.replace(/[\s\-()]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '62' + cleanPhone.slice(1);
+  // Format phone number for display
+  const formatPhoneDisplay = (phone: string) => {
+    // Remove all non-digits
+    let cleaned = phone.replace(/\D/g, '');
+    // Format: 0857-3185-4878
+    if (cleaned.startsWith('62')) {
+      cleaned = '0' + cleaned.slice(2);
     }
-    cleanPhone = cleanPhone.replace(/^\+/, '');
-    
-    const message = `Halo Kak ${order.name},\nBerikut nota layanan dari *Teman Cuci Sepatu*.\n\nTotal Biaya: *Rp ${order.finalPrice?.toLocaleString('id-ID') || order.estimatedPrice.toLocaleString('id-ID')}*\n\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`;
-    
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  };
-  
-  // Handle sending nota - use Web Share API for mobile (image attached directly!)
-  const handleSendNota = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!notaUrl) return;
-    
-    try {
-      // Fetch the nota image as blob
-      const response = await fetch(notaUrl);
-      const blob = await response.blob();
-      
-      // Create a File object from blob
-      const file = new File([blob], `nota-${order.orderNumber}.png`, { type: 'image/png' });
-      
-      // Check if Web Share API with files is supported (mobile)
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        // Mobile: Use Web Share API - image will be attached directly!
-        await navigator.share({
-          files: [file],
-          title: `Nota ${order.orderNumber}`,
-          text: `Halo Kak ${order.name}, berikut nota layanan dari Teman Cuci Sepatu. Total: Rp ${order.finalPrice?.toLocaleString('id-ID') || order.estimatedPrice.toLocaleString('id-ID')}`,
-        });
-      } else {
-        // Desktop fallback: Download image + open WhatsApp
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = `nota-${order.orderNumber}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        
-        // Open WhatsApp after download
-        setTimeout(() => {
-          window.open(getNotaWhatsAppLink(), '_blank');
-        }, 500);
-      }
-    } catch (err) {
-      console.error('Error sending nota:', err);
-      // Fallback: just open WhatsApp
-      window.open(getNotaWhatsAppLink(), '_blank');
-    }
+    return cleaned.replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3');
   };
 
   return (
@@ -219,25 +171,16 @@ function OrderCard({ order }: { order: Order }) {
           {getStatusLabel(order.status)}
         </span>
         <div className="flex items-center gap-2">
-          {/* Nota Button - Only show for finished orders with nota */}
-          {order.status === 'finished' && notaUrl && (
-            <button
-              onClick={handleSendNota}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-              title="Kirim nota ke WhatsApp"
-            >
-              <span className="material-symbols-outlined text-[16px]">receipt_long</span>
-              <span className="text-xs font-bold">Nota</span>
-            </button>
-          )}
+          {/* Phone Number - Opens WhatsApp directly */}
           <a
             href={generateStatusBasedWhatsAppLink(order)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+            className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+            title="Chat WhatsApp"
           >
-            <span className="text-xs font-bold">WhatsApp</span>
-            <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
+            <span className="material-symbols-outlined text-[16px]">phone</span>
+            <span className="text-xs font-medium">{formatPhoneDisplay(order.phone)}</span>
           </a>
           <Link
             href={`/admin/orders/${order._id}`}
