@@ -3,10 +3,10 @@
 // ============================================
 // GET /api/auth/verify - Check if session is valid
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Admin from '@/lib/models/Admin';
-import { getAuthCookie, verifyAuthToken } from '@/lib/auth';
+import { verifyAuthToken } from '@/lib/auth';
 
 interface VerifyResponse {
   authenticated: boolean;
@@ -21,7 +21,7 @@ interface VerifyResponse {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET(): Promise<NextResponse<VerifyResponse>> {
+export async function GET(request: NextRequest): Promise<NextResponse<VerifyResponse>> {
   // Create response headers to prevent caching
   const headers = {
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -30,7 +30,8 @@ export async function GET(): Promise<NextResponse<VerifyResponse>> {
   };
 
   try {
-    const token = await getAuthCookie();
+    // Read cookie directly from request
+    const token = request.cookies.get('admin_session')?.value;
     
     if (!token) {
       return NextResponse.json({ authenticated: false }, { headers });

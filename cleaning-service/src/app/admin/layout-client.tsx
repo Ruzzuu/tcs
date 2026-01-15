@@ -41,9 +41,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     );
   }
 
-  // If not authenticated after loading, middleware should have redirected
-  // But show spinner as fallback
+  // If not authenticated after loading, redirect to login
   if (!admin) {
+    // Redirect to login
+    if (typeof window !== 'undefined') {
+      window.location.href = '/admin/login';
+    }
     return (
       <div className="min-h-screen bg-[#f6f6f8] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
