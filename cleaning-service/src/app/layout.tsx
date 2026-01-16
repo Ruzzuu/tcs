@@ -29,8 +29,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="light" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
+        {/* Prevent flash of unstyled content for dark mode */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 
+                  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+              })();
+            `,
+          }}
+        />
         {/* Material Icons */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
