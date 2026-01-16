@@ -509,66 +509,84 @@ export default function OrderDetailPage() {
           width: '400px', 
           backgroundColor: '#ffffff', 
           padding: '24px',
-          fontFamily: 'Arial, sans-serif',
-          backgroundImage: 'url(https://res.cloudinary.com/dncpyspjq/image/upload/e_blur:2000,o_10/v1768543427/logo_tcs_keooto.png)',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: '280px'
+          fontFamily: 'Arial, sans-serif'
         }}
       >
-        <div style={{ textAlign: 'center', borderBottom: '2px dashed #d1d5db', paddingBottom: '16px', marginBottom: '16px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>TEMAN CUCI SEPATU</h1>
-          <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>Layanan Cuci Profesional</p>
-          <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', marginBottom: 0, lineHeight: '1.4' }}>Teman Cuci Sepatu, Jl. Keputih Tegal No.36C, Keputih, Kec. Sukolilo, Surabaya, Jawa Timur 60111</p>
-        </div>
+        {/* Background Logo Image */}
+        <img 
+          src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/v1768543427/logo_tcs_keooto.png"
+          alt=""
+          crossOrigin="anonymous"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: 0.08,
+            filter: 'blur(3px)',
+            width: '280px',
+            height: 'auto',
+            zIndex: 0,
+            pointerEvents: 'none'
+          }}
+        />
         
-        <div style={{ fontSize: '14px', marginBottom: '16px', color: '#374151' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>No. Nota:</span>
-            <span>{order.orderNumber}</span>
+        {/* Content with relative positioning */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ textAlign: 'center', borderBottom: '2px dashed #d1d5db', paddingBottom: '16px', marginBottom: '16px' }}>
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>TEMAN CUCI SEPATU</h1>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>Layanan Cuci Profesional</p>
+            <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', marginBottom: 0, lineHeight: '1.4' }}>Teman Cuci Sepatu, Jl. Keputih Tegal No.36C, Keputih, Kec. Sukolilo, Surabaya, Jawa Timur 60111</p>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>Tanggal:</span>
-            <span>{formatDate(new Date())}</span>
+          
+          <div style={{ fontSize: '14px', marginBottom: '16px', color: '#374151' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontWeight: '500' }}>No. Nota:</span>
+              <span>{order.orderNumber}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontWeight: '500' }}>Tanggal:</span>
+              <span>{formatDate(new Date())}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontWeight: '500' }}>Jam:</span>
+              <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontWeight: '500' }}>Nama:</span>
+              <span>{order.name}</span>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>Jam:</span>
-            <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>Nama:</span>
-            <span>{order.name}</span>
-          </div>
-        </div>
         
-        <div style={{ borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '12px 0', margin: '12px 0' }}>
-          <table style={{ width: '100%', fontSize: '14px', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ color: '#6b7280' }}>
-                <th style={{ textAlign: 'left', padding: '4px 0', fontWeight: '500' }}>Item</th>
-                <th style={{ textAlign: 'center', fontWeight: '500' }}>Qty</th>
-                <th style={{ textAlign: 'right', fontWeight: '500' }}>Harga</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ color: '#1f2937' }}>
-                <td style={{ padding: '8px 0' }}>{serviceName}</td>
-                <td style={{ textAlign: 'center' }}>{order.quantity}</td>
-                <td style={{ textAlign: 'right' }}>{formatCurrency(finalPrice || order.estimatedPrice)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <div style={{ textAlign: 'right', marginBottom: '24px' }}>
-          <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-            Total: {formatCurrency(finalPrice || order.estimatedPrice)}
-          </p>
-        </div>
-        
-        <div style={{ textAlign: 'center', borderTop: '2px dashed #d1d5db', paddingTop: '16px' }}>
-          <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Terima kasih telah menggunakan jasa kami!</p>
-          <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', marginBottom: 0 }}>Simpan nota ini sebagai bukti pembayaran</p>
+          <div style={{ borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '12px 0', margin: '12px 0' }}>
+            <table style={{ width: '100%', fontSize: '14px', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ color: '#6b7280' }}>
+                  <th style={{ textAlign: 'left', padding: '4px 0', fontWeight: '500' }}>Item</th>
+                  <th style={{ textAlign: 'center', fontWeight: '500' }}>Qty</th>
+                  <th style={{ textAlign: 'right', fontWeight: '500' }}>Harga</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ color: '#1f2937' }}>
+                  <td style={{ padding: '8px 0' }}>{serviceName}</td>
+                  <td style={{ textAlign: 'center' }}>{order.quantity}</td>
+                  <td style={{ textAlign: 'right' }}>{formatCurrency(finalPrice || order.estimatedPrice)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div style={{ textAlign: 'right', marginBottom: '24px' }}>
+            <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+              Total: {formatCurrency(finalPrice || order.estimatedPrice)}
+            </p>
+          </div>
+          
+          <div style={{ textAlign: 'center', borderTop: '2px dashed #d1d5db', paddingTop: '16px' }}>
+            <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Terima kasih telah menggunakan jasa kami!</p>
+            <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', marginBottom: 0 }}>Simpan nota ini sebagai bukti pembayaran</p>
+          </div>
         </div>
       </div>
 
