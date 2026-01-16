@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
         <div className="mb-10 flex flex-col items-center">
           <div className="mb-4">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
               alt="Teman Cuci Sepatu" 
               className="w-24 h-24 object-contain"
             />

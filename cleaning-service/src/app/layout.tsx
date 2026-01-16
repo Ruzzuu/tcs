@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#1152d4",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -37,8 +37,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
         {/* PWA & Favicon */}
-        <link rel="icon" type="image/png" href="https://res.cloudinary.com/dncpyspjq/image/upload/w_32,h_32,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
-        <link rel="apple-touch-icon" href="https://res.cloudinary.com/dncpyspjq/image/upload/w_180,h_180,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/w_32,h_32,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
+        <link rel="apple-touch-icon" href="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/w_180,h_180,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Teman Cuci Sepatu" />

@@ -73,7 +73,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </button>
           <Link href="/admin" className="flex items-center gap-2">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
               alt="Teman Cuci Sepatu" 
               className="w-8 h-8 object-contain"
             />
@@ -160,7 +160,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="p-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
               alt="Teman Cuci Sepatu" 
               className="w-10 h-10 object-contain"
             />

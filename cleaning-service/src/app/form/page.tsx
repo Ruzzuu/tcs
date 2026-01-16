@@ -125,7 +125,7 @@ export default function CustomerFormPage() {
       <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a2230]/95 backdrop-blur-md border-b border-[#dbdfe6] dark:border-[#2a3441] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img 
-            src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+            src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
             alt="Teman Cuci Sepatu" 
             className="w-10 h-10 object-contain"
           />
