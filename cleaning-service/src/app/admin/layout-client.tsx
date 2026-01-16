@@ -72,11 +72,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link href="/admin" className="flex items-center gap-2">
-            <div className="flex items-center justify-center size-8 rounded-full bg-[#1152d4]/10 text-[#1152d4]">
-              <span className="material-symbols-outlined text-lg">local_laundry_service</span>
+            <div className="flex items-center justify-center size-8 rounded-full bg-[#1152d4]/10">
+              <img 
+                src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+                alt="Teman Cuci Sepatu" 
+                className="w-5 h-5 object-contain"
+              />
             </div>
             <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] hidden sm:block">
-              Cuci Premium
+              Teman Cuci Sepatu
             </h2>
           </Link>
         </div>
@@ -157,11 +161,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       >
         <div className="p-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-full bg-[#1152d4]/10 text-[#1152d4]">
-              <span className="material-symbols-outlined">local_laundry_service</span>
+            <div className="flex items-center justify-center size-10 rounded-full bg-[#1152d4]/10">
+              <img 
+                src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+                alt="Teman Cuci Sepatu" 
+                className="w-6 h-6 object-contain"
+              />
             </div>
             <div>
-              <h2 className="text-[#111318] dark:text-white font-bold">Cuci Premium</h2>
+              <h2 className="text-[#111318] dark:text-white font-bold">Teman Cuci Sepatu</h2>
               <p className="text-xs text-[#616f89]">Admin Panel</p>
             </div>
           </div>

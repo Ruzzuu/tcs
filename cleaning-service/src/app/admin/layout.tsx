@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AdminLayoutClient from "./layout-client";
 
 export const metadata: Metadata = {
-  title: "Admin - Cuci Premium",
+  title: "Admin - Teman Cuci Sepatu",
   description: "Admin panel untuk mengelola pesanan",
   manifest: "/manifest-admin.json",
 };

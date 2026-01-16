@@ -9,10 +9,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cuci Premium - Layanan Cuci Profesional",
+  title: "Teman Cuci Sepatu - Layanan Cuci Profesional",
   description: "Layanan cuci sepatu, tas, helm, sofa, karpet dengan kualitas premium. Penjemputan gratis ke lokasi Anda.",
   keywords: ["cuci sepatu", "cuci tas", "cuci helm", "cuci sofa", "cuci karpet", "laundry"],
-  authors: [{ name: "Cuci Premium" }],
+  authors: [{ name: "Teman Cuci Sepatu" }],
   manifest: "/manifest.json",
 };
 
@@ -42,7 +42,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Cuci Premium" />
+        <meta name="apple-mobile-web-app-title" content="Teman Cuci Sepatu" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-[#f6f6f8] dark:bg-[#101622] min-h-screen`}

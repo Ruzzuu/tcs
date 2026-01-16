@@ -551,7 +551,7 @@ export default function OrderDetailPage() {
         }}
       >
         <div style={{ textAlign: 'center', borderBottom: '2px dashed #d1d5db', paddingBottom: '16px', marginBottom: '16px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>CUCI PREMIUM</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>TEMAN CUCI SEPATU</h1>
           <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>Layanan Cuci Profesional</p>
           <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', marginBottom: 0 }}>WA: 0812-3456-7890</p>
         </div>

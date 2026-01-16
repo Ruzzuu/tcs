@@ -124,12 +124,16 @@ export default function CustomerFormPage() {
       {/* Top App Bar */}
       <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a2230]/95 backdrop-blur-md border-b border-[#dbdfe6] dark:border-[#2a3441] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center size-10 rounded-full bg-[#1152d4]/10 text-[#1152d4]">
-            <span className="material-symbols-outlined text-2xl">local_laundry_service</span>
+          <div className="flex items-center justify-center size-10 rounded-full bg-[#1152d4]/10">
+            <img 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              alt="Teman Cuci Sepatu" 
+              className="w-6 h-6 object-contain"
+            />
           </div>
         </div>
         <h1 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
-          Form Cuci Barang
+          Form Teman Cuci Sepatu
         </h1>
         <div className="w-2"></div>
       </div>
@@ -139,7 +143,7 @@ export default function CustomerFormPage() {
         {/* Header Text */}
         <div className="mb-8 text-center">
           <h2 className="text-[#111318] dark:text-white text-2xl font-bold mb-2">
-            Layanan Cuci Premium
+            Teman Cuci Sepatu
           </h2>
           <p className="text-[#616f89] dark:text-gray-400 text-sm">
             Isi data di bawah ini untuk layanan penjemputan gratis ke lokasi Anda.
