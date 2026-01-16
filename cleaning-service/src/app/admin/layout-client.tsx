@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { admin, isLoading, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showLogoutMenu, setShowLogoutMenu] = useState(false);
 
   const navItems = [
@@ -98,6 +100,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         </nav>
 
         <div className="flex items-center justify-end gap-2">
+          <button 
+            onClick={toggleTheme}
+            className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-transparent text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            aria-label="Toggle theme"
+          >
+            <span className="material-symbols-outlined">
+              {theme === 'light' ? 'dark_mode' : 'light_mode'}
+            </span>
+          </button>
           <button className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-transparent text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
             <span className="material-symbols-outlined">notifications</span>
           </button>
@@ -216,11 +227,13 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   );
 }
 
-// Main export with AuthProvider wrapper
+// Main export with AuthProvider and ThemeProvider wrapper
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <AuthProvider>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <ThemeProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
