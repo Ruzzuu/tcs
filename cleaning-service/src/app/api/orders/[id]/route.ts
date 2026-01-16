@@ -7,6 +7,14 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { v2 as cloudinary } from 'cloudinary';
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
+
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -106,45 +114,44 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Extract all image URLs from the order
-    const imagesToDelete: string[] = [];
+    // Extract all publicIds from the order for Cloudinary deletion
+    const publicIdsToDelete: string[] = [];
     
     // Add beforePhotos from proofOfWork
     if (order.proofOfWork?.beforePhotos && order.proofOfWork.beforePhotos.length > 0) {
-      imagesToDelete.push(...order.proofOfWork.beforePhotos.map((img: any) => img.url));
+      order.proofOfWork.beforePhotos.forEach((img: any) => {
+        if (img.publicId) {
+          publicIdsToDelete.push(img.publicId);
+        }
+      });
     }
     
     // Add afterPhotos from proofOfWork
     if (order.proofOfWork?.afterPhotos && order.proofOfWork.afterPhotos.length > 0) {
-      imagesToDelete.push(...order.proofOfWork.afterPhotos.map((img: any) => img.url));
+      order.proofOfWork.afterPhotos.forEach((img: any) => {
+        if (img.publicId) {
+          publicIdsToDelete.push(img.publicId);
+        }
+      });
     }
     
     // Add notaImage
-    if (order.notaImage) {
-      imagesToDelete.push(order.notaImage.url);
+    if (order.notaImage?.publicId) {
+      publicIdsToDelete.push(order.notaImage.publicId);
     }
 
+    console.log('Public IDs to delete from Cloudinary:', publicIdsToDelete);
+
     // Delete images from Cloudinary
-    const deletePromises = imagesToDelete.map(async (imageUrl) => {
+    const deletePromises = publicIdsToDelete.map(async (publicId) => {
       try {
-        // Extract public_id from Cloudinary URL
-        // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{format}
-        const urlParts = imageUrl.split('/');
-        const uploadIndex = urlParts.indexOf('upload');
-        
-        if (uploadIndex !== -1 && uploadIndex < urlParts.length - 1) {
-          // Get everything after 'upload/v{version}/'
-          const publicIdWithFormat = urlParts.slice(uploadIndex + 2).join('/');
-          // Remove file extension
-          const publicId = publicIdWithFormat.replace(/\.[^/.]+$/, '');
-          
-          // Delete from Cloudinary
-          await cloudinary.uploader.destroy(publicId);
-          console.log(`Deleted image from Cloudinary: ${publicId}`);
-        }
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log(`Cloudinary delete result for ${publicId}:`, result);
+        return result;
       } catch (error) {
-        console.error(`Failed to delete image from Cloudinary: ${imageUrl}`, error);
+        console.error(`Failed to delete image from Cloudinary: ${publicId}`, error);
         // Continue even if some images fail to delete
+        return null;
       }
     });
 
