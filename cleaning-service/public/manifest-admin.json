@@ -9,28 +9,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_120,h_120/e_background_removal/c_pad,w_192,h_192,b_white,f_png/v1768543427/logo_tcs_keooto.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_140,h_140/e_background_removal/c_pad,w_192,h_192,b_white,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_320,h_320/e_background_removal/c_pad,w_512,h_512,b_white,f_png/v1768543427/logo_tcs_keooto.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_380,h_380/e_background_removal/c_pad,w_512,h_512,b_white,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_120,h_120/e_background_removal/c_pad,w_192,h_192,b_white,f_png/v1768543427/logo_tcs_keooto.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/c_fit,w_320,h_320/e_background_removal/c_pad,w_512,h_512,b_white,f_png/v1768543427/logo_tcs_keooto.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
