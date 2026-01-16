@@ -50,11 +50,11 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-[400px] flex flex-col items-center">
         {/* Logo and Header */}
         <div className="mb-10 flex flex-col items-center">
-          <div className="w-20 h-20 bg-[#1152d4] rounded-2xl flex items-center justify-center shadow-lg shadow-[#1152d4]/20 mb-4">
+          <div className="mb-4">
             <img 
               src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
               alt="Teman Cuci Sepatu" 
-              className="w-12 h-12 object-contain"
+              className="w-24 h-24 object-contain"
             />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-center text-[#111318]">
