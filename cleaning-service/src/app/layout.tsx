@@ -31,15 +31,29 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        {/* Prevent flash of unstyled content for dark mode */}
+        {/* Prevent flash of unstyled content for dark mode - Must run before any content renders */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function() {
-                const theme = localStorage.getItem('theme') || 
-                  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.classList.toggle('dark', theme === 'dark');
-              })();
+              try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                
+                // Remove any existing theme classes first
+                document.documentElement.classList.remove('light', 'dark');
+                
+                // Add the correct theme class
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                  console.log('Dark mode applied');
+                } else {
+                  document.documentElement.classList.add('light');
+                  console.log('Light mode applied');
+                }
+              } catch (e) {
+                console.error('Theme initialization error:', e);
+              }
             `,
           }}
         />

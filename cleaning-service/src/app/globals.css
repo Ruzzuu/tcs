@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 /* ============================================
+   DARK MODE CONFIGURATION FOR TAILWIND V4
+   ============================================ */
+@variant dark (&:where(.dark, .dark *));
+
+/* ============================================
    CUSTOM THEME CONFIGURATION
    Based on existing HTML design
    ============================================ */

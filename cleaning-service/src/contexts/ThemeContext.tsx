@@ -18,37 +18,32 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check localStorage for saved theme preference
     const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme = prefersDark ? 'dark' : 'light';
-      setTheme(systemTheme);
-      if (systemTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
+    const initialTheme = savedTheme || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    
+    console.log('ThemeProvider initialized with theme:', initialTheme);
+    setTheme(initialTheme);
+    applyTheme(initialTheme);
     setMounted(true);
   }, []);
 
+  const applyTheme = (newTheme: Theme) => {
+    // Remove both classes first to ensure clean state
+    document.documentElement.classList.remove('light', 'dark');
+    
+    // Add the correct class
+    document.documentElement.classList.add(newTheme);
+    
+    console.log('Theme applied:', newTheme, 'Classes:', document.documentElement.className);
+  };
+
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
+    console.log('Toggling theme from', theme, 'to', newTheme);
+    
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
-    
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyTheme(newTheme);
   };
 
   return (
