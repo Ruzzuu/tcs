@@ -67,9 +67,11 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="flex justify-center mb-10 pt-4">
           <div className="w-20 h-20 bg-[#1152d4]/10 rounded-2xl flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-[#1152d4]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.36 2.64a4.75 4.75 0 00-6.72 0L10 4.29 8.36 2.64a4.75 4.75 0 00-6.72 6.72L10 17.71l8.36-8.35a4.75 4.75 0 000-6.72zM12 20.71L3.64 12.36a4.75 4.75 0 010-6.72 4.75 4.75 0 016.72 0L12 7.29l1.64-1.65a4.75 4.75 0 016.72 6.72L12 20.71z"/>
-            </svg>
+            <img 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              alt="Teman Cuci Sepatu" 
+              className="w-12 h-12 object-contain"
+            />
           </div>
         </div>
 

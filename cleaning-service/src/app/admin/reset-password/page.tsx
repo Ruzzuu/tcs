@@ -90,9 +90,11 @@ function ResetPasswordForm() {
         {/* Logo */}
         <div className="flex justify-center mb-10 pt-4">
           <div className="w-20 h-20 bg-[#1152d4]/10 rounded-2xl flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-[#1152d4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
+            <img 
+              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
+              alt="Teman Cuci Sepatu" 
+              className="w-12 h-12 object-contain"
+            />
           </div>
         </div>
 

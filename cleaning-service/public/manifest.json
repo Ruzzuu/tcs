@@ -1,6 +1,6 @@
 {
-  "name": "Cuci Premium",
-  "short_name": "Cuci Premium",
+  "name": "Teman Cuci Sepatu",
+  "short_name": "TCS",
   "description": "Layanan cuci sepatu, tas, helm, sofa, karpet dengan kualitas premium",
   "start_url": "/",
   "display": "standalone",
@@ -9,25 +9,25 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/w_192,h_192,c_fit,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/w_512,h_512,c_fit,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-maskable-192x192.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/w_192,h_192,c_fit,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-maskable-512x512.png",
+      "src": "https://res.cloudinary.com/dncpyspjq/image/upload/w_512,h_512,c_fit,f_png/v1768543427/logo_tcs_keooto.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
