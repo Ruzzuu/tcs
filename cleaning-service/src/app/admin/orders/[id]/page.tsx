@@ -509,13 +509,17 @@ export default function OrderDetailPage() {
           width: '400px', 
           backgroundColor: '#ffffff', 
           padding: '24px',
-          fontFamily: 'Arial, sans-serif'
+          fontFamily: 'Arial, sans-serif',
+          backgroundImage: 'url(https://res.cloudinary.com/dncpyspjq/image/upload/e_blur:2000,o_10/v1768543427/logo_tcs_keooto.png)',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '280px'
         }}
       >
         <div style={{ textAlign: 'center', borderBottom: '2px dashed #d1d5db', paddingBottom: '16px', marginBottom: '16px' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>TEMAN CUCI SEPATU</h1>
           <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>Layanan Cuci Profesional</p>
-          <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', marginBottom: 0 }}>WA: 0812-3456-7890</p>
+          <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', marginBottom: 0, lineHeight: '1.4' }}>Teman Cuci Sepatu, Jl. Keputih Tegal No.36C, Keputih, Kec. Sukolilo, Surabaya, Jawa Timur 60111</p>
         </div>
         
         <div style={{ fontSize: '14px', marginBottom: '16px', color: '#374151' }}>
@@ -528,12 +532,12 @@ export default function OrderDetailPage() {
             <span>{formatDate(new Date())}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>Nama:</span>
-            <span>{order.name}</span>
+            <span style={{ fontWeight: '500' }}>Jam:</span>
+            <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontWeight: '500' }}>HP:</span>
-            <span>{formatPhoneNumber(order.phone)}</span>
+            <span style={{ fontWeight: '500' }}>Nama:</span>
+            <span>{order.name}</span>
           </div>
         </div>
         
