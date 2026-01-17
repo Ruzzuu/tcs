@@ -63,28 +63,41 @@ export default function AdminForm() {
       return;
     }
 
-    const totalCost = calculateTotal();
-
     try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          items: validItems,
-          totalCost,
-          status: 'pending'
+      // Send each item as a separate order
+      const promises = validItems.map(item => 
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.customerName,
+            phone: formData.whatsapp,
+            address: formData.address,
+            itemType: item.service,
+            quantity: item.quantity,
+            customerNotes: item.notes
+          })
         })
-      });
+      );
 
-      if (response.ok) {
-        alert('Data berhasil dikirim!');
-        // Reset form
-        setFormData({ customerName: '', whatsapp: '', address: '' });
-        setItems([{ service: '', quantity: 1, notes: '' }]);
+      const responses = await Promise.all(promises);
+      const allSuccess = responses.every(res => res.ok);
+
+      if (allSuccess) {
+        // Redirect to success page
+        window.location.href = '/admin/orders/success';
       } else {
-        const error = await response.json();
-        alert(error.message || 'Gagal mengirim data');
+        const errors = await Promise.all(
+          responses.map(async (res) => {
+            if (!res.ok) {
+              const error = await res.json();
+              return error.error || 'Gagal mengirim data';
+            }
+            return null;
+          })
+        );
+        const errorMessages = errors.filter(e => e !== null).join(', ');
+        alert(errorMessages || 'Gagal mengirim beberapa data');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
