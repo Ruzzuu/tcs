@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus } from '@/types';
-import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateStatusBasedWhatsAppLink, isValidPhoneNumber } from '@/lib/utils';
+import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
@@ -98,27 +98,6 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
   
-  // Format phone number for display
-  const formatPhoneDisplay = (phone: string) => {
-    // Remove all non-digits
-    let cleaned = phone.replace(/\D/g, '');
-    // Format: 0857-3185-4878
-    if (cleaned.startsWith('62')) {
-      cleaned = '0' + cleaned.slice(2);
-    }
-    return cleaned.replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3');
-  };
-
-  // Generate direct WhatsApp link (no template message)
-  const getDirectWhatsAppLink = () => {
-    let cleanPhone = order.phone.replace(/[\s\-()]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '62' + cleanPhone.slice(1);
-    }
-    cleanPhone = cleanPhone.replace(/^\+/, '');
-    return `https://wa.me/${cleanPhone}`;
-  };
-
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
       {/* Proof of Work Preview */}
@@ -181,28 +160,6 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           {getStatusLabel(order.status)}
         </span>
         <div className="flex items-center gap-2">
-          {/* Phone Number - Direct WhatsApp (no template) */}
-          <a
-            href={getDirectWhatsAppLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-            title="Chat WhatsApp"
-          >
-            <span className="material-symbols-outlined text-[16px]">phone</span>
-            <span className="text-xs font-medium">{formatPhoneDisplay(order.phone)}</span>
-          </a>
-          {/* WhatsApp with Template Message (status-based) */}
-          <a
-            href={generateStatusBasedWhatsAppLink(order)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
-            title="WhatsApp dengan template"
-          >
-            <span className="text-xs font-bold">WhatsApp</span>
-            <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
-          </a>
           <Link
             href={`/admin/orders/${order._id}`}
             className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
