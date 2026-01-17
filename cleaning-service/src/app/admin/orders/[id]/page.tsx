@@ -32,77 +32,158 @@ export default function OrderDetailPage() {
   const [finalPrice, setFinalPrice] = useState<number | undefined>();
   const [proofOfWork, setProofOfWork] = useState<{ beforePhotos: CloudinaryImage[], afterPhotos: CloudinaryImage[] }>({ beforePhotos: [], afterPhotos: [] });
   const [uploading, setUploading] = useState<'before' | 'after' | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ type: 'before' | 'after', current: number, total: number } | null>(null);
+  const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
 
-  // File upload handler for proof of work images - Uploads to Cloudinary
-  const handleImageUpload = async (type: 'before' | 'after', file: File) => {
+  // Multi-file upload handler with optimistic UI
+  const handleMultipleImageUpload = async (type: 'before' | 'after', files: FileList | File[]) => {
     if (!orderId) return;
     
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
     setUploading(type);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', type);
-      formData.append('orderId', orderId);
+    setUploadProgress({ type, current: 0, total: fileArray.length });
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+    const successfulUploads: CloudinaryImage[] = [];
+    const failedUploads: string[] = [];
 
-      const result = await response.json();
-
-      if (result.success && result.data) {
-        const newImage: CloudinaryImage = {
-          url: result.data.url,
-          publicId: result.data.publicId,
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i];
+      
+      try {
+        // Optimistic UI - create temporary placeholder
+        const tempId = `temp-${Date.now()}-${i}`;
+        const tempImage: CloudinaryImage = {
+          url: URL.createObjectURL(file),
+          publicId: tempId,
         };
 
+        // Add optimistic image
         if (type === 'before') {
-          setProofOfWork(prev => ({ ...prev, beforePhotos: [newImage] }));
+          setProofOfWork(prev => ({ ...prev, beforePhotos: [...prev.beforePhotos, tempImage] }));
         } else {
-          setProofOfWork(prev => ({ ...prev, afterPhotos: [newImage] }));
+          setProofOfWork(prev => ({ ...prev, afterPhotos: [...prev.afterPhotos, tempImage] }));
         }
-      } else {
-        alert(result.error || 'Gagal upload gambar');
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+        formData.append('orderId', orderId);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          const realImage: CloudinaryImage = {
+            url: result.data.url,
+            publicId: result.data.publicId,
+          };
+
+          // Replace temp with real image
+          if (type === 'before') {
+            setProofOfWork(prev => ({
+              ...prev,
+              beforePhotos: prev.beforePhotos.map(img => 
+                img.publicId === tempId ? realImage : img
+              )
+            }));
+          } else {
+            setProofOfWork(prev => ({
+              ...prev,
+              afterPhotos: prev.afterPhotos.map(img => 
+                img.publicId === tempId ? realImage : img
+              )
+            }));
+          }
+
+          successfulUploads.push(realImage);
+        } else {
+          // Remove failed temp image
+          if (type === 'before') {
+            setProofOfWork(prev => ({
+              ...prev,
+              beforePhotos: prev.beforePhotos.filter(img => img.publicId !== tempId)
+            }));
+          } else {
+            setProofOfWork(prev => ({
+              ...prev,
+              afterPhotos: prev.afterPhotos.filter(img => img.publicId !== tempId)
+            }));
+          }
+          failedUploads.push(file.name);
+        }
+      } catch (err) {
+        console.error('Failed to upload image:', err);
+        failedUploads.push(file.name);
       }
-    } catch (err) {
-      console.error('Failed to upload image:', err);
-      alert('Gagal upload gambar. Silakan coba lagi.');
-    } finally {
-      setUploading(null);
+
+      setUploadProgress({ type, current: i + 1, total: fileArray.length });
+    }
+
+    setUploading(null);
+    setUploadProgress(null);
+
+    if (failedUploads.length > 0) {
+      alert(`Gagal upload ${failedUploads.length} foto: ${failedUploads.join(', ')}`);
     }
   };
 
-  // Delete photo from Cloudinary and MongoDB
-  const handleDeletePhoto = async (type: 'before' | 'after') => {
-    if (!orderId) return;
-    
-    const photo = type === 'before' ? proofOfWork.beforePhotos[0] : proofOfWork.afterPhotos[0];
-    if (!photo?.publicId) return;
+  // Delete individual photo with optimistic UI and rollback
+  const handleDeletePhoto = async (type: 'before' | 'after', publicId: string) => {
+    if (!orderId || !publicId) return;
 
     const confirmed = confirm('Hapus foto ini? Foto akan dihapus dari Cloudinary dan database.');
     if (!confirmed) return;
 
+    setDeletingPhoto(publicId);
+
+    // Optimistic UI - remove immediately
+    const backup = type === 'before' ? [...proofOfWork.beforePhotos] : [...proofOfWork.afterPhotos];
+    
+    if (type === 'before') {
+      setProofOfWork(prev => ({
+        ...prev,
+        beforePhotos: prev.beforePhotos.filter(img => img.publicId !== publicId)
+      }));
+    } else {
+      setProofOfWork(prev => ({
+        ...prev,
+        afterPhotos: prev.afterPhotos.filter(img => img.publicId !== publicId)
+      }));
+    }
+
     try {
-      const response = await fetch(`/api/orders/${orderId}/photos?publicId=${encodeURIComponent(photo.publicId)}&type=${type}`, {
+      const response = await fetch(`/api/orders/${orderId}/photos?publicId=${encodeURIComponent(publicId)}&type=${type}`, {
         method: 'DELETE',
       });
 
       const result = await response.json();
 
-      if (result.success) {
-        // Update local state
+      if (!result.success) {
+        // Rollback on error
         if (type === 'before') {
-          setProofOfWork(prev => ({ ...prev, beforePhotos: [] }));
+          setProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
         } else {
-          setProofOfWork(prev => ({ ...prev, afterPhotos: [] }));
+          setProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
         }
-      } else {
         alert(result.error || 'Gagal hapus foto');
       }
     } catch (err) {
       console.error('Failed to delete photo:', err);
+      // Rollback on error
+      if (type === 'before') {
+        setProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
+      } else {
+        setProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
+      }
       alert('Gagal hapus foto. Silakan coba lagi.');
+    } finally {
+      setDeletingPhoto(null);
     }
   };
 
@@ -421,101 +502,160 @@ export default function OrderDetailPage() {
         <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
           Bukti Pengerjaan
         </h3>
-        <div className="grid grid-cols-2 gap-4">
-          {/* Before */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">Sebelum</span>
-            {proofOfWork.beforePhotos.length > 0 && proofOfWork.beforePhotos[0]?.url ? (
-              <div className="relative aspect-square w-full rounded-xl bg-gray-100 overflow-hidden border border-gray-200 dark:border-gray-700">
-                <img 
-                  src={proofOfWork.beforePhotos[0].url} 
-                  alt="Before" 
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => handleDeletePhoto('before')}
-                  className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1 text-white backdrop-blur-sm"
-                >
-                  <span className="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-            ) : (
-              <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  capture="environment"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  disabled={uploading === 'before'}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload('before', file);
-                  }}
-                />
-                {uploading === 'before' ? (
-                  <>
-                    <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="text-xs text-[#1152d4]">Uploading...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
-                    <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
-                  </>
-                )}
-              </label>
+        
+        {/* Before Photos */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 ml-1 uppercase tracking-wider">Sebelum</span>
+            {uploadProgress?.type === 'before' && (
+              <span className="text-xs text-[#1152d4]">
+                {uploadProgress.current}/{uploadProgress.total}
+              </span>
             )}
           </div>
-
-          {/* After */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">Sesudah</span>
-            {proofOfWork.afterPhotos.length > 0 && proofOfWork.afterPhotos[0]?.url ? (
-              <div className="relative aspect-square w-full rounded-xl bg-gray-100 overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Existing Before Photos */}
+            {proofOfWork.beforePhotos.map((photo, index) => (
+              <div key={photo.publicId} className="relative aspect-square w-full rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
                 <img 
-                  src={proofOfWork.afterPhotos[0].url} 
-                  alt="After" 
-                  className="w-full h-full object-cover"
+                  src={photo.url} 
+                  alt={`Before ${index + 1}`}
+                  className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
                 />
-                <button
-                  onClick={() => handleDeletePhoto('after')}
-                  className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1 text-white backdrop-blur-sm"
-                >
-                  <span className="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-            ) : (
-              <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  capture="environment"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  disabled={uploading === 'after'}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload('after', file);
-                  }}
-                />
-                {uploading === 'after' ? (
-                  <>
-                    <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
+                {!photo.publicId.startsWith('temp-') && (
+                  <button
+                    onClick={() => handleDeletePhoto('before', photo.publicId)}
+                    disabled={deletingPhoto === photo.publicId}
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                )}
+                {photo.publicId.startsWith('temp-') && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span className="text-xs text-[#1152d4]">Uploading...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">add_a_photo</span>
-                    <span className="text-xs text-gray-400 group-hover:text-[#1152d4]">Ambil Foto</span>
-                  </>
+                  </div>
                 )}
-              </label>
+              </div>
+            ))}
+            
+            {/* Add Photo Button */}
+            <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
+                multiple
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={uploading === 'before'}
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length > 0) {
+                    handleMultipleImageUpload('before', files);
+                  }
+                  e.target.value = '';
+                }}
+              />
+              {uploading === 'before' ? (
+                <>
+                  <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="text-xs text-[#1152d4]">Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">
+                    {proofOfWork.beforePhotos.length === 0 ? 'add_a_photo' : 'add'}
+                  </span>
+                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-[#1152d4]">
+                    {proofOfWork.beforePhotos.length === 0 ? 'Ambil Foto' : 'Tambah Foto'}
+                  </span>
+                </>
+              )}
+            </label>
+          </div>
+        </div>
+
+        {/* After Photos */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 ml-1 uppercase tracking-wider">Sesudah</span>
+            {uploadProgress?.type === 'after' && (
+              <span className="text-xs text-[#1152d4]">
+                {uploadProgress.current}/{uploadProgress.total}
+              </span>
             )}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Existing After Photos */}
+            {proofOfWork.afterPhotos.map((photo, index) => (
+              <div key={photo.publicId} className="relative aspect-square w-full rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                <img 
+                  src={photo.url} 
+                  alt={`After ${index + 1}`}
+                  className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
+                />
+                {!photo.publicId.startsWith('temp-') && (
+                  <button
+                    onClick={() => handleDeletePhoto('after', photo.publicId)}
+                    disabled={deletingPhoto === photo.publicId}
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                )}
+                {photo.publicId.startsWith('temp-') && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Add Photo Button */}
+            <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
+                multiple
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={uploading === 'after'}
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length > 0) {
+                    handleMultipleImageUpload('after', files);
+                  }
+                  e.target.value = '';
+                }}
+              />
+              {uploading === 'after' ? (
+                <>
+                  <svg className="animate-spin h-8 w-8 text-[#1152d4] mb-1" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="text-xs text-[#1152d4]">Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">
+                    {proofOfWork.afterPhotos.length === 0 ? 'add_a_photo' : 'add'}
+                  </span>
+                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-[#1152d4]">
+                    {proofOfWork.afterPhotos.length === 0 ? 'Ambil Foto' : 'Tambah Foto'}
+                  </span>
+                </>
+              )}
+            </label>
           </div>
         </div>
       </div>
