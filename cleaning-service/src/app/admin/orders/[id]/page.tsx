@@ -73,6 +73,39 @@ export default function OrderDetailPage() {
     }
   };
 
+  // Delete photo from Cloudinary and MongoDB
+  const handleDeletePhoto = async (type: 'before' | 'after') => {
+    if (!orderId) return;
+    
+    const photo = type === 'before' ? proofOfWork.beforePhotos[0] : proofOfWork.afterPhotos[0];
+    if (!photo?.publicId) return;
+
+    const confirmed = confirm('Hapus foto ini? Foto akan dihapus dari Cloudinary dan database.');
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}/photos?publicId=${encodeURIComponent(photo.publicId)}&type=${type}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
+        if (type === 'before') {
+          setProofOfWork(prev => ({ ...prev, beforePhotos: [] }));
+        } else {
+          setProofOfWork(prev => ({ ...prev, afterPhotos: [] }));
+        }
+      } else {
+        alert(result.error || 'Gagal hapus foto');
+      }
+    } catch (err) {
+      console.error('Failed to delete photo:', err);
+      alert('Gagal hapus foto. Silakan coba lagi.');
+    }
+  };
+
 
   const fetchOrder = useCallback(async () => {
     try {
@@ -400,7 +433,7 @@ export default function OrderDetailPage() {
                   className="w-full h-full object-cover"
                 />
                 <button
-                  onClick={() => setProofOfWork({ ...proofOfWork, beforePhotos: [] })}
+                  onClick={() => handleDeletePhoto('before')}
                   className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1 text-white backdrop-blur-sm"
                 >
                   <span className="material-symbols-outlined text-sm">close</span>
@@ -448,7 +481,7 @@ export default function OrderDetailPage() {
                   className="w-full h-full object-cover"
                 />
                 <button
-                  onClick={() => setProofOfWork({ ...proofOfWork, afterPhotos: [] })}
+                  onClick={() => handleDeletePhoto('after')}
                   className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1 text-white backdrop-blur-sm"
                 >
                   <span className="material-symbols-outlined text-sm">close</span>
