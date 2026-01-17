@@ -99,20 +99,38 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
 // Service categories for grouped dropdown
 export const SERVICE_CATEGORIES = [
   {
-    label: 'Cleaning',
-    services: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service'] as ServiceType[]
+    name: 'Cleaning',
+    services: [
+      { value: 'sepatu', label: 'Sepatu', price: 35000 },
+      { value: 'sandal', label: 'Sandal', price: 25000 },
+      { value: 'tas_ransel', label: 'Tas Ransel', price: 40000 },
+      { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
+      { value: 'topi', label: 'Topi', price: 25000 },
+      { value: 'helm', label: 'Helm', price: 30000 },
+      { value: 'one_day_service', label: 'One Day Service', price: 50000 }
+    ]
   },
   {
-    label: 'Treatment',
-    services: ['unyellowing', 'whitening', 'sewing'] as ServiceType[]
+    name: 'Treatment',
+    services: [
+      { value: 'unyellowing', label: 'Unyellowing', price: 50000 },
+      { value: 'whitening', label: 'Whitening', price: 50000 },
+      { value: 'sewing', label: 'Sewing (Jahit)', price: 35000 }
+    ]
   },
   {
-    label: 'Repaint',
-    services: ['repaint_canvas', 'repaint_leather', 'repaint_suede'] as ServiceType[]
+    name: 'Repaint',
+    services: [
+      { value: 'repaint_canvas', label: 'Repaint Canvas', price: 75000 },
+      { value: 'repaint_leather', label: 'Repaint Leather', price: 75000 },
+      { value: 'repaint_suede', label: 'Repaint Suede', price: 75000 }
+    ]
   },
   {
-    label: 'Lainnya',
-    services: ['other'] as ServiceType[]
+    name: 'Lainnya',
+    services: [
+      { value: 'other', label: 'Lainnya', price: 0 }
+    ]
   }
 ];
 

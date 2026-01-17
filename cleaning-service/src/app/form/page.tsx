@@ -259,15 +259,12 @@ export default function CustomerFormPage() {
                       Pilih layanan...
                     </option>
                     {SERVICE_CATEGORIES.map((category) => (
-                      <optgroup key={category.label} label={category.label}>
-                        {category.services.map((serviceKey) => {
-                          const service = SERVICES[serviceKey];
-                          return (
-                            <option key={serviceKey} value={serviceKey}>
-                              {service.name}{service.price > 0 ? ` - ${formatCurrency(service.price)}` : ''}
-                            </option>
-                          );
-                        })}
+                      <optgroup key={category.name} label={category.name}>
+                        {category.services.map((service) => (
+                          <option key={service.value} value={service.value}>
+                            {service.label}{service.price > 0 ? ` - ${formatCurrency(service.price)}` : ''}
+                          </option>
+                        ))}
                       </optgroup>
                     ))}
                   </select>
