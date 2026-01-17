@@ -83,7 +83,7 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
 }
 
 // Order Card Component
-function OrderCard({ order }: { order: Order }) {
+function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (orderId: string, e: React.MouseEvent) => void; deletingId: string | null }) {
   const statusColor = getStatusColor(order.status);
   const avatarColor = getAvatarColor(order.name);
   const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
@@ -209,6 +209,22 @@ function OrderCard({ order }: { order: Order }) {
           >
             <span className="material-symbols-outlined text-[16px]">open_in_new</span>
           </Link>
+          {/* Delete Button */}
+          <button
+            onClick={(e) => onDelete(order._id, e)}
+            disabled={deletingId === order._id}
+            className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
+            title="Hapus pesanan"
+          >
+            {deletingId === order._id ? (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <span className="material-symbols-outlined text-[16px]">delete</span>
+            )}
+          </button>
         </div>
       </div>
     </div>
@@ -244,6 +260,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Add Order Form State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -356,6 +373,40 @@ export default function AdminDashboard() {
     });
     setFormError(null);
     setShowAddForm(false);
+  };
+
+  // Handle Delete Order
+  const handleDelete = async (orderId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) return;
+    
+    setDeletingId(orderId);
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'DELETE'
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        // Remove from local state
+        setData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            recentOrders: prev.recentOrders.filter(o => o._id !== orderId),
+            total: prev.total - 1
+          };
+        });
+      } else {
+        alert(result.error || 'Gagal menghapus pesanan');
+      }
+    } catch {
+      alert('Gagal terhubung ke server');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const statusOptions: Array<{ value: OrderStatus | 'all'; label: string; icon: string }> = [
@@ -792,7 +843,7 @@ export default function AdminDashboard() {
             </div>
           ) : (
             filteredOrders.map((order) => (
-              <OrderCard key={order._id} order={order} />
+              <OrderCard key={order._id} order={order} onDelete={handleDelete} deletingId={deletingId} />
             ))
           )}
         </div>
