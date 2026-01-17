@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 
 interface FormItem {
@@ -97,23 +96,6 @@ export default function AdminForm() {
 
   return (
     <div className="bg-[#f6f6f8] dark:bg-[#101622] min-h-screen flex flex-col">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a2230]/95 backdrop-blur-md border-b border-[#dbdfe6] dark:border-[#2a3441] px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image
-            src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png"
-            alt="Teman Cuci Sepatu"
-            width={40}
-            height={40}
-            className="object-contain"
-          />
-        </div>
-        <h1 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
-          Form Teman Cuci Sepatu
-        </h1>
-        <div className="w-2"></div>
-      </div>
-
       {/* Main Content */}
       <main className="flex-1 w-full max-w-md mx-auto px-4 py-6 pb-24">
         <div className="mb-8 text-center">
