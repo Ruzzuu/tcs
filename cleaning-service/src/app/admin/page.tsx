@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { DashboardData, Order } from '@/types';
-import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateStatusBasedWhatsAppLink } from '@/lib/utils';
-import { SERVICES } from '@/lib/services';
+import { DashboardData, Order, OrderStatus } from '@/types';
+import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, generateStatusBasedWhatsAppLink, isValidPhoneNumber } from '@/lib/utils';
+import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
 // Simple Pie Chart Component (CSS-based, matching original design)
@@ -242,6 +242,38 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  
+  // Add Order Form State
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    itemType: '' as ServiceType | '',
+    customItemType: '',
+    quantity: 1,
+    customerNotes: ''
+  });
+
+  // Form validation
+  const isFormValid = useMemo(() => {
+    const hasValidCustomer = formData.name.trim().length >= 2 && isValidPhoneNumber(formData.phone);
+    const hasValidItem = formData.itemType !== '' && 
+      (formData.itemType !== 'other' || formData.customItemType.trim().length > 0) &&
+      formData.quantity >= 1;
+    return hasValidCustomer && hasValidItem;
+  }, [formData]);
+
+  // Calculate estimated price
+  const estimatedPrice = useMemo(() => {
+    if (!formData.itemType || formData.itemType === 'other') return 0;
+    const service = SERVICES[formData.itemType as ServiceType];
+    return service ? service.price * formData.quantity : 0;
+  }, [formData.itemType, formData.quantity]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -268,15 +300,95 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  // Filter recent orders by search
-  const filteredOrders = data?.recentOrders.filter(order =>
-    order.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.phone.includes(searchQuery) ||
-    order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (SERVICES[order.itemType as ServiceType]?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (order.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (order.customItemType || '').toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  // Handle Add Order Form Submit
+  const handleAddOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isFormValid) {
+      setFormError('Mohon lengkapi semua data yang wajib diisi');
+      return;
+    }
+
+    setFormSubmitting(true);
+    setFormError(null);
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          itemType: formData.itemType,
+          customItemType: formData.customItemType,
+          quantity: formData.quantity,
+          customerNotes: formData.customerNotes,
+          estimatedPrice: estimatedPrice,
+          verified: true
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        resetForm();
+        fetchData(); // Refresh dashboard
+      } else {
+        setFormError(result.error || 'Gagal menambahkan pesanan');
+      }
+    } catch {
+      setFormError('Gagal terhubung ke server');
+    } finally {
+      setFormSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      phone: '',
+      address: '',
+      itemType: '',
+      customItemType: '',
+      quantity: 1,
+      customerNotes: ''
+    });
+    setFormError(null);
+    setShowAddForm(false);
+  };
+
+  const statusOptions: Array<{ value: OrderStatus | 'all'; label: string; icon: string }> = [
+    { value: 'all', label: 'Semua', icon: 'list_alt' },
+    { value: 'pending', label: 'Menunggu', icon: 'pending_actions' },
+    { value: 'in_progress', label: 'Proses', icon: 'autorenew' },
+    { value: 'delivered', label: 'Diantar', icon: 'local_shipping' },
+    { value: 'picked_up', label: 'Diambil', icon: 'inventory' },
+    { value: 'finished', label: 'Selesai', icon: 'check_circle' }
+  ];
+
+  // Filter recent orders by search, date, and status
+  const filteredOrders = data?.recentOrders.filter(order => {
+    // Search filter
+    const matchesSearch = !searchQuery || (
+      order.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.phone.includes(searchQuery) ||
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (SERVICES[order.itemType as ServiceType]?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.customItemType || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    
+    // Date filter
+    const matchesDate = !dateFilter || (
+      new Date(order.createdAt).toISOString().split('T')[0] === dateFilter
+    );
+    
+    return matchesSearch && matchesStatus && matchesDate;
+  }) || [];
 
   if (loading && !data) {
     return <DashboardSkeleton />;
@@ -410,23 +522,265 @@ export default function AdminDashboard() {
       <section className="px-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Pesanan Terbaru</h2>
-          <Link href="/admin/orders" className="text-[#1152d4] text-sm font-medium hover:underline">
-            Lihat Semua
-          </Link>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1152d4] text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            <span className="text-sm font-medium">Tambah</span>
+          </button>
         </div>
 
-        {/* Search Input */}
-        <div className="relative mb-5 group">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-            <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">search</span>
+        {/* Add Order Modal - Same as Orders Page */}
+        {showAddForm && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={resetForm}
+            />
+            <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-white dark:bg-[#1a202c] rounded-2xl shadow-xl z-50 max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-[#1a202c] border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-[#111318] dark:text-white">Tambah Pesanan Baru</h2>
+                <button
+                  onClick={resetForm}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              
+              <form onSubmit={handleAddOrder} className="p-4 flex flex-col gap-4">
+                {formError && (
+                  <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg">error</span>
+                    {formError}
+                  </div>
+                )}
+
+                {/* Customer Name */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Nama Lengkap <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
+                    placeholder="Nama customer"
+                    required
+                  />
+                </div>
+
+                {/* Phone */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Nomor WhatsApp <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
+                    placeholder="0812xxxx..."
+                    required
+                  />
+                  {formData.phone && !isValidPhoneNumber(formData.phone) && (
+                    <p className="text-red-500 text-xs">Format nomor tidak valid</p>
+                  )}
+                </div>
+
+                {/* Address */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Alamat <span className="text-gray-400 text-xs">(Opsional)</span>
+                  </label>
+                  <textarea
+                    value={formData.address}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                    className="w-full min-h-[80px] p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all resize-none"
+                    placeholder="Alamat penjemputan..."
+                  />
+                </div>
+
+                {/* Service Type */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Jenis Layanan <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.itemType}
+                    onChange={(e) => setFormData(prev => ({ ...prev, itemType: e.target.value as ServiceType }))}
+                    className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="" disabled>Pilih layanan...</option>
+                    {SERVICE_CATEGORIES.map((category) => (
+                      <optgroup key={category.label} label={category.label}>
+                        {category.services.map((serviceKey) => {
+                          const service = SERVICES[serviceKey];
+                          return (
+                            <option key={serviceKey} value={serviceKey}>
+                              {service.name}{service.price > 0 ? ` - ${formatCurrency(service.price)}` : ''}
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Custom Item Type (if other selected) */}
+                {formData.itemType === 'other' && (
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                      Nama Barang <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.customItemType}
+                      onChange={(e) => setFormData(prev => ({ ...prev, customItemType: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
+                      placeholder="Contoh: Boneka Besar, Stroller, dll."
+                      required
+                    />
+                  </div>
+                )}
+
+                {/* Quantity */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Jumlah
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, quantity: Math.max(1, prev.quantity - 1) }))}
+                      className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <span className="material-symbols-outlined">remove</span>
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.quantity}
+                      onChange={(e) => setFormData(prev => ({ ...prev, quantity: Math.max(1, parseInt(e.target.value) || 1) }))}
+                      className="w-20 h-10 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, quantity: prev.quantity + 1 }))}
+                      className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <span className="material-symbols-outlined">add</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Catatan <span className="text-gray-400 text-xs">(Opsional)</span>
+                  </label>
+                  <textarea
+                    value={formData.customerNotes}
+                    onChange={(e) => setFormData(prev => ({ ...prev, customerNotes: e.target.value }))}
+                    className="w-full min-h-[80px] p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all resize-none"
+                    placeholder="Catatan tambahan..."
+                  />
+                </div>
+
+                {/* Price Summary */}
+                {estimatedPrice > 0 && (
+                  <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                    <span className="text-sm font-medium text-[#111318] dark:text-white">Estimasi Harga</span>
+                    <span className="text-lg font-bold text-[#1152d4]">{formatCurrency(estimatedPrice)}</span>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-[#111318] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isFormValid || formSubmitting}
+                    className="flex-1 py-3 rounded-xl bg-[#1152d4] text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {formSubmitting ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Menyimpan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[20px]">save</span>
+                        <span>Simpan Pesanan</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
+
+        {/* Search with Date Picker */}
+        <div className="flex gap-2 mb-4">
+          <div className="relative group flex-1">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+              <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">search</span>
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all"
+              placeholder="Cari nama, telepon, atau nomor order..."
+            />
           </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all"
-            placeholder="Cari nama, telepon, atau nomor order..."
-          />
+          <div className="relative">
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="h-full px-3 py-2 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer"
+            />
+            {dateFilter && (
+              <button
+                onClick={() => setDateFilter('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <span className="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Status Filter Buttons */}
+        <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar mb-4">
+          {statusOptions.map(option => (
+            <button
+              key={option.value}
+              onClick={() => setStatusFilter(option.value)}
+              className={`flex h-9 shrink-0 items-center justify-center gap-2 rounded-full px-4 transition-all ${
+                statusFilter === option.value
+                  ? 'bg-[#1152d4] text-white shadow-md'
+                  : 'bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{option.icon}</span>
+              <span className="text-sm font-medium">{option.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Orders List */}
