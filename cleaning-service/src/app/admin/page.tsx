@@ -89,11 +89,27 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
   const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
   
   // Check for proof of work - handle both new Cloudinary format and legacy base64
-  const beforePhoto = order.proofOfWork?.beforePhotos?.[0];
-  const afterPhoto = order.proofOfWork?.afterPhotos?.[0];
-  const beforeUrl = typeof beforePhoto === 'object' && beforePhoto?.url ? beforePhoto.url : (typeof beforePhoto === 'string' ? beforePhoto : null);
-  const afterUrl = typeof afterPhoto === 'object' && afterPhoto?.url ? afterPhoto.url : (typeof afterPhoto === 'string' ? afterPhoto : null);
-  const hasProofOfWork = beforeUrl || afterUrl;
+  // Display max 5 photos total (combined before + after, oldest to newest)
+  const allPhotos: Array<{ url: string; type: 'before' | 'after' }> = [];
+  
+  // Add before photos (max 5)
+  if (order.proofOfWork?.beforePhotos) {
+    order.proofOfWork.beforePhotos.slice(0, 5).forEach((photo: any) => {
+      const url = typeof photo === 'object' && photo?.url ? photo.url : (typeof photo === 'string' ? photo : null);
+      if (url) allPhotos.push({ url, type: 'before' });
+    });
+  }
+  
+  // Add after photos (up to remaining slots from 5)
+  if (order.proofOfWork?.afterPhotos) {
+    const remainingSlots = 5 - allPhotos.length;
+    order.proofOfWork.afterPhotos.slice(0, remainingSlots).forEach((photo: any) => {
+      const url = typeof photo === 'object' && photo?.url ? photo.url : (typeof photo === 'string' ? photo : null);
+      if (url) allPhotos.push({ url, type: 'after' });
+    });
+  }
+  
+  const hasProofOfWork = allPhotos.length > 0;
   
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
@@ -102,27 +118,19 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
       {/* Proof of Work Preview */}
       {hasProofOfWork && (
-        <div className="flex gap-2 -mx-1 -mt-1 mb-1">
-          {beforeUrl && (
-            <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="flex gap-2 -mx-1 -mt-1 mb-1 overflow-x-auto">
+          {allPhotos.map((photo, index) => (
+            <div key={index} className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
               <img 
-                src={beforeUrl} 
-                alt="Before" 
+                src={photo.url} 
+                alt={photo.type === 'before' ? 'Before' : 'After'} 
                 className="w-full h-full object-cover"
               />
-              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">Before</span>
+              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">
+                {photo.type === 'before' ? 'Before' : 'After'}
+              </span>
             </div>
-          )}
-          {afterUrl && (
-            <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-              <img 
-                src={afterUrl} 
-                alt="After" 
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">After</span>
-            </div>
-          )}
+          ))}
         </div>
       )}
       <div className="flex justify-between items-start">

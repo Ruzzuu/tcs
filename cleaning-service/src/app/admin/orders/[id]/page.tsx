@@ -513,10 +513,10 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
             {/* Existing Before Photos */}
             {proofOfWork.beforePhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-full rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
                 <img 
                   src={photo.url} 
                   alt={`Before ${index + 1}`}
@@ -543,7 +543,7 @@ export default function OrderDetailPage() {
             ))}
             
             {/* Add Photo Button */}
-            <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer snap-start ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -569,11 +569,11 @@ export default function OrderDetailPage() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">
+                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-2xl mb-1">
                     {proofOfWork.beforePhotos.length === 0 ? 'add_a_photo' : 'add'}
                   </span>
-                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-[#1152d4]">
-                    {proofOfWork.beforePhotos.length === 0 ? 'Ambil Foto' : 'Tambah Foto'}
+                  <span className="text-[10px] font-medium text-gray-400 group-hover:text-[#1152d4]">
+                    {proofOfWork.beforePhotos.length === 0 ? 'Foto' : 'Tambah'}
                   </span>
                 </>
               )}
@@ -591,10 +591,10 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
             {/* Existing After Photos */}
             {proofOfWork.afterPhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-full rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
                 <img 
                   src={photo.url} 
                   alt={`After ${index + 1}`}
@@ -621,7 +621,7 @@ export default function OrderDetailPage() {
             ))}
             
             {/* Add Photo Button */}
-            <label className={`relative aspect-square w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer snap-start ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -647,11 +647,11 @@ export default function OrderDetailPage() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-3xl mb-1">
+                  <span className="material-symbols-outlined text-gray-400 group-hover:text-[#1152d4] text-2xl mb-1">
                     {proofOfWork.afterPhotos.length === 0 ? 'add_a_photo' : 'add'}
                   </span>
-                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-[#1152d4]">
-                    {proofOfWork.afterPhotos.length === 0 ? 'Ambil Foto' : 'Tambah Foto'}
+                  <span className="text-[10px] font-medium text-gray-400 group-hover:text-[#1152d4]">
+                    {proofOfWork.afterPhotos.length === 0 ? 'Foto' : 'Tambah'}
                   </span>
                 </>
               )}
