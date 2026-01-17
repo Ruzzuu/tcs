@@ -287,24 +287,22 @@ export default function AdminForm() {
               *Harga final dikonfirmasi saat penjemputan
             </p>
           </div>
+
+          {/* Submit Button */}
+          <div className="pb-4">
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
+            >
+              <span>Kirim Data</span>
+              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
+                arrow_forward
+              </span>
+            </button>
+          </div>
         </form>
       </main>
-
-      {/* Submit Button */}
-      <div className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-[#1a2230]/80 backdrop-blur-lg border-t border-[#dbdfe6] dark:border-[#2a3441] p-4 z-40">
-        <div className="max-w-md mx-auto w-full">
-          <button
-            onClick={handleSubmit}
-            disabled={!isFormValid}
-            className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
-          >
-            <span>Kirim Data</span>
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
-              arrow_forward
-            </span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
