@@ -14,6 +14,200 @@ import {
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
+// Zoomable Image Component with Pinch-to-Zoom and Pan-to-Move
+interface ZoomableImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+}
+
+function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
+  const [zoomState, setZoomState] = useState({ scale: 1, x: 0, y: 0 });
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const touchStartRef = useRef<{ distance: number; scale: number; x: number; y: number; touches: number } | null>(null);
+  const mouseStartRef = useRef<{ x: number; y: number; isDown: boolean } | null>(null);
+  const lastTapRef = useRef<number>(0);
+
+  // Helper: Calculate distance between two touch points
+  const getTouchDistance = (touches: TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // Helper: Calculate midpoint between two touches
+  const getTouchMidpoint = (touches: TouchList) => {
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    };
+  };
+
+  // Helper: Clamp scale between 1.0 and 3.0
+  const clampScale = (scale: number) => Math.max(1, Math.min(3, scale));
+
+  // Reset zoom
+  const resetZoom = () => {
+    setIsTransitioning(true);
+    setZoomState({ scale: 1, x: 0, y: 0 });
+    setTimeout(() => setIsTransitioning(false), 150);
+  };
+
+  // Touch Start Handler
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      // Pinch-to-zoom initialization
+      e.preventDefault();
+      const distance = getTouchDistance(e.touches);
+      touchStartRef.current = {
+        distance,
+        scale: zoomState.scale,
+        x: zoomState.x,
+        y: zoomState.y,
+        touches: 2,
+      };
+    } else if (e.touches.length === 1 && zoomState.scale > 1) {
+      // Pan-to-move initialization
+      touchStartRef.current = {
+        distance: 0,
+        scale: zoomState.scale,
+        x: e.touches[0].clientX - zoomState.x,
+        y: e.touches[0].clientY - zoomState.y,
+        touches: 1,
+      };
+    }
+  };
+
+  // Touch Move Handler
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+
+    if (e.touches.length === 2 && touchStartRef.current.touches === 2) {
+      // Pinch-to-zoom
+      e.preventDefault();
+      const currentDistance = getTouchDistance(e.touches);
+      const scaleRatio = currentDistance / touchStartRef.current.distance;
+      const newScale = clampScale(touchStartRef.current.scale * scaleRatio);
+      
+      setZoomState(prev => ({
+        ...prev,
+        scale: newScale,
+      }));
+    } else if (e.touches.length === 1 && touchStartRef.current.touches === 1 && zoomState.scale > 1) {
+      // Pan-to-move
+      e.preventDefault();
+      const newX = e.touches[0].clientX - touchStartRef.current.x;
+      const newY = e.touches[0].clientY - touchStartRef.current.y;
+      
+      setZoomState(prev => ({
+        ...prev,
+        x: newX,
+        y: newY,
+      }));
+    }
+  };
+
+  // Touch End Handler
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Detect double-tap
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      resetZoom();
+    }
+    lastTapRef.current = now;
+
+    // Reset to original if zoomed out completely
+    if (zoomState.scale <= 1) {
+      resetZoom();
+    }
+
+    touchStartRef.current = null;
+  };
+
+  // Mouse Down Handler (Desktop)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoomState.scale > 1) {
+      e.preventDefault();
+      mouseStartRef.current = {
+        x: e.clientX - zoomState.x,
+        y: e.clientY - zoomState.y,
+        isDown: true,
+      };
+    }
+  };
+
+  // Mouse Move Handler (Desktop)
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!mouseStartRef.current?.isDown || zoomState.scale <= 1) return;
+    
+    e.preventDefault();
+    const newX = e.clientX - mouseStartRef.current.x;
+    const newY = e.clientY - mouseStartRef.current.y;
+    
+    setZoomState(prev => ({
+      ...prev,
+      x: newX,
+      y: newY,
+    }));
+  };
+
+  // Mouse Up Handler (Desktop)
+  const handleMouseUp = () => {
+    if (mouseStartRef.current) {
+      mouseStartRef.current.isDown = false;
+    }
+  };
+
+  // Double Click Handler (Desktop)
+  const handleDoubleClick = () => {
+    if (zoomState.scale > 1) {
+      resetZoom();
+    } else {
+      setIsTransitioning(true);
+      setZoomState({ scale: 2, x: 0, y: 0 });
+      setTimeout(() => setIsTransitioning(false), 150);
+    }
+  };
+
+  // Get cursor style based on state
+  const getCursor = () => {
+    if (zoomState.scale > 1) {
+      return mouseStartRef.current?.isDown ? 'grabbing' : 'grab';
+    }
+    return 'zoom-in';
+  };
+
+  return (
+    <div
+      className="relative w-full h-full overflow-hidden"
+      style={{ touchAction: 'none' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onDoubleClick={handleDoubleClick}
+    >
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        draggable={false}
+        style={{
+          transform: `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`,
+          transition: isTransitioning ? 'transform 0.15s ease-out' : 'none',
+          cursor: getCursor(),
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          touchAction: 'none',
+        }}
+      />
+    </div>
+  );
+}
+
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -517,8 +711,8 @@ export default function OrderDetailPage() {
             {/* Existing Before Photos */}
             {proofOfWork.beforePhotos.map((photo, index) => (
               <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
-                <img 
-                  src={photo.url} 
+                <ZoomableImage
+                  src={photo.url}
                   alt={`Before ${index + 1}`}
                   className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
                 />
@@ -526,13 +720,13 @@ export default function OrderDetailPage() {
                   <button
                     onClick={() => handleDeletePhoto('before', photo.publicId)}
                     disabled={deletingPhoto === photo.publicId}
-                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50"
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50 z-10"
                   >
                     <span className="material-symbols-outlined text-[16px]">close</span>
                   </button>
                 )}
                 {photo.publicId.startsWith('temp-') && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10 pointer-events-none">
                     <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -595,8 +789,8 @@ export default function OrderDetailPage() {
             {/* Existing After Photos */}
             {proofOfWork.afterPhotos.map((photo, index) => (
               <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
-                <img 
-                  src={photo.url} 
+                <ZoomableImage
+                  src={photo.url}
                   alt={`After ${index + 1}`}
                   className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
                 />
@@ -604,13 +798,13 @@ export default function OrderDetailPage() {
                   <button
                     onClick={() => handleDeletePhoto('after', photo.publicId)}
                     disabled={deletingPhoto === photo.publicId}
-                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50"
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50 z-10"
                   >
                     <span className="material-symbols-outlined text-[16px]">close</span>
                   </button>
                 )}
                 {photo.publicId.startsWith('temp-') && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10 pointer-events-none">
                     <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
