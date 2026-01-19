@@ -14,33 +14,40 @@ import {
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
-// Zoomable Image Component with Pinch-to-Zoom and Pan-to-Move
-interface ZoomableImageProps {
-  src: string;
-  alt: string;
-  className?: string;
+// Fullscreen Image Viewer Modal with Pinch-to-Zoom
+interface ImageViewerModalProps {
+  isOpen: boolean;
+  imageUrl: string;
+  imageAlt: string;
+  onClose: () => void;
 }
 
-function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
+function ImageViewerModal({ isOpen, imageUrl, imageAlt, onClose }: ImageViewerModalProps) {
   const [zoomState, setZoomState] = useState({ scale: 1, x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const touchStartRef = useRef<{ distance: number; scale: number; x: number; y: number; touches: number } | null>(null);
   const mouseStartRef = useRef<{ x: number; y: number; isDown: boolean } | null>(null);
   const lastTapRef = useRef<number>(0);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  // Reset zoom when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setZoomState({ scale: 1, x: 0, y: 0 });
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   // Helper: Calculate distance between two touch points
   const getTouchDistance = (touches: React.TouchList) => {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
-  };
-
-  // Helper: Calculate midpoint between two touches
-  const getTouchMidpoint = (touches: React.TouchList) => {
-    return {
-      x: (touches[0].clientX + touches[1].clientX) / 2,
-      y: (touches[0].clientY + touches[1].clientY) / 2,
-    };
   };
 
   // Helper: Clamp scale between 1.0 and 3.0
@@ -56,7 +63,6 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
   // Touch Start Handler
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
-      // Pinch-to-zoom initialization
       e.preventDefault();
       const distance = getTouchDistance(e.touches);
       touchStartRef.current = {
@@ -67,7 +73,6 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
         touches: 2,
       };
     } else if (e.touches.length === 1 && zoomState.scale > 1) {
-      // Pan-to-move initialization
       touchStartRef.current = {
         distance: 0,
         scale: zoomState.scale,
@@ -83,7 +88,6 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     if (!touchStartRef.current) return;
 
     if (e.touches.length === 2 && touchStartRef.current.touches === 2) {
-      // Pinch-to-zoom
       e.preventDefault();
       const currentDistance = getTouchDistance(e.touches);
       const scaleRatio = currentDistance / touchStartRef.current.distance;
@@ -94,7 +98,6 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
         scale: newScale,
       }));
     } else if (e.touches.length === 1 && touchStartRef.current.touches === 1 && zoomState.scale > 1) {
-      // Pan-to-move
       e.preventDefault();
       const newX = e.touches[0].clientX - touchStartRef.current.x;
       const newY = e.touches[0].clientY - touchStartRef.current.y;
@@ -108,15 +111,14 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
   };
 
   // Touch End Handler
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    // Detect double-tap
+  const handleTouchEnd = () => {
     const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      resetZoom();
+    if (now - lastTapRef.current < 300 && zoomState.scale <= 1) {
+      // Double-tap when not zoomed = close modal
+      onClose();
     }
     lastTapRef.current = now;
 
-    // Reset to original if zoomed out completely
     if (zoomState.scale <= 1) {
       resetZoom();
     }
@@ -124,7 +126,7 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     touchStartRef.current = null;
   };
 
-  // Mouse Down Handler (Desktop)
+  // Mouse Handlers (Desktop)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (zoomState.scale > 1) {
       e.preventDefault();
@@ -136,7 +138,6 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     }
   };
 
-  // Mouse Move Handler (Desktop)
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!mouseStartRef.current?.isDown || zoomState.scale <= 1) return;
     
@@ -151,14 +152,12 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     }));
   };
 
-  // Mouse Up Handler (Desktop)
   const handleMouseUp = () => {
     if (mouseStartRef.current) {
       mouseStartRef.current.isDown = false;
     }
   };
 
-  // Double Click Handler (Desktop)
   const handleDoubleClick = () => {
     if (zoomState.scale > 1) {
       resetZoom();
@@ -169,7 +168,13 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     }
   };
 
-  // Get cursor style based on state
+  // Click outside image to close
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && zoomState.scale <= 1) {
+      onClose();
+    }
+  };
+
   const getCursor = () => {
     if (zoomState.scale > 1) {
       return mouseStartRef.current?.isDown ? 'grabbing' : 'grab';
@@ -177,33 +182,58 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
     return 'zoom-in';
   };
 
+  if (!isOpen) return null;
+
   return (
     <div
-      className="relative w-full h-full overflow-hidden"
+      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+      onClick={handleBackdropClick}
       style={{ touchAction: 'none' }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onDoubleClick={handleDoubleClick}
     >
-      <img
-        src={src}
-        alt={alt}
-        className={className}
-        draggable={false}
-        style={{
-          transform: `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`,
-          transition: isTransitioning ? 'transform 0.15s ease-out' : 'none',
-          cursor: getCursor(),
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          touchAction: 'none',
-        }}
-      />
+      {/* Close Button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 text-white transition-colors"
+        aria-label="Close"
+      >
+        <span className="material-symbols-outlined text-2xl">close</span>
+      </button>
+
+      {/* Image Container */}
+      <div
+        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
+      >
+        <img
+          ref={imageRef}
+          src={imageUrl}
+          alt={imageAlt}
+          draggable={false}
+          className="max-w-full max-h-full object-contain"
+          style={{
+            transform: `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`,
+            transition: isTransitioning ? 'transform 0.15s ease-out' : 'none',
+            cursor: getCursor(),
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            touchAction: 'none',
+          }}
+        />
+      </div>
+
+      {/* Zoom Indicator */}
+      {zoomState.scale > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-medium">
+          {(zoomState.scale * 100).toFixed(0)}%
+        </div>
+      )}
     </div>
   );
 }
@@ -228,6 +258,23 @@ export default function OrderDetailPage() {
   const [uploading, setUploading] = useState<'before' | 'after' | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{ type: 'before' | 'after', current: number, total: number } | null>(null);
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
+
+  // Image viewer modal state
+  const [viewerState, setViewerState] = useState<{ isOpen: boolean; imageUrl: string; imageAlt: string }>({
+    isOpen: false,
+    imageUrl: '',
+    imageAlt: '',
+  });
+
+  // Open image in fullscreen viewer
+  const openImageViewer = (url: string, alt: string) => {
+    setViewerState({ isOpen: true, imageUrl: url, imageAlt: alt });
+  };
+
+  // Close image viewer
+  const closeImageViewer = () => {
+    setViewerState({ isOpen: false, imageUrl: '', imageAlt: '' });
+  };
 
   // Multi-file upload handler with optimistic UI
   const handleMultipleImageUpload = async (type: 'before' | 'after', files: FileList | File[]) => {
@@ -710,15 +757,29 @@ export default function OrderDetailPage() {
           <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
             {/* Existing Before Photos */}
             {proofOfWork.beforePhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
-                <ZoomableImage
-                  src={photo.url}
-                  alt={`Before ${index + 1}`}
-                  className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
-                />
+              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start group">
+                <button
+                  onClick={() => openImageViewer(photo.url, `Before ${index + 1}`)}
+                  disabled={photo.publicId.startsWith('temp-')}
+                  className="w-full h-full relative"
+                >
+                  <img
+                    src={photo.url}
+                    alt={`Before ${index + 1}`}
+                    className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''} ${!photo.publicId.startsWith('temp-') ? 'group-hover:brightness-75 transition-all cursor-pointer' : ''}`}
+                  />
+                  {!photo.publicId.startsWith('temp-') && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 pointer-events-none">
+                      <span className="material-symbols-outlined text-white text-3xl">zoom_in</span>
+                    </div>
+                  )}
+                </button>
                 {!photo.publicId.startsWith('temp-') && (
                   <button
-                    onClick={() => handleDeletePhoto('before', photo.publicId)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeletePhoto('before', photo.publicId);
+                    }}
                     disabled={deletingPhoto === photo.publicId}
                     className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50 z-10"
                   >
@@ -788,15 +849,29 @@ export default function OrderDetailPage() {
           <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
             {/* Existing After Photos */}
             {proofOfWork.afterPhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start">
-                <ZoomableImage
-                  src={photo.url}
-                  alt={`After ${index + 1}`}
-                  className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''}`}
-                />
+              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start group">
+                <button
+                  onClick={() => openImageViewer(photo.url, `After ${index + 1}`)}
+                  disabled={photo.publicId.startsWith('temp-')}
+                  className="w-full h-full relative"
+                >
+                  <img
+                    src={photo.url}
+                    alt={`After ${index + 1}`}
+                    className={`w-full h-full object-cover ${deletingPhoto === photo.publicId ? 'opacity-50' : ''} ${!photo.publicId.startsWith('temp-') ? 'group-hover:brightness-75 transition-all cursor-pointer' : ''}`}
+                  />
+                  {!photo.publicId.startsWith('temp-') && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 pointer-events-none">
+                      <span className="material-symbols-outlined text-white text-3xl">zoom_in</span>
+                    </div>
+                  )}
+                </button>
                 {!photo.publicId.startsWith('temp-') && (
                   <button
-                    onClick={() => handleDeletePhoto('after', photo.publicId)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeletePhoto('after', photo.publicId);
+                    }}
                     disabled={deletingPhoto === photo.publicId}
                     className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1.5 text-white backdrop-blur-sm transition-colors disabled:opacity-50 z-10"
                   >
@@ -990,6 +1065,14 @@ export default function OrderDetailPage() {
           Simpan
         </button>
       </div>
+
+      {/* Image Viewer Modal */}
+      <ImageViewerModal
+        isOpen={viewerState.isOpen}
+        imageUrl={viewerState.imageUrl}
+        imageAlt={viewerState.imageAlt}
+        onClose={closeImageViewer}
+      />
     </div>
   );
 }
