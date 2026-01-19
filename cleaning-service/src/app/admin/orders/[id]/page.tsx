@@ -29,14 +29,14 @@ function ZoomableImage({ src, alt, className = '' }: ZoomableImageProps) {
   const lastTapRef = useRef<number>(0);
 
   // Helper: Calculate distance between two touch points
-  const getTouchDistance = (touches: TouchList) => {
+  const getTouchDistance = (touches: React.TouchList) => {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
   };
 
   // Helper: Calculate midpoint between two touches
-  const getTouchMidpoint = (touches: TouchList) => {
+  const getTouchMidpoint = (touches: React.TouchList) => {
     return {
       x: (touches[0].clientX + touches[1].clientX) / 2,
       y: (touches[0].clientY + touches[1].clientY) / 2,
