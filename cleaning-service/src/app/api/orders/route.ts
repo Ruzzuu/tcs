@@ -222,7 +222,6 @@ export async function POST(request: NextRequest) {
           },
           message: 'Item berhasil ditambahkan ke pesanan yang ada'
         });
-        }
       }
     }
 
