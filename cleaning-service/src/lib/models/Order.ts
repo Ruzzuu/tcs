@@ -3,10 +3,50 @@
 // ============================================
 
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { Order as OrderType, ServiceType, OrderStatus, VerificationStatus } from '@/types';
+import { Order as OrderType, ServiceType, OrderStatus, VerificationStatus, OrderItem } from '@/types';
 
 // Document interface
 export interface OrderDocument extends Omit<OrderType, '_id'>, Document {}
+
+// OrderItem sub-schema
+const OrderItemSchema = new Schema({
+  id: {
+    type: String,
+    required: true
+  },
+  serviceType: {
+    type: String,
+    required: true,
+    enum: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[]
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  unitPrice: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  subtotal: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  notes: {
+    type: String,
+    trim: true
+  },
+  customItemType: {
+    type: String,
+    trim: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: true });
 
 // Schema definition
 const OrderSchema = new Schema<OrderDocument>(
@@ -37,10 +77,21 @@ const OrderSchema = new Schema<OrderDocument>(
       trim: true
     },
     
-    // Order Details
+    // Order Details - Multi-item support
+    items: {
+      type: [OrderItemSchema],
+      required: true,
+      validate: {
+        validator: function(items: any[]) {
+          return items && items.length > 0;
+        },
+        message: 'Order must have at least one item'
+      }
+    },
+    
+    // Legacy fields (for backwards compatibility)
     itemType: {
       type: String,
-      required: [true, 'Jenis barang wajib dipilih'],
       enum: {
         values: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[],
         message: 'Jenis barang tidak valid'
@@ -52,17 +103,22 @@ const OrderSchema = new Schema<OrderDocument>(
     },
     quantity: {
       type: Number,
-      required: true,
-      min: [1, 'Jumlah minimal 1'],
-      default: 1
+      min: [1, 'Jumlah minimal 1']
     },
     estimatedPrice: {
+      type: Number,
+      min: 0
+    },
+    
+    // Pricing
+    subtotal: {
       type: Number,
       required: true,
       min: 0
     },
     finalPrice: {
       type: Number,
+      required: true,
       min: 0
     },
     
@@ -78,11 +134,7 @@ const OrderSchema = new Schema<OrderDocument>(
       }
     },
     
-    // Pricing breakdown
-    subtotal: {
-      type: Number,
-      min: 0
-    },
+    // Pricing breakdown (removed - calculated from items)
     
     // Status Flow
     status: {

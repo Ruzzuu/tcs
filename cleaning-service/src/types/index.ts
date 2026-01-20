@@ -8,6 +8,19 @@ export interface CloudinaryImage {
   publicId: string;
 }
 
+// Order Item - represents a single item in an order
+export interface OrderItem {
+  _id?: string;
+  id: string; // Unique ID for the item
+  serviceType: ServiceType;
+  quantity: number;
+  unitPrice: number; // Price per unit at time of order
+  subtotal: number; // unitPrice * quantity
+  notes?: string; // Item-specific notes
+  customItemType?: string; // For 'other' service type
+  createdAt: Date;
+}
+
 export interface Order {
   _id: string;
   orderNumber: string;
@@ -17,20 +30,24 @@ export interface Order {
   phone: string;
   address: string;
   
-  // Order Details
-  itemType: ServiceType;
-  quantity: number;
-  estimatedPrice: number;
-  finalPrice?: number;
+  // Order Details - NEW: Multi-item support
+  items: OrderItem[]; // Array of items in this order
+  
+  // Legacy fields (kept for backwards compatibility during migration)
+  itemType?: ServiceType;
+  quantity?: number;
+  estimatedPrice?: number;
+  customItemType?: string;
+  
+  // Pricing
+  subtotal: number; // Sum of all item subtotals
+  finalPrice: number; // Total after discount
   
   // Discount
   discount?: {
     type: 'percentage' | 'fixed';
     value: number;
   };
-  
-  // Pricing breakdown
-  subtotal?: number;
   
   // Status
   status: OrderStatus;
@@ -49,9 +66,6 @@ export interface Order {
 
   // Nota Image (Cloudinary URL)
   notaImage?: CloudinaryImage;
-
-  // Custom Item
-  customItemType?: string;
   
   // Notes
   customerNotes?: string; // Notes from customer when ordering
