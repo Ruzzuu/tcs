@@ -1243,16 +1243,39 @@ export default function OrderDetailPage() {
                 <tr style={{ color: '#1f2937' }}>
                   <td style={{ padding: '8px 0' }}>{serviceName}</td>
                   <td style={{ textAlign: 'center' }}>{order.quantity}</td>
-                  <td style={{ textAlign: 'right' }}>{formatCurrency(finalPrice || order.estimatedPrice)}</td>
+                  <td style={{ textAlign: 'right' }}>{formatCurrency((order.subtotal || order.estimatedPrice) / order.quantity)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           
-          <div style={{ textAlign: 'right', marginBottom: '24px' }}>
-            <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-              Total: {formatCurrency(finalPrice || order.estimatedPrice)}
-            </p>
+          <div style={{ marginTop: '16px', marginBottom: '24px', fontSize: '14px', color: '#374151' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', paddingBottom: '8px' }}>
+              <span style={{ fontWeight: '500' }}>Jumlah Pembelian</span>
+              <span style={{ fontWeight: '600' }}>{formatCurrency(order.subtotal || order.estimatedPrice)}</span>
+            </div>
+            
+            {order.discount && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', paddingBottom: '8px', color: '#059669' }}>
+                <span style={{ fontWeight: '500' }}>
+                  Diskon {order.discount.type === 'percentage' ? `(${order.discount.value}%)` : ''}
+                </span>
+                <span style={{ fontWeight: '600' }}>
+                  - {formatCurrency(
+                    order.discount.type === 'percentage' 
+                      ? Math.round((order.subtotal || order.estimatedPrice) * order.discount.value / 100)
+                      : order.discount.value
+                  )}
+                </span>
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '12px', borderTop: '2px solid #e5e7eb' }}>
+              <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Total Pembayaran</span>
+              <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
+                {formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice)}
+              </span>
+            </div>
           </div>
           
           <div style={{ textAlign: 'center', borderTop: '2px dashed #d1d5db', paddingTop: '16px' }}>
