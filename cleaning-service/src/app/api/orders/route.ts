@@ -187,18 +187,26 @@ export async function POST(request: NextRequest) {
           console.log('📝 Items after push:', existingOrder.items.length);
         
           // Recalculate totals
-        const subtotal = existingOrder.items.reduce((sum, item) => sum + item.subtotal, 0);
-        existingOrder.subtotal = subtotal;
-        existingOrder.estimatedPrice = subtotal;
-        existingOrder.finalPrice = existingOrder.discount 
-          ? subtotal - (existingOrder.discount.type === 'percentage' 
-              ? (subtotal * existingOrder.discount.value / 100) 
-              : existingOrder.discount.value)
-          : subtotal;
-
-        // Update address if provided
-        if (address?.trim()) {
-          existingOrder.address = address.trim();
+          const subtotal = existingOrder.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+          console.log('💰 Calculated subtotal:', subtotal);
+          
+          existingOrder.subtotal = subtotal;
+          existingOrder.estimatedPrice = subtotal;
+          
+          // Calculate final price with discount
+          let finalPrice = subtotal;
+          if (existingOrder.discount) {
+            const discountValue = Number(existingOrder.discount.value) || 0;
+            if (existingOrder.discount.type === 'percentage') {
+              const discountAmount = Math.round((subtotal * discountValue) / 100);
+              finalPrice = subtotal - discountAmount;
+            } else {
+              finalPrice = subtotal - discountValue;
+            }
+          }
+          existingOrder.finalPrice = Math.max(0, finalPrice);
+          
+          console.log('💵 Final price:', existingOrder.finalPrice);
         }
 
         await existingOrder.save();
