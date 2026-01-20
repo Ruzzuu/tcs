@@ -259,6 +259,11 @@ export default function OrderDetailPage() {
   const [uploadProgress, setUploadProgress] = useState<{ type: 'before' | 'after', current: number, total: number } | null>(null);
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
 
+  // Discount state
+  const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
+  const [discountValue, setDiscountValue] = useState<number>(0);
+  const [applyingDiscount, setApplyingDiscount] = useState(false);
+
   // Image viewer modal state
   const [viewerState, setViewerState] = useState<{ isOpen: boolean; imageUrl: string; imageAlt: string }>({
     isOpen: false,
@@ -441,6 +446,15 @@ export default function OrderDetailPage() {
         setNotes(result.data.notes || '');
         setFinalPrice(result.data.finalPrice);
         setProofOfWork(result.data.proofOfWork || { beforePhotos: [], afterPhotos: [] });
+        
+        // Load discount data
+        if (result.data.discount) {
+          setDiscountType(result.data.discount.type);
+          setDiscountValue(result.data.discount.value);
+        } else {
+          setDiscountType('percentage');
+          setDiscountValue(0);
+        }
       } else {
         setError(result.error || 'Order not found');
       }
@@ -529,6 +543,74 @@ export default function OrderDetailPage() {
       alert('Gagal membuat nota. Silakan coba lagi.');
     } finally {
       setGeneratingNota(false);
+    }
+  };
+
+  // Apply discount
+  const handleApplyDiscount = async () => {
+    if (!order) return;
+
+    setApplyingDiscount(true);
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount: {
+            type: discountType,
+            value: discountValue
+          }
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setOrder(result.data);
+        setFinalPrice(result.data.finalPrice);
+        alert('Diskon berhasil diterapkan!');
+      } else {
+        alert(result.error || 'Gagal menerapkan diskon');
+      }
+    } catch {
+      alert('Gagal terhubung ke server');
+    } finally {
+      setApplyingDiscount(false);
+    }
+  };
+
+  // Remove discount
+  const handleRemoveDiscount = async () => {
+    if (!order) return;
+
+    const confirmed = confirm('Hapus diskon dari pesanan ini?');
+    if (!confirmed) return;
+
+    setApplyingDiscount(true);
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount: null
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setOrder(result.data);
+        setFinalPrice(result.data.finalPrice);
+        setDiscountType('percentage');
+        setDiscountValue(0);
+        alert('Diskon berhasil dihapus!');
+      } else {
+        alert(result.error || 'Gagal menghapus diskon');
+      }
+    } catch {
+      alert('Gagal terhubung ke server');
+    } finally {
+      setApplyingDiscount(false);
     }
   };
 
@@ -688,29 +770,150 @@ export default function OrderDetailPage() {
           {/* Pricing */}
           <div className="mt-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Estimasi</span>
-              <span>{formatCurrency(order.estimatedPrice)}</span>
+              <span>Subtotal</span>
+              <span>{formatCurrency(order.subtotal || order.estimatedPrice)}</span>
             </div>
             
-            {/* Final Price Input */}
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Harga Final</span>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Rp</span>
-                <input
-                  type="number"
-                  value={finalPrice || order.estimatedPrice}
-                  onChange={(e) => setFinalPrice(parseInt(e.target.value) || undefined)}
-                  className="w-32 pl-9 pr-3 py-2 text-right text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1a2230] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
-                />
+            {/* Show discount if applied */}
+            {order.discount && (
+              <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                <span>
+                  Diskon {order.discount.type === 'percentage' ? `(${order.discount.value}%)` : ''}
+                </span>
+                <span>
+                  - {formatCurrency(
+                    order.discount.type === 'percentage' 
+                      ? Math.round((order.subtotal || order.estimatedPrice) * order.discount.value / 100)
+                      : order.discount.value
+                  )}
+                </span>
               </div>
-            </div>
+            )}
 
-            <div className="flex justify-between text-lg font-bold text-[#111318] dark:text-[#1152d4] pt-2">
-              <span>Total</span>
-              <span>{formatCurrency(finalPrice || order.estimatedPrice)}</span>
+            <div className="flex justify-between text-lg font-bold text-[#111318] dark:text-[#1152d4] pt-2 border-t border-gray-200 dark:border-gray-700">
+              <span>Total Bayar</span>
+              <span>{formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice)}</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Discount Section */}
+      <div className="px-4 mt-6">
+        <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
+          Diskon
+        </h3>
+        <div className="bg-white dark:bg-[#1a2230] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 space-y-4">
+          {/* Discount Type Toggle */}
+          <div>
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 block">
+              Tipe Diskon
+            </label>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDiscountType('percentage')}
+                disabled={applyingDiscount}
+                className={`flex-1 py-2.5 px-4 rounded-lg border-2 font-medium text-sm transition-all ${
+                  discountType === 'percentage'
+                    ? 'border-[#1152d4] bg-[#1152d4]/10 text-[#1152d4]'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'
+                }`}
+              >
+                Persen (%)
+              </button>
+              <button
+                onClick={() => setDiscountType('fixed')}
+                disabled={applyingDiscount}
+                className={`flex-1 py-2.5 px-4 rounded-lg border-2 font-medium text-sm transition-all ${
+                  discountType === 'fixed'
+                    ? 'border-[#1152d4] bg-[#1152d4]/10 text-[#1152d4]'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'
+                }`}
+              >
+                Nominal (Rp)
+              </button>
+            </div>
+          </div>
+
+          {/* Discount Value Input */}
+          <div>
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 block">
+              Nilai Diskon
+            </label>
+            <div className="relative">
+              {discountType === 'fixed' && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">Rp</span>
+              )}
+              <input
+                type="number"
+                value={discountValue || ''}
+                onChange={(e) => setDiscountValue(parseInt(e.target.value) || 0)}
+                disabled={applyingDiscount}
+                min="0"
+                max={discountType === 'percentage' ? 100 : undefined}
+                placeholder={discountType === 'percentage' ? '0-100' : '0'}
+                className={`w-full ${discountType === 'fixed' ? 'pl-9' : 'pl-4'} pr-12 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1a2230] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50`}
+              />
+              {discountType === 'percentage' && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">%</span>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={handleApplyDiscount}
+              disabled={applyingDiscount || discountValue <= 0}
+              className="flex-1 py-2.5 px-4 bg-[#1152d4] hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {applyingDiscount ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Menerapkan...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-[18px]">discount</span>
+                  <span>Terapkan Diskon</span>
+                </>
+              )}
+            </button>
+            
+            {order?.discount && (
+              <button
+                onClick={handleRemoveDiscount}
+                disabled={applyingDiscount}
+                className="py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span>Hapus</span>
+              </button>
+            )}
+          </div>
+
+          {/* Current Discount Info */}
+          {order?.discount && (
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[20px]">check_circle</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                    Diskon Aktif
+                  </p>
+                  <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+                    {order.discount.type === 'percentage' 
+                      ? `${order.discount.value}% dari subtotal`
+                      : `Potongan ${formatCurrency(order.discount.value)}`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

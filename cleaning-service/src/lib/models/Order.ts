@@ -66,6 +66,24 @@ const OrderSchema = new Schema<OrderDocument>(
       min: 0
     },
     
+    // Discount information
+    discount: {
+      type: {
+        type: String,
+        enum: ['percentage', 'fixed']
+      },
+      value: {
+        type: Number,
+        min: 0
+      }
+    },
+    
+    // Pricing breakdown
+    subtotal: {
+      type: Number,
+      min: 0
+    },
+    
     // Status Flow
     status: {
       type: String,

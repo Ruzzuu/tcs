@@ -23,6 +23,15 @@ export interface Order {
   estimatedPrice: number;
   finalPrice?: number;
   
+  // Discount
+  discount?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  };
+  
+  // Pricing breakdown
+  subtotal?: number;
+  
   // Status
   status: OrderStatus;
   

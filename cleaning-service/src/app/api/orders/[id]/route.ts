@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { v2 as cloudinary } from 'cloudinary';
+import { calculateTotal } from '@/lib/services';
+import type { ServiceSelection, Discount } from '@/lib/services';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -55,12 +57,45 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
 
     // Only allow certain fields to be updated
-    const allowedFields = ['status', 'notes', 'beforePhoto', 'afterPhoto', 'finalPrice', 'proofOfWork', 'notaImage'];
+    const allowedFields = ['status', 'notes', 'beforePhoto', 'afterPhoto', 'finalPrice', 'proofOfWork', 'notaImage', 'discount'];
     const updateData: Record<string, unknown> = {};
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
         updateData[field] = body[field];
+      }
+    }
+
+    // Handle discount updates
+    if ('discount' in body) {
+      const order = await Order.findById(id);
+      
+      if (!order) {
+        return NextResponse.json(
+          { success: false, error: 'Pesanan tidak ditemukan' },
+          { status: 404 }
+        );
+      }
+
+      if (body.discount === null) {
+        // Remove discount
+        updateData.discount = undefined;
+        updateData.subtotal = order.estimatedPrice;
+        updateData.finalPrice = order.estimatedPrice;
+      } else {
+        // Apply discount
+        const discount: Discount = body.discount;
+        const items: ServiceSelection[] = [{
+          serviceKey: order.itemType,
+          quantity: order.quantity,
+          price: order.estimatedPrice / order.quantity
+        }];
+
+        const pricing = calculateTotal(items, discount);
+        
+        updateData.discount = discount;
+        updateData.subtotal = pricing.subtotal;
+        updateData.finalPrice = pricing.total;
       }
     }
 
