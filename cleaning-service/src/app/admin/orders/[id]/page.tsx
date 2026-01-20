@@ -877,7 +877,7 @@ export default function OrderDetailPage() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-[18px]">discount</span>
+                  <span className="material-symbols-outlined text-[18px]"></span>
                   <span>Terapkan Diskon</span>
                 </>
               )}
