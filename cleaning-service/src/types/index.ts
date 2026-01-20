@@ -31,7 +31,7 @@ export interface Order {
   address: string;
   
   // Order Details - NEW: Multi-item support
-  items: OrderItem[]; // Array of items in this order
+  items?: OrderItem[]; // Array of items in this order (optional for legacy orders)
   
   // Legacy fields (kept for backwards compatibility during migration)
   itemType?: ServiceType;

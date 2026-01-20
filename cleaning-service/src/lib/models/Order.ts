@@ -80,13 +80,8 @@ const OrderSchema = new Schema<OrderDocument>(
     // Order Details - Multi-item support
     items: {
       type: [OrderItemSchema],
-      required: true,
-      validate: {
-        validator: function(items: any[]) {
-          return items && items.length > 0;
-        },
-        message: 'Order must have at least one item'
-      }
+      required: false, // Optional for backwards compatibility with legacy orders
+      default: undefined
     },
     
     // Legacy fields (for backwards compatibility)

@@ -588,7 +588,7 @@ export default function OrderDetailPage() {
 
     // Optimistically clear discount UI immediately
     const originalOrder = { ...order };
-    const subtotal = order.items?.length > 0 
+    const subtotal = (order.items && order.items.length > 0)
       ? order.items.reduce((sum, item) => sum + item.subtotal, 0)
       : (order.estimatedPrice || 0);
     

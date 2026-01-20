@@ -81,9 +81,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       if (body.discount === null) {
         // Remove discount - use $unset to completely remove the field
-        const subtotal = isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items?.length > 0
+        const subtotal = isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items && order.items.length > 0
           ? order.items.reduce((sum: number, item: any) => sum + item.subtotal, 0)
-          : order.estimatedPrice;
+          : (order.estimatedPrice || 0);
 
         const updatedOrder = await Order.findByIdAndUpdate(
           id,
@@ -113,7 +113,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         // Apply discount
         const discount: Discount = body.discount;
         
-        if (isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items?.length > 0) {
+        if (isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items && order.items.length > 0) {
           // Multi-item order: use new calculation method
           const subtotal = order.items.reduce((sum: number, item: any) => sum + item.subtotal, 0);
           const pricing = calculateOrderTotal(order.items, discount);

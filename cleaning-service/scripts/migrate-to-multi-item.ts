@@ -123,7 +123,7 @@ async function rollbackMultiItem() {
     console.log(`📊 Found ${orders.length} orders to rollback\n`);
 
     for (const order of orders) {
-      if (order.items.length === 1) {
+      if (order.items && order.items.length === 1) {
         const item = order.items[0];
         
         await Order.findByIdAndUpdate(

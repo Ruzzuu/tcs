@@ -43,6 +43,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Check if order has items array
+    if (!order.items || order.items.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Pesanan tidak memiliki items array' },
+        { status: 400 }
+      );
+    }
+
     // Find and remove item
     const itemIndex = order.items.findIndex((item: any) => item.id === itemId);
 

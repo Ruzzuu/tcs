@@ -157,6 +157,11 @@ export async function POST(request: NextRequest) {
           customerNotes?.trim()
         );
 
+        // Ensure items array exists
+        if (!existingOrder.items) {
+          existingOrder.items = [];
+        }
+
         existingOrder.items.push(newItem);
         
         // Recalculate totals
@@ -220,6 +225,9 @@ export async function POST(request: NextRequest) {
       orderData.quantity = quantity;
       orderData.estimatedPrice = estimatedPrice;
       orderData.customerNotes = customerNotes?.trim() || '';
+      // Set subtotal and finalPrice for schema validation
+      orderData.subtotal = estimatedPrice;
+      orderData.finalPrice = estimatedPrice;
     }
 
     const order = new Order(orderData);

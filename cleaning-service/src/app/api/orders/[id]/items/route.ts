@@ -69,6 +69,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Ensure items array exists
+    if (!order.items) {
+      order.items = [];
+    }
+
     // Create new item
     const newItem = createOrderItem(
       itemType as ServiceType,
