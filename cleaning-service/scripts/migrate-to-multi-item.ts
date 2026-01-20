@@ -41,15 +41,22 @@ async function migrateToMultiItem() {
           continue;
         }
 
+        // Skip if order doesn't have required legacy fields
+        if (!order.itemType || !order.estimatedPrice) {
+          console.log(`⚠️  Skipping order ${order._id} - missing required fields`);
+          continue;
+        }
+
         // Create item from legacy fields
-        const unitPrice = order.estimatedPrice / (order.quantity || 1);
+        const quantity = order.quantity || 1;
+        const unitPrice = order.estimatedPrice / quantity;
         const serviceKey = order.itemType;
         const servicePrice = SERVICES[serviceKey]?.price || unitPrice;
 
         const item = {
           id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           serviceType: order.itemType,
-          quantity: order.quantity || 1,
+          quantity: quantity,
           unitPrice: servicePrice,
           subtotal: order.estimatedPrice,
           notes: order.customerNotes || '',

@@ -155,7 +155,7 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
         </div>
         <div className="text-right">
           <p className="text-sm font-bold text-[#111318] dark:text-white">
-            {formatCurrency(order.finalPrice || order.estimatedPrice)}
+            {formatCurrency(order.finalPrice || order.estimatedPrice || 0)}
           </p>
           <div className="flex flex-col items-end">
             <p className="text-xs font-medium text-gray-500 dark:text-gray-300">{formatDate(order.createdAt)}</p>

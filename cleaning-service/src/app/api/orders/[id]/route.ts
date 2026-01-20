@@ -8,6 +8,8 @@ import Order from '@/lib/models/Order';
 import { v2 as cloudinary } from 'cloudinary';
 import { calculateTotal } from '@/lib/services';
 import type { ServiceSelection, Discount } from '@/lib/services';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { calculateOrderTotal } from '@/lib/orderUtils';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -79,13 +81,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       if (body.discount === null) {
         // Remove discount - use $unset to completely remove the field
+        const subtotal = isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items?.length > 0
+          ? order.items.reduce((sum: number, item: any) => sum + item.subtotal, 0)
+          : order.estimatedPrice;
+
         const updatedOrder = await Order.findByIdAndUpdate(
           id,
           {
             $unset: { discount: "" },
             $set: {
-              subtotal: order.estimatedPrice,
-              finalPrice: order.estimatedPrice
+              subtotal: subtotal,
+              finalPrice: subtotal
             }
           },
           { new: true, runValidators: true }
@@ -106,17 +112,36 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       } else {
         // Apply discount
         const discount: Discount = body.discount;
-        const items: ServiceSelection[] = [{
-          serviceKey: order.itemType,
-          quantity: order.quantity,
-          price: order.estimatedPrice / order.quantity
-        }];
-
-        const pricing = calculateTotal(items, discount);
         
-        updateData.discount = discount;
-        updateData.subtotal = pricing.subtotal;
-        updateData.finalPrice = pricing.total;
+        if (isFeatureEnabled('MULTI_ITEM_ORDERS') && order.items?.length > 0) {
+          // Multi-item order: use new calculation method
+          const subtotal = order.items.reduce((sum: number, item: any) => sum + item.subtotal, 0);
+          const pricing = calculateOrderTotal(order.items, discount);
+          
+          updateData.discount = discount;
+          updateData.subtotal = subtotal;
+          updateData.finalPrice = pricing.total;
+        } else {
+          // Legacy single-item order - check for required fields
+          if (!order.itemType || order.quantity === undefined || !order.estimatedPrice) {
+            return NextResponse.json(
+              { success: false, error: 'Data pesanan tidak lengkap' },
+              { status: 400 }
+            );
+          }
+          
+          const items: ServiceSelection[] = [{
+            serviceKey: order.itemType,
+            quantity: order.quantity,
+            price: order.estimatedPrice / order.quantity
+          }];
+
+          const pricing = calculateTotal(items, discount);
+          
+          updateData.discount = discount;
+          updateData.subtotal = pricing.subtotal;
+          updateData.finalPrice = pricing.total;
+        }
       }
     }
 

@@ -52,10 +52,10 @@ function PendingCard({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{serviceName}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatCurrency(order.estimatedPrice)}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatCurrency(order.estimatedPrice || 0)}</p>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Qty:</span>
-            <span className="text-xs font-bold text-slate-900 dark:text-white">{order.quantity} Unit</span>
+            <span className="text-xs font-bold text-slate-900 dark:text-white">{order.quantity || 1} Unit</span>
           </div>
         </div>
       </div>
@@ -184,8 +184,8 @@ export default function PendingPage() {
     ? orders 
     : orders.filter(o => o.itemType === filter);
 
-  // Get unique item types for filter
-  const itemTypes = [...new Set(orders.map(o => o.itemType))];
+  // Get unique item types for filter (filter out undefined)
+  const itemTypes = [...new Set(orders.map(o => o.itemType).filter((type): type is ServiceType => type !== undefined))];
 
   if (loading && orders.length === 0) {
     return (

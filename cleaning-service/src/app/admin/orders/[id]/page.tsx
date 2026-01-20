@@ -588,15 +588,19 @@ export default function OrderDetailPage() {
 
     // Optimistically clear discount UI immediately
     const originalOrder = { ...order };
-    const clearedOrder = {
+    const subtotal = order.items?.length > 0 
+      ? order.items.reduce((sum, item) => sum + item.subtotal, 0)
+      : (order.estimatedPrice || 0);
+    
+    const clearedOrder: Order = {
       ...order,
       discount: undefined,
-      subtotal: order.estimatedPrice,
-      finalPrice: order.estimatedPrice
+      subtotal: subtotal,
+      finalPrice: subtotal
     };
     
     setOrder(clearedOrder);
-    setFinalPrice(order.estimatedPrice);
+    setFinalPrice(subtotal);
     setDiscountType('percentage');
     setDiscountValue(0);
     setApplyingDiscount(true);
@@ -798,7 +802,7 @@ export default function OrderDetailPage() {
           <div className="mt-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
               <span>Subtotal</span>
-              <span>{formatCurrency(order.subtotal || order.estimatedPrice)}</span>
+              <span>{formatCurrency(order.subtotal || order.estimatedPrice || 0)}</span>
             </div>
             
             {/* Show discount if applied */}
@@ -810,7 +814,7 @@ export default function OrderDetailPage() {
                 <span>
                   - {formatCurrency(
                     order.discount.type === 'percentage' 
-                      ? Math.round((order.subtotal || order.estimatedPrice) * order.discount.value / 100)
+                      ? Math.round((order.subtotal || order.estimatedPrice || 0) * order.discount.value / 100)
                       : order.discount.value
                   )}
                 </span>
@@ -819,7 +823,7 @@ export default function OrderDetailPage() {
 
             <div className="flex justify-between text-lg font-bold text-[#111318] dark:text-[#1152d4] pt-2 border-t border-gray-200 dark:border-gray-700">
               <span>Total Bayar</span>
-              <span>{formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice)}</span>
+              <span>{formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice || 0)}</span>
             </div>
           </div>
         </div>
@@ -1242,8 +1246,8 @@ export default function OrderDetailPage() {
               <tbody>
                 <tr style={{ color: '#1f2937' }}>
                   <td style={{ padding: '8px 0' }}>{serviceName}</td>
-                  <td style={{ textAlign: 'center' }}>{order.quantity}</td>
-                  <td style={{ textAlign: 'right' }}>{formatCurrency((order.subtotal || order.estimatedPrice) / order.quantity)}</td>
+                  <td style={{ textAlign: 'center' }}>{order.quantity || 1}</td>
+                  <td style={{ textAlign: 'right' }}>{formatCurrency((order.subtotal || order.estimatedPrice || 0) / (order.quantity || 1))}</td>
                 </tr>
               </tbody>
             </table>
@@ -1252,7 +1256,7 @@ export default function OrderDetailPage() {
           <div style={{ marginTop: '16px', marginBottom: '24px', fontSize: '14px', color: '#374151' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', paddingBottom: '8px' }}>
               <span style={{ fontWeight: '500' }}>Jumlah Pembelian</span>
-              <span style={{ fontWeight: '600' }}>{formatCurrency(order.subtotal || order.estimatedPrice)}</span>
+              <span style={{ fontWeight: '600' }}>{formatCurrency(order.subtotal || order.estimatedPrice || 0)}</span>
             </div>
             
             {order.discount && (
@@ -1263,7 +1267,7 @@ export default function OrderDetailPage() {
                 <span style={{ fontWeight: '600' }}>
                   - {formatCurrency(
                     order.discount.type === 'percentage' 
-                      ? Math.round((order.subtotal || order.estimatedPrice) * order.discount.value / 100)
+                      ? Math.round((order.subtotal || order.estimatedPrice || 0) * order.discount.value / 100)
                       : order.discount.value
                   )}
                 </span>
@@ -1273,7 +1277,7 @@ export default function OrderDetailPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '12px', borderTop: '2px solid #e5e7eb' }}>
               <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Total Pembayaran</span>
               <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
-                {formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice)}
+                {formatCurrency(order.finalPrice || order.subtotal || order.estimatedPrice || 0)}
               </span>
             </div>
           </div>

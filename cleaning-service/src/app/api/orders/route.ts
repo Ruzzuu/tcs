@@ -8,6 +8,8 @@ import Order from '@/lib/models/Order';
 import { SERVICES } from '@/lib/services';
 import { generateOrderNumber, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { createOrderItem, shouldAppendToOrder } from '@/lib/orderUtils';
 
 // GET /api/orders - List orders (for admin)
 export async function GET(request: NextRequest) {
@@ -138,22 +140,89 @@ export async function POST(request: NextRequest) {
     const service = SERVICES[itemType as ServiceType];
     const estimatedPrice = service.price * quantity;
 
-    // Create order
-    const order = new Order({
+    // Check if multi-item orders feature is enabled
+    if (isFeatureEnabled('MULTI_ITEM_ORDERS') && isFeatureEnabled('AUTO_MERGE_ORDERS')) {
+      // Try to find existing pending order for this customer
+      const existingOrder = await Order.findOne({
+        phone: phone.trim(),
+        status: 'pending'
+      }).sort({ createdAt: -1 });
+
+      if (existingOrder && shouldAppendToOrder(existingOrder, phone.trim(), address?.trim() || '')) {
+        // Append item to existing order
+        const newItem = createOrderItem(
+          itemType as ServiceType,
+          quantity,
+          itemType === 'other' ? customItemType?.trim() : undefined,
+          customerNotes?.trim()
+        );
+
+        existingOrder.items.push(newItem);
+        
+        // Recalculate totals
+        const subtotal = existingOrder.items.reduce((sum, item) => sum + item.subtotal, 0);
+        existingOrder.subtotal = subtotal;
+        existingOrder.estimatedPrice = subtotal;
+        existingOrder.finalPrice = existingOrder.discount 
+          ? subtotal - (existingOrder.discount.type === 'percentage' 
+              ? (subtotal * existingOrder.discount.value / 100) 
+              : existingOrder.discount.value)
+          : subtotal;
+
+        // Update address if provided
+        if (address?.trim()) {
+          existingOrder.address = address.trim();
+        }
+
+        await existingOrder.save();
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            orderId: existingOrder._id,
+            orderNumber: existingOrder.orderNumber,
+            merged: true
+          },
+          message: 'Item berhasil ditambahkan ke pesanan yang ada'
+        });
+      }
+    }
+
+    // Create new order (legacy single-item or new multi-item)
+    const orderData: any = {
       orderNumber: generateOrderNumber(),
       name: name.trim(),
       phone: phone.trim(),
       address: address?.trim() || '',
-      itemType,
-      customItemType: itemType === 'other' ? customItemType?.trim() : undefined, 
-      quantity,
-      estimatedPrice,
-      customerNotes: customerNotes?.trim() || '',
       status: 'pending',
       verification: {
         status: 'unverified'
       }
-    });
+    };
+
+    if (isFeatureEnabled('MULTI_ITEM_ORDERS')) {
+      // Create order with items array
+      const newItem = createOrderItem(
+        itemType as ServiceType,
+        quantity,
+        itemType === 'other' ? customItemType?.trim() : undefined,
+        customerNotes?.trim()
+      );
+
+      orderData.items = [newItem];
+      orderData.subtotal = estimatedPrice;
+      orderData.estimatedPrice = estimatedPrice;
+      orderData.finalPrice = estimatedPrice;
+    } else {
+      // Legacy single-item format
+      orderData.itemType = itemType;
+      orderData.customItemType = itemType === 'other' ? customItemType?.trim() : undefined;
+      orderData.quantity = quantity;
+      orderData.estimatedPrice = estimatedPrice;
+      orderData.customerNotes = customerNotes?.trim() || '';
+    }
+
+    const order = new Order(orderData);
 
     await order.save();
 
@@ -161,7 +230,8 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         orderId: order._id,
-        orderNumber: order.orderNumber
+        orderNumber: order.orderNumber,
+        merged: false
       },
       message: 'Pesanan berhasil dibuat'
     });

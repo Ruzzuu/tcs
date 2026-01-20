@@ -53,20 +53,20 @@ export function generateWhatsAppLink(phone: string, message?: string): string {
  */
 export const WA_TEMPLATES = {
   newOrderVerification: (order: Order) => 
-    `Halo ${order.name}, terima kasih telah menghubungi ${BUSINESS_INFO.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity}\n- Estimasi: ${formatCurrency(order.estimatedPrice)}\n\nApakah data sudah benar?`,
+    `Halo ${order.name}, terima kasih telah menghubungi ${BUSINESS_INFO.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
   
   orderInProgress: (order: Order) =>
     `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan sepatu ke *Teman Cuci Sepatu*.\n\nSaat ini sepatu Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,
   
   orderFinished: (order: Order) =>
-    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai!\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice)}\n\nSilakan cek nota yang kami kirim.`,
+    `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sudah selesai!\n\nTotal: ${formatCurrency(order.finalPrice || order.estimatedPrice || 0)}\n\nSilakan cek nota yang kami kirim.`,
   
   // Status-based templates for admin dashboard
   orderPending: (order: Order) =>
     `Halo ${order.name}, pesanan Anda (#${order.orderNumber}) sedang kami proses. Kami akan kabari setelah selesai. Terima kasih.`,
   
   orderCompleted: (order: Order) => {
-    return `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`;
+    return `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice || 0)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`;
   }
 };
 
