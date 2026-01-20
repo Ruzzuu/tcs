@@ -141,30 +141,52 @@ export async function POST(request: NextRequest) {
     const estimatedPrice = service.price * quantity;
 
     // Check if multi-item orders feature is enabled
-    if (isFeatureEnabled('MULTI_ITEM_ORDERS') && isFeatureEnabled('AUTO_MERGE_ORDERS')) {
+    const multiItemEnabled = isFeatureEnabled('MULTI_ITEM_ORDERS');
+    const autoMergeEnabled = isFeatureEnabled('AUTO_MERGE_ORDERS');
+    console.log('🚩 Feature Flags:', { multiItemEnabled, autoMergeEnabled });
+
+    if (multiItemEnabled && autoMergeEnabled) {
       // Try to find existing pending order for this customer
+      console.log('🔍 Looking for existing order with phone:', phone.trim());
+      
       const existingOrder = await Order.findOne({
         phone: phone.trim(),
         status: 'pending'
       }).sort({ createdAt: -1 });
 
-      if (existingOrder && shouldAppendToOrder(existingOrder, phone.trim(), address?.trim() || '')) {
-        // Append item to existing order
-        const newItem = createOrderItem(
-          itemType as ServiceType,
-          quantity,
-          itemType === 'other' ? customItemType?.trim() : undefined,
-          customerNotes?.trim()
-        );
+      console.log('📦 Found existing order:', existingOrder ? {
+        id: existingOrder._id,
+        orderNumber: existingOrder.orderNumber,
+        phone: existingOrder.phone,
+        status: existingOrder.status,
+        createdAt: existingOrder.createdAt,
+        hasItems: !!existingOrder.items,
+        itemsLength: existingOrder.items?.length || 0
+      } : null);
 
-        // Ensure items array exists
-        if (!existingOrder.items) {
-          existingOrder.items = [];
-        }
-
-        existingOrder.items.push(newItem);
+      if (existingOrder) {
+        const shouldMerge = shouldAppendToOrder(existingOrder, phone.trim(), address?.trim() || '');
+        console.log('🤔 Should merge?', shouldMerge);
         
-        // Recalculate totals
+        if (shouldMerge) {
+          console.log('✅ MERGING ORDER - Appending new item to existing order');
+          // Append item to existing order
+          const newItem = createOrderItem(
+            itemType as ServiceType,
+            quantity,
+            itemType === 'other' ? customItemType?.trim() : undefined,
+            customerNotes?.trim()
+          );
+
+          // Ensure items array exists
+          if (!existingOrder.items) {
+            existingOrder.items = [];
+          }
+
+          existingOrder.items.push(newItem);
+          console.log('📝 Items after push:', existingOrder.items.length);
+        
+          // Recalculate totals
         const subtotal = existingOrder.items.reduce((sum, item) => sum + item.subtotal, 0);
         existingOrder.subtotal = subtotal;
         existingOrder.estimatedPrice = subtotal;
@@ -181,6 +203,8 @@ export async function POST(request: NextRequest) {
 
         await existingOrder.save();
 
+        console.log('💾 Order saved with merged items. Total items:', existingOrder.items.length);
+
         return NextResponse.json({
           success: true,
           data: {
@@ -190,8 +214,11 @@ export async function POST(request: NextRequest) {
           },
           message: 'Item berhasil ditambahkan ke pesanan yang ada'
         });
+        }
       }
     }
+
+    console.log('➕ Creating NEW order (no merge)');
 
     // Create new order (legacy single-item or new multi-item)
     const orderData: any = {

@@ -91,13 +91,25 @@ export function shouldAppendToOrder(
   customerPhone: string,
   customerAddress: string
 ): boolean {
+  console.log('🔎 shouldAppendToOrder checking:', {
+    orderStatus: existingOrder.status,
+    orderPhone: existingOrder.phone,
+    customerPhone,
+    orderCreatedAt: existingOrder.createdAt
+  });
+
   // Only append to pending orders
   if (existingOrder.status !== 'pending') {
+    console.log('❌ Status not pending:', existingOrder.status);
     return false;
   }
 
   // Match by phone
   if (existingOrder.phone !== customerPhone) {
+    console.log('❌ Phone mismatch:', {
+      orderPhone: existingOrder.phone,
+      customerPhone
+    });
     return false;
   }
 
@@ -112,5 +124,12 @@ export function shouldAppendToOrder(
   orderDate.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
 
-  return orderDate.getTime() === today.getTime();
+  const isSameDay = orderDate.getTime() === today.getTime();
+  console.log('📅 Date check:', {
+    orderDate: orderDate.toISOString(),
+    today: today.toISOString(),
+    isSameDay
+  });
+
+  return isSameDay;
 }
