@@ -78,10 +78,31 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       }
 
       if (body.discount === null) {
-        // Remove discount
-        updateData.discount = undefined;
-        updateData.subtotal = order.estimatedPrice;
-        updateData.finalPrice = order.estimatedPrice;
+        // Remove discount - use $unset to completely remove the field
+        const updatedOrder = await Order.findByIdAndUpdate(
+          id,
+          {
+            $unset: { discount: "" },
+            $set: {
+              subtotal: order.estimatedPrice,
+              finalPrice: order.estimatedPrice
+            }
+          },
+          { new: true, runValidators: true }
+        ).lean();
+
+        if (!updatedOrder) {
+          return NextResponse.json(
+            { success: false, error: 'Pesanan tidak ditemukan' },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json({
+          success: true,
+          data: updatedOrder,
+          message: 'Diskon berhasil dihapus'
+        });
       } else {
         // Apply discount
         const discount: Discount = body.discount;

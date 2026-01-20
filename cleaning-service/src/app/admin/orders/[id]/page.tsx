@@ -586,7 +586,21 @@ export default function OrderDetailPage() {
     const confirmed = confirm('Hapus diskon dari pesanan ini?');
     if (!confirmed) return;
 
+    // Optimistically clear discount UI immediately
+    const originalOrder = { ...order };
+    const clearedOrder = {
+      ...order,
+      discount: undefined,
+      subtotal: order.estimatedPrice,
+      finalPrice: order.estimatedPrice
+    };
+    
+    setOrder(clearedOrder);
+    setFinalPrice(order.estimatedPrice);
+    setDiscountType('percentage');
+    setDiscountValue(0);
     setApplyingDiscount(true);
+
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
@@ -599,15 +613,28 @@ export default function OrderDetailPage() {
       const result = await response.json();
 
       if (result.success) {
+        // Update with server response
         setOrder(result.data);
-        setFinalPrice(result.data.finalPrice);
-        setDiscountType('percentage');
-        setDiscountValue(0);
+        setFinalPrice(result.data.finalPrice || result.data.estimatedPrice);
         alert('Diskon berhasil dihapus!');
       } else {
+        // Rollback on error
+        setOrder(originalOrder);
+        setFinalPrice(originalOrder.finalPrice);
+        if (originalOrder.discount) {
+          setDiscountType(originalOrder.discount.type);
+          setDiscountValue(originalOrder.discount.value);
+        }
         alert(result.error || 'Gagal menghapus diskon');
       }
     } catch {
+      // Rollback on error
+      setOrder(originalOrder);
+      setFinalPrice(originalOrder.finalPrice);
+      if (originalOrder.discount) {
+        setDiscountType(originalOrder.discount.type);
+        setDiscountValue(originalOrder.discount.value);
+      }
       alert('Gagal terhubung ke server');
     } finally {
       setApplyingDiscount(false);
