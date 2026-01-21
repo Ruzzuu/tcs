@@ -1027,10 +1027,10 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
             {/* Existing Before Photos */}
             {proofOfWork.beforePhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start group">
+              <div key={photo.publicId} className="relative aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm group">
                 <button
                   onClick={() => openImageViewer(photo.url, `Before ${index + 1}`)}
                   disabled={photo.publicId.startsWith('temp-')}
@@ -1071,7 +1071,7 @@ export default function OrderDetailPage() {
             ))}
             
             {/* Add Photo Button */}
-            <label className={`relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer snap-start ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`relative aspect-square rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'before' ? 'pointer-events-none opacity-50' : ''}`}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -1119,10 +1119,10 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
             {/* Existing After Photos */}
             {proofOfWork.afterPhotos.map((photo, index) => (
-              <div key={photo.publicId} className="relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm snap-start group">
+              <div key={photo.publicId} className="relative aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm group">
                 <button
                   onClick={() => openImageViewer(photo.url, `After ${index + 1}`)}
                   disabled={photo.publicId.startsWith('temp-')}
@@ -1163,7 +1163,7 @@ export default function OrderDetailPage() {
             ))}
             
             {/* Add Photo Button */}
-            <label className={`relative aspect-square w-32 h-32 flex-shrink-0 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer snap-start ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`relative aspect-square rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a2230] hover:border-[#1152d4] dark:hover:border-[#1152d4] transition-colors flex flex-col items-center justify-center group cursor-pointer ${uploading === 'after' ? 'pointer-events-none opacity-50' : ''}`}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
