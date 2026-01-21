@@ -90,7 +90,17 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
 function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (orderId: string, e: React.MouseEvent) => void; deletingId: string | null }) {
   const statusColor = getStatusColor(order.status);
   const avatarColor = getAvatarColor(order.name);
-  const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
+  
+  // Get items list for display
+  const hasItems = order.items && order.items.length > 0;
+  const itemsList = hasItems 
+    ? order.items!.map(item => ({
+        name: SERVICES[item.serviceType as ServiceType]?.name || item.customItemType || item.serviceType,
+        quantity: item.quantity || 1
+      }))
+    : [{ name: SERVICES[order.itemType as ServiceType]?.name || order.itemType, quantity: order.quantity || 1 }];
+  
+  const totalQuantity = itemsList.reduce((sum, item) => sum + (item.quantity || 0), 0);
   
   // Check for proof of work - handle both new Cloudinary format and legacy base64
   // Get before photos
@@ -160,18 +170,24 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           <div className={`${avatarColor} rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm`}>
             {getInitials(order.name)}
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="text-sm font-bold text-[#111318] dark:text-white">{order.name}</h3>
-            <div className="flex items-center gap-1 mt-0.5">
-              <span className="text-xs text-gray-500 dark:text-gray-400">{serviceName}</span>
-              <span className="text-xs text-gray-300">•</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">Qty: {order.quantity}</span>
-              {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
-                <>
-                  <span className="text-xs text-gray-300">•</span>
-                  <span className="material-symbols-outlined text-[12px] text-green-500">photo_camera</span>
-                </>
-              )}
+            <div className="flex flex-col gap-0.5 mt-1">
+              {itemsList.map((item, index) => (
+                <div key={index} className="flex items-center gap-1.5">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">{item.name}</span>
+                  <span className="text-xs text-gray-400">×{item.quantity}</span>
+                </div>
+              ))}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-gray-400">Total: {totalQuantity} item</span>
+                {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
+                  <>
+                    <span className="text-[10px] text-gray-300">•</span>
+                    <span className="material-symbols-outlined text-[11px] text-green-500">photo_camera</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

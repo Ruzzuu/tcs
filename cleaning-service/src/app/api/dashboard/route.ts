@@ -56,12 +56,24 @@ export async function GET() {
       // Unverified count (for pending verification badge)
       Order.countDocuments({ 'verification.status': 'unverified' }),
 
-      // Service distribution pie chart
+      // Service distribution pie chart - count orders by primary service
       Order.aggregate([
         { $match: { 'verification.status': 'approved' } },
         {
+          $project: {
+            // Use first item's serviceType if items array exists, otherwise use legacy itemType
+            primaryService: {
+              $cond: {
+                if: { $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }] },
+                then: { $arrayElemAt: ['$items.serviceType', 0] },
+                else: '$itemType'
+              }
+            }
+          }
+        },
+        {
           $group: {
-            _id: '$itemType',
+            _id: '$primaryService',
             count: { $sum: 1 }
           }
         },
