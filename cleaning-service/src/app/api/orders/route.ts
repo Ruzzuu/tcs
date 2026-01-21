@@ -147,9 +147,9 @@ export async function POST(request: NextRequest) {
 
     if (multiItemEnabled && autoMergeEnabled) {
       // Try to find existing pending order for this customer
-      // Look for orders created within last 5 minutes to handle race conditions
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created after:', fiveMinutesAgo);
+      // Look for orders created within last 10 minutes (increased window)
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created after:', tenMinutesAgo);
       
       // Calculate new item first
       const newItem = createOrderItem(
@@ -159,27 +159,43 @@ export async function POST(request: NextRequest) {
         customerNotes?.trim()
       );
       
-      // Try to atomically find and update existing order
-      // This prevents race conditions when multiple requests come in simultaneously
-      const existingOrder = await Order.findOneAndUpdate(
-        {
-          phone: phone.trim(),
-          status: 'pending',
-          createdAt: { $gte: fiveMinutesAgo }
-        },
-        {
-          $push: { items: newItem },
-          $inc: { 
-            subtotal: newItem.subtotal,
-            estimatedPrice: newItem.subtotal,
-            finalPrice: newItem.subtotal 
-          }
-        },
-        {
-          new: true, // Return updated document
-          sort: { createdAt: -1 } // Get most recent
+      // Try multiple times to find and update (handle race conditions)
+      let existingOrder = null;
+      const maxRetries = 3;
+      
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        if (attempt > 0) {
+          // Wait a bit before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 100 * attempt));
+          console.log(`🔄 Retry attempt ${attempt + 1}/${maxRetries}`);
         }
-      );
+        
+        existingOrder = await Order.findOneAndUpdate(
+          {
+            phone: phone.trim(),
+            status: 'pending',
+            createdAt: { $gte: tenMinutesAgo },
+            items: { $exists: true, $not: { $size: 0 } } // Must have items array with at least 1 item
+          },
+          {
+            $push: { items: newItem },
+            $inc: { 
+              subtotal: newItem.subtotal,
+              estimatedPrice: newItem.subtotal,
+              finalPrice: newItem.subtotal 
+            }
+          },
+          {
+            new: true, // Return updated document
+            sort: { createdAt: -1 } // Get most recent
+          }
+        );
+        
+        if (existingOrder) {
+          console.log(`✅ Found and updated on attempt ${attempt + 1}`);
+          break;
+        }
+      }
 
       console.log('📦 Atomic update result:', existingOrder ? {
         id: existingOrder._id,

@@ -33,10 +33,10 @@ async function checkOrders() {
     console.log('✅ Connected!\n');
 
     // Get the two orders from the screenshot
-    console.log('📋 Checking orders from phone: 08123131231213\n');
+    console.log('📋 Checking orders from phone: 08123124124\n');
     
     const orders = await Order.find({ 
-      phone: '08123131231213' 
+      phone: '08123124124' 
     }).sort({ createdAt: -1 }).limit(5).lean();
 
     console.log(`Found ${orders.length} orders:\n`);
