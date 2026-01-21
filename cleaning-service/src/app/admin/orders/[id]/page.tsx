@@ -776,27 +776,66 @@ export default function OrderDetailPage() {
           Detail Pesanan
         </h3>
         <div className="bg-white dark:bg-[#1a2230] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex gap-3">
-              <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500">
-                <span className="material-symbols-outlined">
-                  {SERVICES[order.itemType as ServiceType]?.icon || 'inventory_2'}
-                </span>
+          {/* Check if order has items array (multi-item) or legacy single item */}
+          {order.items && order.items.length > 0 ? (
+            // Multi-item display
+            <div className="space-y-4">
+              {order.items.map((item, index) => {
+                const service = SERVICES[item.serviceType];
+                return (
+                  <div key={item.id || index} className="flex items-start justify-between pb-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0 last:pb-0">
+                    <div className="flex gap-3 flex-1">
+                      <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 shrink-0">
+                        <span className="material-symbols-outlined">
+                          {service?.icon || 'inventory_2'}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[#111318] dark:text-white font-medium text-base">
+                          {service?.name || item.customItemType || item.serviceType}
+                        </p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          {service?.nameEn || item.serviceType}
+                        </p>
+                        <p className="text-gray-500 text-sm mt-1">Qty: {item.quantity}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 ml-3">
+                      <p className="text-[#111318] dark:text-white font-semibold">
+                        {formatCurrency(item.subtotal)}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {formatCurrency(item.unitPrice)} x {item.quantity}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            // Legacy single item display
+            <div className="flex items-start justify-between">
+              <div className="flex gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500">
+                  <span className="material-symbols-outlined">
+                    {SERVICES[order.itemType as ServiceType]?.icon || 'inventory_2'}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[#111318] dark:text-white font-medium text-base">{serviceName}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    {SERVICES[order.itemType as ServiceType]?.nameEn || order.itemType}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-[#111318] dark:text-white font-medium text-base">{serviceName}</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  {SERVICES[order.itemType as ServiceType]?.nameEn || order.itemType}
+              <div className="text-right">
+                <p className="text-[#111318] dark:text-white font-semibold">
+                  {formatCurrency(SERVICES[order.itemType as ServiceType]?.price || 0)}
                 </p>
+                <p className="text-gray-500 text-sm">Qty: {order.quantity}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-[#111318] dark:text-white font-semibold">
-                {formatCurrency(SERVICES[order.itemType as ServiceType]?.price || 0)}
-              </p>
-              <p className="text-gray-500 text-sm">Qty: {order.quantity}</p>
-            </div>
-          </div>
+          )}
 
           {/* Pricing */}
           <div className="mt-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2">
@@ -1240,15 +1279,36 @@ export default function OrderDetailPage() {
                 <tr style={{ color: '#6b7280' }}>
                   <th style={{ textAlign: 'left', padding: '4px 0', fontWeight: '500' }}>Item</th>
                   <th style={{ textAlign: 'center', fontWeight: '500' }}>Qty</th>
-                  <th style={{ textAlign: 'right', fontWeight: '500' }}>Harga</th>
+                  <th style={{ textAlign: 'right', fontWeight: '500' }}>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                <tr style={{ color: '#1f2937' }}>
-                  <td style={{ padding: '8px 0' }}>{serviceName}</td>
-                  <td style={{ textAlign: 'center' }}>{order.quantity || 1}</td>
-                  <td style={{ textAlign: 'right' }}>{formatCurrency((order.subtotal || order.estimatedPrice || 0) / (order.quantity || 1))}</td>
-                </tr>
+                {order.items && order.items.length > 0 ? (
+                  // Multi-item order - show all items
+                  order.items.map((item, index) => {
+                    const service = SERVICES[item.serviceType];
+                    return (
+                      <tr key={index} style={{ color: '#1f2937' }}>
+                        <td style={{ padding: '8px 0', borderBottom: index < order.items!.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                          {service?.name || item.customItemType || item.serviceType}
+                        </td>
+                        <td style={{ textAlign: 'center', borderBottom: index < order.items!.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                          {item.quantity}
+                        </td>
+                        <td style={{ textAlign: 'right', borderBottom: index < order.items!.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                          {formatCurrency(item.subtotal)}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  // Legacy single item order
+                  <tr style={{ color: '#1f2937' }}>
+                    <td style={{ padding: '8px 0' }}>{serviceName}</td>
+                    <td style={{ textAlign: 'center' }}>{order.quantity || 1}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrency((order.subtotal || order.estimatedPrice || 0))}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
