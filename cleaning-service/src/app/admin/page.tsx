@@ -45,7 +45,7 @@ function PieChart({ data }: { data: Array<{ name: string; value: number; color: 
           <div key={item.name} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {SERVICES[item.name as ServiceType]?.name || item.name} ({item.value} pesanan)
+              {SERVICES[item.name as ServiceType]?.name || item.name} ({item.value})
             </span>
           </div>
         ))}

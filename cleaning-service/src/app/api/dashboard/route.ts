@@ -56,25 +56,29 @@ export async function GET() {
       // Unverified count (for pending verification badge)
       Order.countDocuments({ 'verification.status': 'unverified' }),
 
-      // Service distribution pie chart - count orders by primary service
+      // Service distribution pie chart - count all individual items
       Order.aggregate([
         { $match: { 'verification.status': 'approved' } },
         {
           $project: {
-            // Use first item's serviceType if items array exists, otherwise use legacy itemType
-            primaryService: {
+            // Expand items array if exists, otherwise create single item from legacy fields
+            itemsToCount: {
               $cond: {
                 if: { $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }] },
-                then: { $arrayElemAt: ['$items.serviceType', 0] },
-                else: '$itemType'
+                then: '$items',
+                else: [{
+                  serviceType: '$itemType',
+                  quantity: { $ifNull: ['$quantity', 1] }
+                }]
               }
             }
           }
         },
+        { $unwind: '$itemsToCount' },
         {
           $group: {
-            _id: '$primaryService',
-            count: { $sum: 1 }
+            _id: '$itemsToCount.serviceType',
+            count: { $sum: { $ifNull: ['$itemsToCount.quantity', 1] } }
           }
         },
         {
