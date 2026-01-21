@@ -33,10 +33,10 @@ async function checkOrders() {
     console.log('✅ Connected!\n');
 
     // Get the two orders from the screenshot
-    console.log('📋 Checking orders from phone: 081515263851\n');
+    console.log('📋 Checking orders from phone: 08123131231213\n');
     
     const orders = await Order.find({ 
-      phone: '081515263851' 
+      phone: '08123131231213' 
     }).sort({ createdAt: -1 }).limit(5).lean();
 
     console.log(`Found ${orders.length} orders:\n`);
@@ -54,7 +54,10 @@ async function checkOrders() {
       if (order.items && order.items.length > 0) {
         console.log(`  Items detail:`);
         order.items.forEach((item: any, i: number) => {
-          console.log(`    ${i + 1}. ${item.itemType} - ${item.quantity} unit`);
+          console.log(`    ${i + 1}. Type: ${item.itemType || 'undefined'}`);
+          console.log(`       Price: Rp ${item.price?.toLocaleString() || '0'}`);
+          console.log(`       Quantity: ${item.quantity}`);
+          console.log(`       Subtotal: Rp ${item.subtotal?.toLocaleString() || '0'}`);
         });
       }
       console.log('');

@@ -147,71 +147,67 @@ export async function POST(request: NextRequest) {
 
     if (multiItemEnabled && autoMergeEnabled) {
       // Try to find existing pending order for this customer
-      console.log('🔍 Looking for existing order with phone:', phone.trim());
+      // Look for orders created within last 5 minutes to handle race conditions
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created after:', fiveMinutesAgo);
       
-      const existingOrder = await Order.findOne({
-        phone: phone.trim(),
-        status: 'pending'
-      }).sort({ createdAt: -1 });
+      // Calculate new item first
+      const newItem = createOrderItem(
+        itemType as ServiceType,
+        quantity,
+        itemType === 'other' ? customItemType?.trim() : undefined,
+        customerNotes?.trim()
+      );
+      
+      // Try to atomically find and update existing order
+      // This prevents race conditions when multiple requests come in simultaneously
+      const existingOrder = await Order.findOneAndUpdate(
+        {
+          phone: phone.trim(),
+          status: 'pending',
+          createdAt: { $gte: fiveMinutesAgo }
+        },
+        {
+          $push: { items: newItem },
+          $inc: { 
+            subtotal: newItem.subtotal,
+            estimatedPrice: newItem.subtotal,
+            finalPrice: newItem.subtotal 
+          }
+        },
+        {
+          new: true, // Return updated document
+          sort: { createdAt: -1 } // Get most recent
+        }
+      );
 
-      console.log('📦 Found existing order:', existingOrder ? {
+      console.log('📦 Atomic update result:', existingOrder ? {
         id: existingOrder._id,
         orderNumber: existingOrder.orderNumber,
-        phone: existingOrder.phone,
-        status: existingOrder.status,
-        createdAt: existingOrder.createdAt,
-        hasItems: !!existingOrder.items,
-        itemsLength: existingOrder.items?.length || 0
-      } : null);
+        itemsLength: existingOrder.items?.length || 0,
+        merged: true
+      } : 'No existing order found');
 
       if (existingOrder) {
-        const shouldMerge = shouldAppendToOrder(existingOrder, phone.trim(), address?.trim() || '');
-        console.log('🤔 Should merge?', shouldMerge);
-        
-        if (shouldMerge) {
-          console.log('✅ MERGING ORDER - Appending new item to existing order');
-          // Append item to existing order
-          const newItem = createOrderItem(
-            itemType as ServiceType,
-            quantity,
-            itemType === 'other' ? customItemType?.trim() : undefined,
-            customerNotes?.trim()
-          );
-
-          // Ensure items array exists
-          if (!existingOrder.items) {
-            existingOrder.items = [];
-          }
-
-          existingOrder.items.push(newItem);
-          console.log('📝 Items after push:', existingOrder.items.length);
-        
-          // Recalculate totals
-          const subtotal = existingOrder.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-          console.log('💰 Calculated subtotal:', subtotal);
-          
-          existingOrder.subtotal = subtotal;
-          existingOrder.estimatedPrice = subtotal;
-          
-          // Calculate final price with discount
+        // Order was found and updated atomically
+        // Now recalculate with discount if exists
+        if (existingOrder.discount) {
+          const subtotal = existingOrder.items!.reduce((sum, item) => sum + (item.subtotal || 0), 0);
           let finalPrice = subtotal;
-          if (existingOrder.discount) {
-            const discountValue = Number(existingOrder.discount.value) || 0;
-            if (existingOrder.discount.type === 'percentage') {
-              const discountAmount = Math.round((subtotal * discountValue) / 100);
-              finalPrice = subtotal - discountAmount;
-            } else {
-              finalPrice = subtotal - discountValue;
-            }
-          }
-          existingOrder.finalPrice = Math.max(0, finalPrice);
+          const discountValue = Number(existingOrder.discount.value) || 0;
           
-          console.log('💵 Final price:', existingOrder.finalPrice);
+          if (existingOrder.discount.type === 'percentage') {
+            const discountAmount = Math.round((subtotal * discountValue) / 100);
+            finalPrice = subtotal - discountAmount;
+          } else {
+            finalPrice = subtotal - discountValue;
+          }
+          
+          existingOrder.finalPrice = Math.max(0, finalPrice);
+          await existingOrder.save();
         }
-
-        await existingOrder.save();
-
-        console.log('💾 Order saved with merged items. Total items:', existingOrder.items?.length ?? 0);
+        
+        console.log('✅ MERGED - Added item to existing order. Total items:', existingOrder.items?.length);
 
         return NextResponse.json({
           success: true,
