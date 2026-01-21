@@ -9,6 +9,9 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
+// TypeScript now knows MONGODB_URI is defined
+const dbUri: string = MONGODB_URI;
+
 // Define Order schema inline to avoid import issues
 const orderSchema = new mongoose.Schema({
   orderNumber: String,
@@ -26,7 +29,7 @@ const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 async function checkOrders() {
   try {
     console.log('🔌 Connecting to MongoDB...');
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(dbUri);
     console.log('✅ Connected!\n');
 
     // Get the two orders from the screenshot
