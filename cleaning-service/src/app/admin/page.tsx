@@ -89,27 +89,23 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
   const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
   
   // Check for proof of work - handle both new Cloudinary format and legacy base64
-  // Display max 5 photos total (combined before + after, oldest to newest)
-  const allPhotos: Array<{ url: string; type: 'before' | 'after' }> = [];
-  
-  // Add before photos (max 5)
+  // Get before photos
+  const beforePhotos: Array<{ url: string; type: 'before' }> = [];
   if (order.proofOfWork?.beforePhotos) {
-    order.proofOfWork.beforePhotos.slice(0, 5).forEach((photo: any) => {
+    order.proofOfWork.beforePhotos.forEach((photo: any) => {
       const url = typeof photo === 'object' && photo?.url ? photo.url : (typeof photo === 'string' ? photo : null);
-      if (url) allPhotos.push({ url, type: 'before' });
+      if (url) beforePhotos.push({ url, type: 'before' });
     });
   }
   
-  // Add after photos (up to remaining slots from 5)
+  // Get after photos
+  const afterPhotos: Array<{ url: string; type: 'after' }> = [];
   if (order.proofOfWork?.afterPhotos) {
-    const remainingSlots = 5 - allPhotos.length;
-    order.proofOfWork.afterPhotos.slice(0, remainingSlots).forEach((photo: any) => {
+    order.proofOfWork.afterPhotos.forEach((photo: any) => {
       const url = typeof photo === 'object' && photo?.url ? photo.url : (typeof photo === 'string' ? photo : null);
-      if (url) allPhotos.push({ url, type: 'after' });
+      if (url) afterPhotos.push({ url, type: 'after' });
     });
   }
-  
-  const hasProofOfWork = allPhotos.length > 0;
   
   // Get nota image URL
   const notaUrl = order.notaImage?.url || null;
@@ -117,20 +113,42 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
       {/* Proof of Work Preview */}
-      {hasProofOfWork && (
-        <div className="flex gap-2 -mx-1 -mt-1 mb-1 overflow-x-auto">
-          {allPhotos.map((photo, index) => (
-            <div key={index} className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-              <img 
-                src={photo.url} 
-                alt={photo.type === 'before' ? 'Before' : 'After'} 
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] text-center py-0.5">
-                {photo.type === 'before' ? 'Before' : 'After'}
-              </span>
+      {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
+        <div className="flex flex-col gap-3 -mx-1 -mt-1 mb-1">
+          {/* Before Photos */}
+          {beforePhotos.length > 0 && (
+            <div>
+              <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">Before</span>
+              <div className="grid grid-cols-5 gap-2">
+                {beforePhotos.map((photo, index) => (
+                  <div key={`before-${index}`} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <img 
+                      src={photo.url} 
+                      alt={`Before ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+          {/* After Photos */}
+          {afterPhotos.length > 0 && (
+            <div>
+              <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">After</span>
+              <div className="grid grid-cols-5 gap-2">
+                {afterPhotos.map((photo, index) => (
+                  <div key={`after-${index}`} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <img 
+                      src={photo.url} 
+                      alt={`After ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
       <div className="flex justify-between items-start">
@@ -144,7 +162,7 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
               <span className="text-xs text-gray-500 dark:text-gray-400">{serviceName}</span>
               <span className="text-xs text-gray-300">•</span>
               <span className="text-xs text-gray-500 dark:text-gray-400">Qty: {order.quantity}</span>
-              {hasProofOfWork && (
+              {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
                 <>
                   <span className="text-xs text-gray-300">•</span>
                   <span className="material-symbols-outlined text-[12px] text-green-500">photo_camera</span>
