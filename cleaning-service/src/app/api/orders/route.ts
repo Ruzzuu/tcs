@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
 
         await existingOrder.save();
 
-        console.log('💾 Order saved with merged items. Total items:', existingOrder.items.length);
+        console.log('💾 Order saved with merged items. Total items:', existingOrder.items?.length ?? 0);
 
         return NextResponse.json({
           success: true,
