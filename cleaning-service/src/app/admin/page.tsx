@@ -119,9 +119,9 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           {beforePhotos.length > 0 && (
             <div>
               <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">Before</span>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
                 {beforePhotos.map((photo, index) => (
-                  <div key={`before-${index}`} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <div key={`before-${index}`} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                     <img 
                       src={photo.url} 
                       alt={`Before ${index + 1}`} 
@@ -136,9 +136,9 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           {afterPhotos.length > 0 && (
             <div>
               <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">After</span>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
                 {afterPhotos.map((photo, index) => (
-                  <div key={`after-${index}`} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <div key={`after-${index}`} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                     <img 
                       src={photo.url} 
                       alt={`After ${index + 1}`} 
