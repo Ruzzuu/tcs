@@ -45,7 +45,7 @@ function PieChart({ data }: { data: Array<{ name: string; value: number; color: 
           <div key={item.name} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {SERVICES[item.name as ServiceType]?.name || item.name} ({Math.round((item.value / total) * 100)}%)
+              {SERVICES[item.name as ServiceType]?.name || item.name} ({item.value} pesanan)
             </span>
           </div>
         ))}
@@ -59,22 +59,26 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
   const maxAmount = Math.max(...data.map(d => d.amount), 1);
 
   return (
-    <div className="grid grid-flow-col gap-2 grid-rows-[1fr_auto] items-end justify-items-center h-40 pt-4">
+    <div className="space-y-3">
       {data.map((item, index) => {
-        const height = (item.amount / maxAmount) * 100;
-        const opacity = 0.2 + (index / data.length) * 0.8;
+        const percentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
+        const opacity = 0.4 + (index / data.length) * 0.6;
         
         return (
-          <div key={item.day} className="contents">
-            <div
-              className="w-full rounded-t-sm transition-all duration-300"
-              style={{
-                height: `${Math.max(height, 5)}%`,
-                backgroundColor: `rgba(17, 82, 212, ${opacity})`
-              }}
-              title={formatCurrency(item.amount)}
-            ></div>
-            <p className="text-gray-400 text-[10px] font-bold mt-2">{item.day}</p>
+          <div key={item.day} className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-gray-400 w-8 text-right">{item.day}</span>
+            <div className="flex-1 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
+              <div
+                className="h-full rounded-md transition-all duration-300"
+                style={{
+                  width: `${Math.max(percentage, 3)}%`,
+                  backgroundColor: `rgba(17, 82, 212, ${opacity})`
+                }}
+              ></div>
+            </div>
+            <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-20 text-right">
+              {formatCurrency(item.amount)}
+            </span>
           </div>
         );
       })}
@@ -119,7 +123,7 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           {beforePhotos.length > 0 && (
             <div>
               <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">Before</span>
-              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1">
                 {beforePhotos.map((photo, index) => (
                   <div key={`before-${index}`} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                     <img 
@@ -136,7 +140,7 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           {afterPhotos.length > 0 && (
             <div>
               <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 mb-1 block">After</span>
-              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1">
                 {afterPhotos.map((photo, index) => (
                   <div key={`after-${index}`} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                     <img 

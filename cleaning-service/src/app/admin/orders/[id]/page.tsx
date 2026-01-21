@@ -1027,7 +1027,7 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1">
             {/* Existing Before Photos */}
             {proofOfWork.beforePhotos.map((photo, index) => (
               <div key={photo.publicId} className="relative aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm group">
@@ -1119,7 +1119,7 @@ export default function OrderDetailPage() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1">
             {/* Existing After Photos */}
             {proofOfWork.afterPhotos.map((photo, index) => (
               <div key={photo.publicId} className="relative aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm group">
