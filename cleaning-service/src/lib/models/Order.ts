@@ -187,6 +187,22 @@ const OrderSchema = new Schema<OrderDocument>(
       type: Date
     },
     
+    // Rekap reference
+    rekapId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Rekap'
+    },
+    
+    // Soft delete fields
+    deleted: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    archivedAt: {
+      type: Date
+    },
+    
     // TTL Auto-deletion
     expireAt: {
       type: Date

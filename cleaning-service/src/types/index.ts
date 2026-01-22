@@ -76,6 +76,13 @@ export interface Order {
   updatedAt: Date;
   finishedAt?: Date;
   expireAt?: Date;
+  
+  // Rekap reference
+  rekapId?: string;
+  
+  // Soft delete
+  deleted?: boolean;
+  archivedAt?: Date;
 }
 
 export type ServiceType = 

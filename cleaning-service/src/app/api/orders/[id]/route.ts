@@ -185,7 +185,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await connectDB();
     const { id } = await params;
 
-    // First, get the order to retrieve image URLs
     const order = await Order.findById(id);
 
     if (!order) {
@@ -195,10 +194,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Extract all publicIds from the order for Cloudinary deletion
+    const isComplete = order.status === 'finished' || !!order.rekapId;
+
+    if (isComplete) {
+      order.deleted = true;
+      order.archivedAt = new Date();
+      await order.save();
+
+      return NextResponse.json({
+        success: true,
+        message: 'Pesanan berhasil diarsipkan (soft delete). Data rekap tetap tersimpan.'
+      });
+    }
+
     const publicIdsToDelete: string[] = [];
     
-    // Add beforePhotos from proofOfWork
     if (order.proofOfWork?.beforePhotos && order.proofOfWork.beforePhotos.length > 0) {
       order.proofOfWork.beforePhotos.forEach((img: any) => {
         if (img.publicId) {
@@ -207,7 +217,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       });
     }
     
-    // Add afterPhotos from proofOfWork
     if (order.proofOfWork?.afterPhotos && order.proofOfWork.afterPhotos.length > 0) {
       order.proofOfWork.afterPhotos.forEach((img: any) => {
         if (img.publicId) {
@@ -216,14 +225,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       });
     }
     
-    // Add notaImage
     if (order.notaImage?.publicId) {
       publicIdsToDelete.push(order.notaImage.publicId);
     }
 
     console.log('Public IDs to delete from Cloudinary:', publicIdsToDelete);
 
-    // Delete images from Cloudinary
     const deletePromises = publicIdsToDelete.map(async (publicId) => {
       try {
         const result = await cloudinary.uploader.destroy(publicId);
@@ -231,15 +238,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         return result;
       } catch (error) {
         console.error(`Failed to delete image from Cloudinary: ${publicId}`, error);
-        // Continue even if some images fail to delete
         return null;
       }
     });
 
-    // Wait for all delete operations to complete
     await Promise.allSettled(deletePromises);
 
-    // Delete order from MongoDB
     await Order.findByIdAndDelete(id);
 
     return NextResponse.json({
