@@ -338,22 +338,18 @@ export default function AdminDashboard() {
       
       if (result.success && result.data.availableWeeks.length > 0) {
         setAvailableWeeks(result.data.availableWeeks);
-        // Set to latest week with data
+        // Return latest week for initialization
         const latestWeek = result.data.availableWeeks[result.data.availableWeeks.length - 1];
-        if (selectedWeek === null) {
-          setSelectedWeek(latestWeek);
-        }
         return latestWeek;
       } else {
         setAvailableWeeks([]);
-        setSelectedWeek(null);
         return null;
       }
     } catch (error) {
       console.error('Failed to fetch available weeks:', error);
       return null;
     }
-  }, [selectedWeek]);
+  }, []);
 
   // Fetch weekly income data
   const fetchWeeklyData = useCallback(async (week: number, year?: number) => {
@@ -376,15 +372,39 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  // Initialize weekly data on mount
   useEffect(() => {
+    let isMounted = true;
+    
     const initWeeklyData = async () => {
-      const latestWeek = await fetchAvailableWeeks();
-      if (latestWeek !== null) {
+      const latestWeek = await fetchAvailableWeeks(selectedYear);
+      if (latestWeek !== null && isMounted) {
+        setSelectedWeek(latestWeek);
         await fetchWeeklyData(latestWeek, selectedYear);
       }
     };
+    
     initWeeklyData();
-  }, [fetchAvailableWeeks, fetchWeeklyData, selectedYear]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedYear]);
+
+  // Fetch data when selected week changes (user interaction)
+  useEffect(() => {
+    let isMounted = true;
+    
+    if (selectedWeek !== null && availableWeeks.includes(selectedWeek)) {
+      fetchWeeklyData(selectedWeek, selectedYear).then(() => {
+        if (!isMounted) return;
+      });
+    }
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedWeek]);
 
   const handleWeekChange = (week: number) => {
     setSelectedWeek(week);
