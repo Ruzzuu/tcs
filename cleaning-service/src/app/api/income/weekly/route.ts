@@ -134,18 +134,36 @@ export async function GET(request: NextRequest) {
 }
 
 function getCurrentWeek(date: Date): number {
-  const startOfYear = new Date(date.getFullYear(), 0, 1);
-  const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-  return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  // ISO week date calculation
+  // Week starts on Sunday (0) in JavaScript, but we want Monday as week start
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  
+  // Get January 1st of the year
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  
+  // Calculate days from start of year
+  const daysSinceYearStart = Math.floor((d.getTime() - yearStart.getTime()) / (24 * 60 * 60 * 1000));
+  
+  // Calculate week number (week starts on Sunday)
+  const weekNumber = Math.ceil((daysSinceYearStart + yearStart.getDay() + 1) / 7);
+  
+  return weekNumber;
 }
 
 function getWeekDateRange(year: number, week: number): { startDate: Date; endDate: Date } {
-  const startOfYear = new Date(year, 0, 1);
-  const daysToAdd = (week - 1) * 7 - startOfYear.getDay();
+  // Get January 1st
+  const yearStart = new Date(year, 0, 1);
   
-  const startDate = new Date(year, 0, 1 + daysToAdd);
+  // Calculate the first Sunday of the year (or Jan 1 if it's already Sunday)
+  const firstSunday = new Date(year, 0, 1 - yearStart.getDay());
+  
+  // Calculate start date of the requested week (Sunday)
+  const startDate = new Date(firstSunday);
+  startDate.setDate(firstSunday.getDate() + (week - 1) * 7);
   startDate.setHours(0, 0, 0, 0);
   
+  // Calculate end date (Saturday)
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
   endDate.setHours(23, 59, 59, 999);
