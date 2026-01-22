@@ -78,42 +78,34 @@ export default function CustomerFormPage() {
     setError(null);
 
     try {
-      // Submit each item as a separate order
-      const orderPromises = items.map(async (item) => {
-        const itemPrice = item.itemType === 'other' 
-          ? 0 
-          : (SERVICES[item.itemType as ServiceType]?.price || 0) * item.quantity;
-        
-        return fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name,
-            phone,
-            address,
+      // Submit all items as ONE order with multiple items
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          phone,
+          address,
+          items: items.map(item => ({
             itemType: item.itemType,
             customItemType: item.customItemType,
             quantity: item.quantity,
-            customerNotes: item.notes || '', // Customer notes from form
-            estimatedPrice: itemPrice
-          })
-        });
+            notes: item.notes || ''
+          }))
+        })
       });
 
-      const responses = await Promise.all(orderPromises);
-      const results = await Promise.all(responses.map(r => r.json()));
+      const result = await response.json();
 
-      // Check if all orders were created successfully
-      const allSuccess = results.every(r => r.success);
-
-      if (allSuccess) {
-        router.push('/form/success');
-      } else {
-        const failedResults = results.filter(r => !r.success);
-        setError(failedResults[0]?.error || 'Terjadi kesalahan. Silakan coba lagi.');
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Gagal membuat pesanan');
       }
-    } catch {
-      setError('Gagal mengirim data. Periksa koneksi internet Anda.');
+
+      // Redirect to success page
+      router.push('/form/success?orderId=' + result.data.orderId);
+    } catch (err) {
+      console.error('Submit error:', err);
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);
     }

@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { name, phone, address, itemType, quantity, customItemType, customerNotes } = body;
+    const { name, phone, address, items: submittedItems } = body;
 
     // Validation
     const errors: string[] = [];
@@ -116,17 +116,23 @@ export async function POST(request: NextRequest) {
       errors.push('Nomor WhatsApp tidak valid');
     }
 
-    if (!itemType || !SERVICES[itemType as ServiceType]) {
-      errors.push('Jenis barang tidak valid');
+    if (!submittedItems || !Array.isArray(submittedItems) || submittedItems.length === 0) {
+      errors.push('Minimal 1 item harus diisi');
     }
 
-    // Custom Item Validation
-    if (itemType === 'other' && (!customItemType || customItemType.trim().length === 0)) {
-      errors.push('Nama barang wajib diisi untuk kategori Lainnya');
-    }
-
-    if (!quantity || quantity < 1) {
-      errors.push('Jumlah minimal 1');
+    // Validate each item
+    if (submittedItems && Array.isArray(submittedItems)) {
+      submittedItems.forEach((item, index) => {
+        if (!item.itemType || !SERVICES[item.itemType as ServiceType]) {
+          errors.push(`Item ${index + 1}: Jenis barang tidak valid`);
+        }
+        if (item.itemType === 'other' && (!item.customItemType || item.customItemType.trim().length === 0)) {
+          errors.push(`Item ${index + 1}: Nama barang wajib diisi untuk kategori Lainnya`);
+        }
+        if (!item.quantity || item.quantity < 1) {
+          errors.push(`Item ${index + 1}: Jumlah minimal 1`);
+        }
+      });
     }
 
     if (errors.length > 0) {
@@ -136,160 +142,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate price
-    const service = SERVICES[itemType as ServiceType];
-    const estimatedPrice = service.price * quantity;
+    console.log('📦 Creating new order with', submittedItems.length, 'items');
 
-    // Check if multi-item orders feature is enabled
-    const multiItemEnabled = isFeatureEnabled('MULTI_ITEM_ORDERS');
-    const autoMergeEnabled = isFeatureEnabled('AUTO_MERGE_ORDERS');
-    console.log('🚩 Feature Flags:', { multiItemEnabled, autoMergeEnabled });
-    console.log('🚩 ENV vars:', { 
-      MULTI_ITEM: process.env.NEXT_PUBLIC_FEATURE_MULTI_ITEM,
-      AUTO_MERGE: process.env.NEXT_PUBLIC_FEATURE_AUTO_MERGE 
-    });
-
-    // ALWAYS try to merge if same phone number, same day, pending status
-    // This works regardless of feature flags for better UX
-    
-    // Try to find existing pending order for this customer today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    
-    const phoneNormalized = phone.trim().replace(/\s+/g, '').replace(/^0/, '62').replace(/^\+/, '');
-    console.log('🔍 Looking for existing order with phone:', phone.trim(), 'normalized:', phoneNormalized, 'created today:', todayStart);
-    
-    // Calculate new item
-    const newItem = createOrderItem(
-      itemType as ServiceType,
-      quantity,
-      itemType === 'other' ? customItemType?.trim() : undefined,
-      customerNotes?.trim()
-    );
-    
-    // Simple approach: Find ANY pending unverified order from same phone today
-    // Use a single query that handles both legacy and multi-item orders
-    const existingOrders = await Order.find({
-      phone: phone.trim(),
-      status: 'pending',
-      'verification.status': 'unverified',
-      createdAt: { $gte: todayStart }
-    }).sort({ createdAt: -1 }).limit(1);
-    
-    console.log('📦 Found orders:', existingOrders.length);
-    
-    if (existingOrders.length > 0) {
-      const existingOrder = existingOrders[0];
-      console.log('📦 Existing order found:', {
-        id: existingOrder._id,
-        orderNumber: existingOrder.orderNumber,
-        hasItems: !!existingOrder.items,
-        itemsLength: existingOrder.items?.length || 0,
-        itemType: existingOrder.itemType
-      });
-      
-      // Initialize items array if not exists
-      if (!existingOrder.items || existingOrder.items.length === 0) {
-        // Convert legacy order to multi-item format
-        const legacyItem = createOrderItem(
-          existingOrder.itemType as ServiceType,
-          existingOrder.quantity || 1,
-          existingOrder.customItemType,
-          existingOrder.customerNotes
-        );
-        existingOrder.items = [legacyItem];
-        console.log('📦 Converted legacy order to multi-item format');
-      }
-      
-      // Add new item
-      existingOrder.items.push(newItem);
-      
-      // Log all items for debugging
-      console.log('📋 All items after adding:', existingOrder.items.map((item, idx) => ({
-        index: idx,
-        serviceType: item.serviceType,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        subtotal: item.subtotal,
-        calculated: item.unitPrice * item.quantity
-      })));
-      
-      // Recalculate totals - ALWAYS recalculate from items array
-      const subtotal = existingOrder.items.reduce((sum, item) => {
-        const itemSubtotal = item.subtotal || (item.unitPrice * item.quantity);
-        console.log(`  Item ${item.serviceType}: ${item.unitPrice} × ${item.quantity} = ${itemSubtotal}`);
-        return sum + itemSubtotal;
-      }, 0);
-      
-      console.log('💰 Recalculating prices:', {
-        itemsCount: existingOrder.items.length,
-        subtotal,
-        hasDiscount: !!existingOrder.discount,
-        discount: existingOrder.discount
-      });
-      
-      // Update all price fields
-      existingOrder.subtotal = subtotal;
-      existingOrder.estimatedPrice = subtotal; // Always sync with subtotal
-      
-      // Calculate final price with discount if exists
-      let finalPrice = subtotal;
-      if (existingOrder.discount && existingOrder.discount.value > 0) {
-        const discountValue = Number(existingOrder.discount.value) || 0;
-        
-        if (existingOrder.discount.type === 'percentage') {
-          const discountAmount = Math.round((subtotal * discountValue) / 100);
-          finalPrice = subtotal - discountAmount;
-          console.log('💰 Applied percentage discount:', { discountValue, discountAmount, finalPrice });
-        } else {
-          finalPrice = subtotal - discountValue;
-          console.log('💰 Applied fixed discount:', { discountValue, finalPrice });
-        }
-      }
-      
-      existingOrder.finalPrice = Math.max(0, finalPrice);
-      
-      console.log('💰 Final prices:', {
-        subtotal: existingOrder.subtotal,
-        estimatedPrice: existingOrder.estimatedPrice,
-        finalPrice: existingOrder.finalPrice
-      });
-      
-      await existingOrder.save();
-      
-      console.log('✅ MERGED - Added item to existing order. Total items:', existingOrder.items?.length);
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          orderId: existingOrder._id,
-          orderNumber: existingOrder.orderNumber,
-          merged: true,
-          itemsCount: existingOrder.items?.length || 0
-        },
-        message: 'Item berhasil ditambahkan ke pesanan yang ada'
-      });
-    }
-
-    console.log('➕ Creating NEW order (no merge)');
-
-    // Create new order - ALWAYS with items array for new orders
-    const orderItem = createOrderItem(
-      itemType as ServiceType,
-      quantity,
-      itemType === 'other' ? customItemType?.trim() : undefined,
-      customerNotes?.trim()
+    // Create order items array
+    const orderItems = submittedItems.map((item: any) => 
+      createOrderItem(
+        item.itemType as ServiceType,
+        item.quantity,
+        item.itemType === 'other' ? item.customItemType?.trim() : undefined,
+        item.notes?.trim()
+      )
     );
 
-    // Calculate prices correctly
-    const subtotal = orderItem.subtotal; // This is already calculated in createOrderItem
-    
-    console.log('💰 Creating new order with prices:', {
-      subtotal,
-      itemPrice: orderItem.unitPrice,
-      quantity: orderItem.quantity
+    // Calculate totals
+    const subtotal = orderItems.reduce((sum: number, item: any) => sum + item.subtotal, 0);
+
+    console.log('💰 Order totals:', {
+      items: orderItems.map((i: any) => ({ type: i.serviceType, qty: i.quantity, sub: i.subtotal })),
+      subtotal
     });
-    
+
+    // Create new order - ONE order with multiple items
     const orderData: any = {
       orderNumber: generateOrderNumber(),
       name: name.trim(),
@@ -299,28 +172,27 @@ export async function POST(request: NextRequest) {
       verification: {
         status: 'unverified'
       },
-      // Always use items array format
-      items: [orderItem],
-      itemType: itemType, // Keep legacy field for backward compatibility
-      customItemType: itemType === 'other' ? customItemType?.trim() : undefined,
-      quantity: quantity,
+      items: orderItems,
+      // Legacy fields for backward compatibility  
+      itemType: orderItems[0].serviceType,
+      customItemType: orderItems[0].customItemType,
+      quantity: orderItems.reduce((sum: number, item: any) => sum + item.quantity, 0),
       subtotal: subtotal,
-      estimatedPrice: subtotal, // Always equal to subtotal
-      finalPrice: subtotal, // No discount initially
-      customerNotes: customerNotes?.trim() || ''
+      estimatedPrice: subtotal,
+      finalPrice: subtotal,
+      customerNotes: orderItems.map((i: any) => i.notes).filter(Boolean).join('; ')
     };
 
     const order = new Order(orderData);
-
     await order.save();
+
+    console.log('✅ Order created:', order.orderNumber);
 
     return NextResponse.json({
       success: true,
       data: {
         orderId: order._id,
-        orderNumber: order.orderNumber,
-        merged: false,
-        itemsCount: 1
+        orderNumber: order.orderNumber
       },
       message: 'Pesanan berhasil dibuat'
     });
