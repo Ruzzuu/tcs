@@ -5,11 +5,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
+import Rekap from '@/lib/models/Rekap';
 import { v2 as cloudinary } from 'cloudinary';
 import { calculateTotal } from '@/lib/services';
 import type { ServiceSelection, Discount } from '@/lib/services';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { calculateOrderTotal } from '@/lib/orderUtils';
+import { runTransactionSafe } from '@/lib/db/transactions';
+import mongoose from 'mongoose';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -145,7 +148,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // Set finishedAt when status changes to finished
+    // Set finishedAt when status changes to finished AND create Rekap
     if (updateData.status === 'finished') {
       updateData.finishedAt = new Date();
       // Set TTL for auto-deletion (30 days)
@@ -156,7 +159,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       id,
       { $set: updateData },
       { new: true, runValidators: true }
-    ).lean();
+    );
 
     if (!order) {
       return NextResponse.json(
@@ -165,9 +168,36 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Auto-create Rekap if status changed to finished and no rekap exists
+    if (updateData.status === 'finished' && !order.rekapId) {
+      try {
+        const amount = order.finalPrice ?? order.subtotal ?? 0;
+        
+        const lastRekap = await Rekap.findOne().sort({ createdAt: -1 });
+        const previousBalance = lastRekap?.balanceSnapshot ?? 0;
+        const newBalance = previousBalance + amount;
+        
+        const rekap = await Rekap.create({
+          orderId: order._id,
+          amount,
+          immutable: true,
+          balanceSnapshot: newBalance,
+          createdAt: order.finishedAt || new Date()
+        });
+        
+        order.rekapId = rekap._id.toString();
+        await order.save();
+        
+        console.log(`Auto-created Rekap for order ${order.orderNumber}: Rp ${amount.toLocaleString('id-ID')}`);
+      } catch (rekapError) {
+        console.error('Failed to auto-create Rekap:', rekapError);
+        // Don't fail the whole request, just log the error
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      data: order,
+      data: order.toObject(),
       message: 'Pesanan berhasil diperbarui'
     });
   } catch (error) {
