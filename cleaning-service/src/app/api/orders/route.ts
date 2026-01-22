@@ -118,10 +118,8 @@ export async function POST(request: NextRequest) {
 
     if (!submittedItems || !Array.isArray(submittedItems) || submittedItems.length === 0) {
       errors.push('Minimal 1 item harus diisi');
-    }
-
-    // Validate each item
-    if (submittedItems && Array.isArray(submittedItems)) {
+    } else {
+      // Validate each item only if items array exists
       submittedItems.forEach((item, index) => {
         if (!item.itemType || !SERVICES[item.itemType as ServiceType]) {
           errors.push(`Item ${index + 1}: Jenis barang tidak valid`);
