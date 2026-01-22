@@ -1,6 +1,46 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
 <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        :root {
+            --out-color: #8b5cf6;
+        }
         body {
             min-height: max(884px, 100dvh);
         }
@@ -12,48 +52,6 @@
   </style>
   </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-white overflow-x-hidden">
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Admin Dashboard Overview</title>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    "primary": "#1152d4",
-                    "background-light": "#f6f6f8",
-                    "background-dark": "#101622",
-                },
-                fontFamily: {
-                    "display": ["Inter", "sans-serif"]
-                },
-                borderRadius: {
-                    "DEFAULT": "0.25rem", 
-                    "lg": "0.5rem", 
-                    "xl": "0.75rem", 
-                    "full": "9999px"
-                },
-            },
-        },
-    }
-</script>
-<style>
-    .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    .hide-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    :root {
-        --out-color: #8b5cf6;}
-</style>
 <header class="sticky top-0 z-50 flex items-center bg-white dark:bg-[#1a202c] p-4 border-b border-gray-100 dark:border-gray-800 justify-between shadow-sm">
 <div class="flex items-center gap-3">
 <button class="text-[#111318] dark:text-white flex size-10 shrink-0 items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
@@ -122,7 +120,7 @@
 </section>
 <section class="px-4">
 <h2 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Analytics</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="grid grid-cols-1 gap-4">
 <div class="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
 <div class="flex justify-between items-start mb-6">
 <div>
@@ -157,25 +155,74 @@
 <div class="flex justify-between items-start mb-4">
 <div>
 <p class="text-[#111318] dark:text-white text-base font-bold">Income Trends</p>
-<p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Last 7 Days</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Daily totals in Rupiah</p>
 </div>
-<span class="material-symbols-outlined text-gray-400">bar_chart</span>
+<div class="flex items-center gap-2">
+<div class="relative">
+<select class="appearance-none bg-gray-50 dark:bg-gray-800 border-none text-[11px] font-bold text-gray-500 dark:text-gray-400 py-1.5 pl-3 pr-8 rounded-lg focus:ring-1 focus:ring-primary outline-none">
+<option>Minggu 1</option>
+<option>Minggu 2</option>
+<option>Minggu 3</option>
+<option selected="">Minggu 4</option>
+<option>Minggu 5</option>
+<option disabled="">...</option>
+<option>Minggu 52</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] pointer-events-none text-gray-400">expand_more</span>
 </div>
-<div class="grid grid-flow-col gap-2 grid-rows-[1fr_auto] items-end justify-items-center h-40 pt-4">
-<div class="w-full bg-primary/20 dark:bg-primary/20 rounded-t-sm" style="height: 30%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">M</p>
-<div class="w-full bg-primary/40 dark:bg-primary/30 rounded-t-sm" style="height: 50%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">T</p>
-<div class="w-full bg-primary/60 dark:bg-primary/50 rounded-t-sm" style="height: 70%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">W</p>
-<div class="w-full bg-primary dark:bg-primary rounded-t-sm" style="height: 60%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">T</p>
-<div class="w-full bg-primary/80 dark:bg-primary/70 rounded-t-sm" style="height: 90%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">F</p>
-<div class="w-full bg-primary/40 dark:bg-primary/30 rounded-t-sm" style="height: 40%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">S</p>
-<div class="w-full bg-primary/20 dark:bg-primary/20 rounded-t-sm" style="height: 50%;"></div>
-<p class="text-gray-400 text-[10px] font-bold mt-2">S</p>
+<span class="material-symbols-outlined text-gray-400 text-xl">bar_chart</span>
+</div>
+</div>
+<div class="flex flex-col gap-4 mt-6">
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Sen</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary/20 rounded-full" style="width: 15%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Sel</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary/20 rounded-full" style="width: 15%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Rab</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary/20 rounded-full" style="width: 15%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Kam</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary/20 rounded-full" style="width: 15%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Jum</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary/20 rounded-full" style="width: 15%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Sab</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary rounded-full shadow-sm" style="width: 75%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 156.000</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-8 text-[11px] font-bold text-gray-400">Min</span>
+<div class="flex-1 h-6 bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden flex items-center">
+<div class="h-full bg-primary rounded-full shadow-sm" style="width: 90%"></div>
+</div>
+<span class="w-20 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300">Rp 190.000</span>
+</div>
 </div>
 </div>
 </div>
