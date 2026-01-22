@@ -56,7 +56,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
 
       order.status = 'finished';
-      order.rekapId = rekap[0]._id as mongoose.Types.ObjectId;
+      order.rekapId = rekap[0]._id.toString();
       order.finishedAt = new Date();
       await order.save({ session });
 

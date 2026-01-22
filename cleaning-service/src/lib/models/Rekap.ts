@@ -14,7 +14,8 @@ const RekapSchema = new Schema<RekapDocument>(
       type: Schema.Types.ObjectId,
       ref: 'Order',
       required: true,
-      index: true
+      index: true,
+      unique: true
     },
     amount: {
       type: Number,
@@ -43,7 +44,6 @@ const RekapSchema = new Schema<RekapDocument>(
   }
 );
 
-RekapSchema.index({ orderId: 1 }, { unique: true });
 RekapSchema.index({ createdAt: -1 });
 RekapSchema.index({ immutable: 1, createdAt: -1 });
 
