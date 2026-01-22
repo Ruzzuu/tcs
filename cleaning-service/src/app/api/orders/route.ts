@@ -204,8 +204,22 @@ export async function POST(request: NextRequest) {
       // Add new item
       existingOrder.items.push(newItem);
       
+      // Log all items for debugging
+      console.log('📋 All items after adding:', existingOrder.items.map((item, idx) => ({
+        index: idx,
+        serviceType: item.serviceType,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.subtotal,
+        calculated: item.unitPrice * item.quantity
+      })));
+      
       // Recalculate totals - ALWAYS recalculate from items array
-      const subtotal = existingOrder.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+      const subtotal = existingOrder.items.reduce((sum, item) => {
+        const itemSubtotal = item.subtotal || (item.unitPrice * item.quantity);
+        console.log(`  Item ${item.serviceType}: ${item.unitPrice} × ${item.quantity} = ${itemSubtotal}`);
+        return sum + itemSubtotal;
+      }, 0);
       
       console.log('💰 Recalculating prices:', {
         itemsCount: existingOrder.items.length,
