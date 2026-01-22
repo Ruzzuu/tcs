@@ -15,7 +15,24 @@ function PendingCard({
   onVerify: (orderId: string, action: 'approved' | 'rejected') => void;
 }) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const serviceName = SERVICES[order.itemType as ServiceType]?.name || order.itemType;
+  
+  // Get items list for display - handle both multi-item and legacy format
+  const hasItems = order.items && order.items.length > 0;
+  const itemsList = hasItems 
+    ? order.items!.map(item => ({
+        name: SERVICES[item.serviceType as ServiceType]?.name || item.customItemType || item.serviceType,
+        quantity: item.quantity || 1,
+        subtotal: item.subtotal || 0,
+        icon: SERVICES[item.serviceType as ServiceType]?.icon || 'inventory_2'
+      }))
+    : [{
+        name: SERVICES[order.itemType as ServiceType]?.name || order.itemType,
+        quantity: order.quantity || 1,
+        subtotal: order.estimatedPrice || 0,
+        icon: SERVICES[order.itemType as ServiceType]?.icon || 'inventory_2'
+      }];
+  
+  const totalQuantity = itemsList.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleVerify = async (action: 'approved' | 'rejected') => {
     setIsProcessing(true);
@@ -43,21 +60,30 @@ function PendingCard({
         </div>
       </div>
 
-      {/* Details */}
-      <div className="bg-slate-50 dark:bg-[#151b26] rounded-xl p-3 flex gap-3 items-center">
-        <div className="w-16 h-16 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
-          <span className="material-symbols-outlined text-3xl text-slate-400">
-            {SERVICES[order.itemType as ServiceType]?.icon || 'inventory_2'}
-          </span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{serviceName}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatCurrency(order.estimatedPrice || 0)}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Qty:</span>
-            <span className="text-xs font-bold text-slate-900 dark:text-white">{order.quantity || 1} Unit</span>
+      {/* Details - Show all items */}
+      <div className="bg-slate-50 dark:bg-[#151b26] rounded-xl p-3 space-y-2">
+        {itemsList.map((item, index) => (
+          <div key={index} className="flex gap-3 items-center">
+            <div className="w-12 h-12 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
+              <span className="material-symbols-outlined text-2xl text-slate-400">
+                {item.icon}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{item.name}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatCurrency(item.subtotal)}</p>
+            </div>
+            <div className="text-right shrink-0">
+              <span className="text-xs font-bold text-slate-900 dark:text-white">×{item.quantity}</span>
+            </div>
           </div>
-        </div>
+        ))}
+        {itemsList.length > 1 && (
+          <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+            <span className="text-xs text-slate-500">Total: {totalQuantity} item</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(order.finalPrice || order.estimatedPrice || 0)}</span>
+          </div>
+        )}
       </div>
 
       {/* Contact Info */}

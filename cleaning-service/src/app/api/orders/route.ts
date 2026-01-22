@@ -151,139 +151,101 @@ export async function POST(request: NextRequest) {
 
     // ALWAYS try to merge if same phone number, same day, pending status
     // This works regardless of feature flags for better UX
-    if (true) { // Always attempt merge
-      // Try to find existing pending order for this customer today
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      
-      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created today:', todayStart);
-      
-      // Calculate new item
-      const newItem = createOrderItem(
-        itemType as ServiceType,
-        quantity,
-        itemType === 'other' ? customItemType?.trim() : undefined,
-        customerNotes?.trim()
-      );
-      
-      // Try multiple times to find and update (handle race conditions)
-      let existingOrder = null;
-      const maxRetries = 3;
-      
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        if (attempt > 0) {
-          // Wait a bit before retrying (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 100 * attempt));
-          console.log(`🔄 Retry attempt ${attempt + 1}/${maxRetries}`);
-        }
-        
-        // First check if there's a legacy order (without items array) that we can convert
-        const legacyOrder = await Order.findOne({
-          phone: phone.trim(),
-          status: 'pending',
-          'verification.status': 'unverified',
-          createdAt: { $gte: todayStart },
-          $or: [
-            { items: { $exists: false } },
-            { items: { $size: 0 } }
-          ]
-        }).sort({ createdAt: -1 });
-        
-        if (legacyOrder) {
-          console.log('📦 Found legacy order, converting to multi-item:', legacyOrder.orderNumber);
-          
-          // Convert legacy order to multi-item format
-          const legacyItem = createOrderItem(
-            legacyOrder.itemType as ServiceType,
-            legacyOrder.quantity || 1,
-            legacyOrder.customItemType,
-            legacyOrder.customerNotes
-          );
-          
-          legacyOrder.items = [legacyItem, newItem];
-          legacyOrder.subtotal = (legacyOrder.subtotal || legacyOrder.estimatedPrice || 0) + newItem.subtotal;
-          legacyOrder.estimatedPrice = legacyOrder.subtotal;
-          legacyOrder.finalPrice = legacyOrder.subtotal;
-          
-          await legacyOrder.save();
-          existingOrder = legacyOrder;
-          break;
-        }
-        
-        // Try to find existing multi-item order
-        existingOrder = await Order.findOneAndUpdate(
-          {
-            phone: phone.trim(),
-            status: 'pending',
-            'verification.status': 'unverified',
-            createdAt: { $gte: todayStart },
-            items: { $exists: true, $not: { $size: 0 } } // Must have items array with at least 1 item
-          },
-          {
-            $push: { items: newItem },
-            $inc: { 
-              subtotal: newItem.subtotal,
-              estimatedPrice: newItem.subtotal,
-              finalPrice: newItem.subtotal 
-            }
-          },
-          {
-            new: true, // Return updated document
-            sort: { createdAt: -1 } // Get most recent
-          }
-        );
-        
-        if (existingOrder) {
-          console.log(`✅ Found and updated on attempt ${attempt + 1}`);
-          break;
-        }
-      }
-
-      console.log('📦 Atomic update result:', existingOrder ? {
+    
+    // Try to find existing pending order for this customer today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    const phoneNormalized = phone.trim().replace(/\s+/g, '').replace(/^0/, '62').replace(/^\+/, '');
+    console.log('🔍 Looking for existing order with phone:', phone.trim(), 'normalized:', phoneNormalized, 'created today:', todayStart);
+    
+    // Calculate new item
+    const newItem = createOrderItem(
+      itemType as ServiceType,
+      quantity,
+      itemType === 'other' ? customItemType?.trim() : undefined,
+      customerNotes?.trim()
+    );
+    
+    // Simple approach: Find ANY pending unverified order from same phone today
+    // Use a single query that handles both legacy and multi-item orders
+    const existingOrders = await Order.find({
+      phone: phone.trim(),
+      status: 'pending',
+      'verification.status': 'unverified',
+      createdAt: { $gte: todayStart }
+    }).sort({ createdAt: -1 }).limit(1);
+    
+    console.log('📦 Found orders:', existingOrders.length);
+    
+    if (existingOrders.length > 0) {
+      const existingOrder = existingOrders[0];
+      console.log('📦 Existing order found:', {
         id: existingOrder._id,
         orderNumber: existingOrder.orderNumber,
+        hasItems: !!existingOrder.items,
         itemsLength: existingOrder.items?.length || 0,
-        merged: true
-      } : 'No existing order found');
-
-      if (existingOrder) {
-        // Order was found and updated atomically
-        // Now recalculate with discount if exists
-        if (existingOrder.discount) {
-          const subtotal = existingOrder.items!.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-          let finalPrice = subtotal;
-          const discountValue = Number(existingOrder.discount.value) || 0;
-          
-          if (existingOrder.discount.type === 'percentage') {
-            const discountAmount = Math.round((subtotal * discountValue) / 100);
-            finalPrice = subtotal - discountAmount;
-          } else {
-            finalPrice = subtotal - discountValue;
-          }
-          
-          existingOrder.finalPrice = Math.max(0, finalPrice);
-          await existingOrder.save();
+        itemType: existingOrder.itemType
+      });
+      
+      // Initialize items array if not exists
+      if (!existingOrder.items || existingOrder.items.length === 0) {
+        // Convert legacy order to multi-item format
+        const legacyItem = createOrderItem(
+          existingOrder.itemType as ServiceType,
+          existingOrder.quantity || 1,
+          existingOrder.customItemType,
+          existingOrder.customerNotes
+        );
+        existingOrder.items = [legacyItem];
+        console.log('📦 Converted legacy order to multi-item format');
+      }
+      
+      // Add new item
+      existingOrder.items.push(newItem);
+      
+      // Recalculate totals
+      const subtotal = existingOrder.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+      existingOrder.subtotal = subtotal;
+      existingOrder.estimatedPrice = subtotal;
+      
+      // Handle discount if exists
+      if (existingOrder.discount) {
+        let finalPrice = subtotal;
+        const discountValue = Number(existingOrder.discount.value) || 0;
+        
+        if (existingOrder.discount.type === 'percentage') {
+          const discountAmount = Math.round((subtotal * discountValue) / 100);
+          finalPrice = subtotal - discountAmount;
+        } else {
+          finalPrice = subtotal - discountValue;
         }
         
-        console.log('✅ MERGED - Added item to existing order. Total items:', existingOrder.items?.length);
-
-        return NextResponse.json({
-          success: true,
-          data: {
-            orderId: existingOrder._id,
-            orderNumber: existingOrder.orderNumber,
-            merged: true,
-            itemsCount: existingOrder.items?.length || 0
-          },
-          message: 'Item berhasil ditambahkan ke pesanan yang ada'
-        });
+        existingOrder.finalPrice = Math.max(0, finalPrice);
+      } else {
+        existingOrder.finalPrice = subtotal;
       }
+      
+      await existingOrder.save();
+      
+      console.log('✅ MERGED - Added item to existing order. Total items:', existingOrder.items?.length);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          orderId: existingOrder._id,
+          orderNumber: existingOrder.orderNumber,
+          merged: true,
+          itemsCount: existingOrder.items?.length || 0
+        },
+        message: 'Item berhasil ditambahkan ke pesanan yang ada'
+      });
     }
 
     console.log('➕ Creating NEW order (no merge)');
 
     // Create new order - ALWAYS with items array for new orders
-    const newItem = createOrderItem(
+    const orderItem = createOrderItem(
       itemType as ServiceType,
       quantity,
       itemType === 'other' ? customItemType?.trim() : undefined,
@@ -300,7 +262,7 @@ export async function POST(request: NextRequest) {
         status: 'unverified'
       },
       // Always use items array format
-      items: [newItem],
+      items: [orderItem],
       itemType: itemType, // Keep legacy field for backward compatibility
       customItemType: itemType === 'other' ? customItemType?.trim() : undefined,
       quantity: quantity,
