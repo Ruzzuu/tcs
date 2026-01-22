@@ -27,6 +27,12 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
 
+    // Exclude deleted orders by default (unless explicitly requested)
+    const includeDeleted = searchParams.get('includeDeleted') === 'true';
+    if (!includeDeleted) {
+      query.deleted = { $ne: true };
+    }
+
     // Filter by verification status
     if (verified === 'true') {
       query['verification.status'] = 'approved';

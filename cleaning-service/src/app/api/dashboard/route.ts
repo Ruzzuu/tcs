@@ -24,9 +24,9 @@ export async function GET() {
       incomeTrend,
       recentOrders
     ] = await Promise.all([
-      // KPI counts (only verified orders)
+      // KPI counts (only verified orders, exclude deleted)
       Order.aggregate([
-        { $match: { 'verification.status': 'approved' } },
+        { $match: { 'verification.status': 'approved', deleted: { $ne: true } } },
         {
           $group: {
             _id: null,
@@ -53,12 +53,12 @@ export async function GET() {
         }
       ]),
 
-      // Unverified count (for pending verification badge)
-      Order.countDocuments({ 'verification.status': 'unverified' }),
+      // Unverified count (for pending verification badge, exclude deleted)
+      Order.countDocuments({ 'verification.status': 'unverified', deleted: { $ne: true } }),
 
-      // Service distribution pie chart - count all individual items
+      // Service distribution pie chart - count all individual items (exclude deleted)
       Order.aggregate([
-        { $match: { 'verification.status': 'approved' } },
+        { $match: { 'verification.status': 'approved', deleted: { $ne: true } } },
         {
           $project: {
             // Expand items array if exists, otherwise create single item from legacy fields
@@ -91,13 +91,14 @@ export async function GET() {
         { $sort: { value: -1 } }
       ]),
 
-      // Income trend (last 7 days, only finished orders)
+      // Income trend (last 7 days, only finished orders, exclude deleted)
       Order.aggregate([
         {
           $match: {
             'verification.status': 'approved',
             status: 'finished',
-            finishedAt: { $gte: sevenDaysAgo }
+            finishedAt: { $gte: sevenDaysAgo },
+            deleted: { $ne: true }
           }
         },
         {
@@ -113,8 +114,8 @@ export async function GET() {
         { $sort: { _id: 1 } }
       ]),
 
-      // Recent orders (last 10 verified)
-      Order.find({ 'verification.status': 'approved' })
+      // Recent orders (last 10 verified, exclude deleted)
+      Order.find({ 'verification.status': 'approved', deleted: { $ne: true } })
         .sort({ createdAt: -1 })
         .limit(10)
         .lean()

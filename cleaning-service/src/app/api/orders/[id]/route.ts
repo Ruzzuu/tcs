@@ -233,34 +233,19 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       // Check if rekap already exists
       if (!order.rekapId && order.finalPrice > 0) {
         try {
-          // Handle both old (single item) and new (items array) format
-          const rekapItems = order.items && order.items.length > 0
-            ? order.items.map((item: any) => ({
-                serviceType: item.serviceType,
-                quantity: item.quantity,
-                price: item.subtotal
-              }))
-            : [{
-                serviceType: order.itemType || 'unknown',
-                quantity: order.quantity || 1,
-                price: order.finalPrice || order.subtotal || 0
-              }];
-          
-          // Create rekap entry
+          // Create rekap entry with correct schema
           const rekapEntry = new Rekap({
-            orderNumber: order.orderNumber,
+            orderId: order._id,
             amount: order.finalPrice || order.subtotal || 0,
-            customerName: order.name,
-            items: rekapItems,
-            completedAt: order.finishedAt || new Date(),
-            immutable: true
+            immutable: true,
+            balanceSnapshot: 0 // Will be updated by balance calculation logic
           });
           
           await rekapEntry.save();
           
           // Update order with rekapId (convert to string)
           order.rekapId = rekapEntry._id.toString();
-          console.log(`✅ Created Rekap entry ${rekapEntry._id} for order ${order.orderNumber} with amount Rp ${order.finalPrice}`);
+          console.log(`✅ Created Rekap entry ${rekapEntry._id} for order ${order.orderNumber} (${order._id}) with amount Rp ${order.finalPrice}`);
         } catch (rekapError) {
           console.error('⚠️ Failed to create Rekap entry:', rekapError);
           // Continue with soft delete even if rekap creation fails

@@ -25,6 +25,22 @@ export async function GET(request: NextRequest) {
           }
         },
         {
+          $lookup: {
+            from: 'orders',
+            localField: 'orderId',
+            foreignField: '_id',
+            as: 'order'
+          }
+        },
+        {
+          $unwind: '$order'
+        },
+        {
+          $match: {
+            'order.deleted': { $ne: true }
+          }
+        },
+        {
           $group: {
             _id: null,
             dates: { $push: '$createdAt' }
@@ -84,6 +100,22 @@ export async function GET(request: NextRequest) {
             $lte: endDate
           },
           immutable: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'orderId',
+          foreignField: '_id',
+          as: 'order'
+        }
+      },
+      {
+        $unwind: '$order'
+      },
+      {
+        $match: {
+          'order.deleted': { $ne: true }
         }
       },
       {

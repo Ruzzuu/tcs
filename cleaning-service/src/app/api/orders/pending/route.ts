@@ -11,7 +11,10 @@ export async function GET() {
   try {
     await connectDB();
 
-    const orders = await Order.find({ 'verification.status': 'unverified' })
+    const orders = await Order.find({ 
+      'verification.status': 'unverified',
+      deleted: { $ne: true }  // Exclude deleted orders
+    })
       .sort({ createdAt: -1 })
       .lean();
 
