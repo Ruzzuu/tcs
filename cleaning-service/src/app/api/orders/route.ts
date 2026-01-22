@@ -144,14 +144,21 @@ export async function POST(request: NextRequest) {
     const multiItemEnabled = isFeatureEnabled('MULTI_ITEM_ORDERS');
     const autoMergeEnabled = isFeatureEnabled('AUTO_MERGE_ORDERS');
     console.log('🚩 Feature Flags:', { multiItemEnabled, autoMergeEnabled });
+    console.log('🚩 ENV vars:', { 
+      MULTI_ITEM: process.env.NEXT_PUBLIC_FEATURE_MULTI_ITEM,
+      AUTO_MERGE: process.env.NEXT_PUBLIC_FEATURE_AUTO_MERGE 
+    });
 
-    if (multiItemEnabled && autoMergeEnabled) {
-      // Try to find existing pending order for this customer
-      // Look for orders created within last 10 minutes (increased window)
-      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created after:', tenMinutesAgo);
+    // ALWAYS try to merge if same phone number, same day, pending status
+    // This works regardless of feature flags for better UX
+    if (true) { // Always attempt merge
+      // Try to find existing pending order for this customer today
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
       
-      // Calculate new item first
+      console.log('🔍 Looking for existing order with phone:', phone.trim(), 'created today:', todayStart);
+      
+      // Calculate new item
       const newItem = createOrderItem(
         itemType as ServiceType,
         quantity,
@@ -170,11 +177,46 @@ export async function POST(request: NextRequest) {
           console.log(`🔄 Retry attempt ${attempt + 1}/${maxRetries}`);
         }
         
+        // First check if there's a legacy order (without items array) that we can convert
+        const legacyOrder = await Order.findOne({
+          phone: phone.trim(),
+          status: 'pending',
+          'verification.status': 'unverified',
+          createdAt: { $gte: todayStart },
+          $or: [
+            { items: { $exists: false } },
+            { items: { $size: 0 } }
+          ]
+        }).sort({ createdAt: -1 });
+        
+        if (legacyOrder) {
+          console.log('📦 Found legacy order, converting to multi-item:', legacyOrder.orderNumber);
+          
+          // Convert legacy order to multi-item format
+          const legacyItem = createOrderItem(
+            legacyOrder.itemType as ServiceType,
+            legacyOrder.quantity || 1,
+            legacyOrder.customItemType,
+            legacyOrder.customerNotes
+          );
+          
+          legacyOrder.items = [legacyItem, newItem];
+          legacyOrder.subtotal = (legacyOrder.subtotal || legacyOrder.estimatedPrice || 0) + newItem.subtotal;
+          legacyOrder.estimatedPrice = legacyOrder.subtotal;
+          legacyOrder.finalPrice = legacyOrder.subtotal;
+          
+          await legacyOrder.save();
+          existingOrder = legacyOrder;
+          break;
+        }
+        
+        // Try to find existing multi-item order
         existingOrder = await Order.findOneAndUpdate(
           {
             phone: phone.trim(),
             status: 'pending',
-            createdAt: { $gte: tenMinutesAgo },
+            'verification.status': 'unverified',
+            createdAt: { $gte: todayStart },
             items: { $exists: true, $not: { $size: 0 } } // Must have items array with at least 1 item
           },
           {
@@ -230,7 +272,8 @@ export async function POST(request: NextRequest) {
           data: {
             orderId: existingOrder._id,
             orderNumber: existingOrder.orderNumber,
-            merged: true
+            merged: true,
+            itemsCount: existingOrder.items?.length || 0
           },
           message: 'Item berhasil ditambahkan ke pesanan yang ada'
         });
@@ -239,7 +282,14 @@ export async function POST(request: NextRequest) {
 
     console.log('➕ Creating NEW order (no merge)');
 
-    // Create new order (legacy single-item or new multi-item)
+    // Create new order - ALWAYS with items array for new orders
+    const newItem = createOrderItem(
+      itemType as ServiceType,
+      quantity,
+      itemType === 'other' ? customItemType?.trim() : undefined,
+      customerNotes?.trim()
+    );
+
     const orderData: any = {
       orderNumber: generateOrderNumber(),
       name: name.trim(),
@@ -248,33 +298,17 @@ export async function POST(request: NextRequest) {
       status: 'pending',
       verification: {
         status: 'unverified'
-      }
+      },
+      // Always use items array format
+      items: [newItem],
+      itemType: itemType, // Keep legacy field for backward compatibility
+      customItemType: itemType === 'other' ? customItemType?.trim() : undefined,
+      quantity: quantity,
+      subtotal: estimatedPrice,
+      estimatedPrice: estimatedPrice,
+      finalPrice: estimatedPrice,
+      customerNotes: customerNotes?.trim() || ''
     };
-
-    if (isFeatureEnabled('MULTI_ITEM_ORDERS')) {
-      // Create order with items array
-      const newItem = createOrderItem(
-        itemType as ServiceType,
-        quantity,
-        itemType === 'other' ? customItemType?.trim() : undefined,
-        customerNotes?.trim()
-      );
-
-      orderData.items = [newItem];
-      orderData.subtotal = estimatedPrice;
-      orderData.estimatedPrice = estimatedPrice;
-      orderData.finalPrice = estimatedPrice;
-    } else {
-      // Legacy single-item format
-      orderData.itemType = itemType;
-      orderData.customItemType = itemType === 'other' ? customItemType?.trim() : undefined;
-      orderData.quantity = quantity;
-      orderData.estimatedPrice = estimatedPrice;
-      orderData.customerNotes = customerNotes?.trim() || '';
-      // Set subtotal and finalPrice for schema validation
-      orderData.subtotal = estimatedPrice;
-      orderData.finalPrice = estimatedPrice;
-    }
 
     const order = new Order(orderData);
 
@@ -285,7 +319,8 @@ export async function POST(request: NextRequest) {
       data: {
         orderId: order._id,
         orderNumber: order.orderNumber,
-        merged: false
+        merged: false,
+        itemsCount: 1
       },
       message: 'Pesanan berhasil dibuat'
     });
