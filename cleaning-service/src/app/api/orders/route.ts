@@ -105,54 +105,95 @@ export async function GET(request: NextRequest) {
 
 // POST /api/orders - Create new order (customer submission)
 export async function POST(request: NextRequest) {
+  const requestId = Math.random().toString(36).substring(7);
+  console.log(`\n🔵 [${requestId}] NEW ORDER REQUEST RECEIVED`);
+  
   try {
     await connectDB();
 
     const body = await request.json();
-    console.log('📥 Received POST body:', JSON.stringify(body, null, 2));
+    console.log(`📥 [${requestId}] Received POST body:`, JSON.stringify(body, null, 2));
     
     const { name, phone, address, items: submittedItems } = body;
 
-    console.log('📦 Extracted data:', {
+    console.log(`📦 [${requestId}] Extracted data:`, {
       name,
       phone,
       address,
       submittedItems,
       hasItems: !!submittedItems,
       isArray: Array.isArray(submittedItems),
-      length: submittedItems?.length
+      length: submittedItems?.length,
+      firstItem: submittedItems?.[0]
     });
 
     // Validation
     const errors: string[] = [];
 
-    if (!name || name.trim().length < 2) {
+    // Name validation
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
       errors.push('Nama minimal 2 karakter');
     }
 
-    if (!phone || !isValidPhoneNumber(phone)) {
+    // Phone validation
+    if (!phone || typeof phone !== 'string' || !isValidPhoneNumber(phone)) {
       errors.push('Nomor WhatsApp tidak valid');
     }
 
-    if (!submittedItems || !Array.isArray(submittedItems) || submittedItems.length === 0) {
+    // Items validation - more defensive
+    if (!submittedItems) {
+      errors.push('Data items tidak ditemukan');
+      console.log(`❌ [${requestId}] Items is null/undefined`);
+    } else if (!Array.isArray(submittedItems)) {
+      errors.push('Format items tidak valid (harus array)');
+      console.log(`❌ [${requestId}] Items is not an array:`, typeof submittedItems);
+    } else if (submittedItems.length === 0) {
       errors.push('Minimal 1 item harus diisi');
-      console.log('❌ Items validation failed:', { submittedItems, isArray: Array.isArray(submittedItems) });
+      console.log(`❌ [${requestId}] Items array is empty`);
     } else {
-      // Validate each item only if items array exists
+      // Validate each item
+      let hasValidItem = false;
       submittedItems.forEach((item, index) => {
-        if (!item.itemType || !SERVICES[item.itemType as ServiceType]) {
-          errors.push(`Item ${index + 1}: Jenis barang tidak valid`);
+        // Check if item is an object
+        if (!item || typeof item !== 'object') {
+          errors.push(`Item ${index + 1}: Format tidak valid`);
+          return;
         }
+
+        // Check itemType
+        if (!item.itemType || item.itemType.trim() === '') {
+          errors.push(`Item ${index + 1}: Jenis barang harus dipilih`);
+          return;
+        }
+
+        // Validate service type exists
+        if (!SERVICES[item.itemType as ServiceType]) {
+          errors.push(`Item ${index + 1}: Jenis barang tidak valid`);
+          return;
+        }
+
+        // Check custom item type for "other"
         if (item.itemType === 'other' && (!item.customItemType || item.customItemType.trim().length === 0)) {
           errors.push(`Item ${index + 1}: Nama barang wajib diisi untuk kategori Lainnya`);
+          return;
         }
-        if (!item.quantity || item.quantity < 1) {
+
+        // Check quantity
+        if (!item.quantity || typeof item.quantity !== 'number' || item.quantity < 1) {
           errors.push(`Item ${index + 1}: Jumlah minimal 1`);
+          return;
         }
+
+        hasValidItem = true;
       });
+
+      if (!hasValidItem && errors.length === 0) {
+        errors.push('Tidak ada item yang valid');
+      }
     }
 
     if (errors.length > 0) {
+      console.log(`❌ [${requestId}] Validation failed with ${errors.length} errors:`, errors);
       return NextResponse.json(
         { success: false, error: errors.join(', ') },
         { status: 400 }

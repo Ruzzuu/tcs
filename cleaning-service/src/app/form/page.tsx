@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { formatCurrency, isValidPhoneNumber } from '@/lib/utils';
@@ -18,6 +18,7 @@ export default function CustomerFormPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const submitAttemptRef = useRef(false);
   
   // Customer info
   const [name, setName] = useState('');
@@ -69,33 +70,54 @@ export default function CustomerFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple simultaneous submissions
+    if (submitAttemptRef.current || isSubmitting) {
+      console.log('⚠️ Duplicate submission attempt blocked');
+      return;
+    }
+    
     if (!isFormValid) {
       setError('Mohon lengkapi semua data yang wajib diisi');
       return;
     }
 
+    submitAttemptRef.current = true;
     setIsSubmitting(true);
     setError(null);
 
+    console.log('📤 Submitting order with items:', items);
+
     try {
+      // Filter out any items with empty itemType
+      const validItems = items.filter(item => item.itemType && item.itemType.trim() !== '');
+      
+      if (validItems.length === 0) {
+        throw new Error('Mohon pilih minimal 1 jenis barang');
+      }
+
+      const payload = {
+        name,
+        phone,
+        address,
+        items: validItems.map(item => ({
+          itemType: item.itemType,
+          customItemType: item.customItemType || '',
+          quantity: item.quantity,
+          notes: item.notes || ''
+        }))
+      };
+
+      console.log('📦 Payload to send:', JSON.stringify(payload, null, 2));
+
       // Submit all items as ONE order with multiple items
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          phone,
-          address,
-          items: items.map(item => ({
-            itemType: item.itemType,
-            customItemType: item.customItemType,
-            quantity: item.quantity,
-            notes: item.notes || ''
-          }))
-        })
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
+      console.log('📬 Response:', result);
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || 'Gagal membuat pesanan');
@@ -106,6 +128,7 @@ export default function CustomerFormPage() {
     } catch (err) {
       console.error('Submit error:', err);
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.');
+      submitAttemptRef.current = false; // Reset on error to allow retry
     } finally {
       setIsSubmitting(false);
     }
