@@ -265,6 +265,12 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
+  // Week selector state
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [weeklyData, setWeeklyData] = useState<any>(null);
+  const [weeklyLoading, setWeeklyLoading] = useState(false);
+  
   // Add Order Form State
   const [showAddForm, setShowAddForm] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
@@ -319,6 +325,57 @@ export default function AdminDashboard() {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [fetchData]);
+
+  // Fetch weekly income data
+  const fetchWeeklyData = useCallback(async (week?: number, year?: number) => {
+    setWeeklyLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (week !== undefined) params.append('week', week.toString());
+      if (year !== undefined) params.append('year', year.toString());
+      
+      const response = await fetch(`/api/income/weekly?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setWeeklyData(result.data);
+        if (selectedWeek === null) {
+          setSelectedWeek(result.data.weekNumber);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch weekly data:', error);
+    } finally {
+      setWeeklyLoading(false);
+    }
+  }, [selectedWeek]);
+
+  useEffect(() => {
+    fetchWeeklyData();
+  }, [fetchWeeklyData]);
+
+  const handleWeekChange = (week: number) => {
+    setSelectedWeek(week);
+    fetchWeeklyData(week, selectedYear);
+  };
+
+  const handlePrevWeek = () => {
+    if (selectedWeek && selectedWeek > 1) {
+      handleWeekChange(selectedWeek - 1);
+    } else if (selectedWeek === 1 && selectedYear > 2024) {
+      setSelectedYear(selectedYear - 1);
+      fetchWeeklyData(52, selectedYear - 1);
+    }
+  };
+
+  const handleNextWeek = () => {
+    if (selectedWeek && weeklyData && selectedWeek < weeklyData.totalWeeks) {
+      handleWeekChange(selectedWeek + 1);
+    } else if (selectedWeek === weeklyData?.totalWeeks) {
+      setSelectedYear(selectedYear + 1);
+      fetchWeeklyData(1, selectedYear + 1);
+    }
+  };
 
   // Handle Add Order Form Submit
   const handleAddOrder = async (e: React.FormEvent) => {
@@ -558,16 +615,51 @@ export default function AdminDashboard() {
             <PieChart data={data?.serviceDistribution || []} />
           </div>
 
-          {/* Income Trend Bar Chart */}
+          {/* Income Trend Bar Chart with Week Selector */}
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">7 Hari Terakhir</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                  Minggu ke-{selectedWeek || '...'} — {weeklyData && new Date(weeklyData.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} s/d {weeklyData && new Date(weeklyData.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
               </div>
-              <span className="material-symbols-outlined text-gray-400">bar_chart</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePrevWeek}
+                  disabled={weeklyLoading || (selectedWeek === 1 && selectedYear === 2024)}
+                  className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  ←
+                </button>
+                <select
+                  value={selectedWeek || ''}
+                  onChange={(e) => handleWeekChange(parseInt(e.target.value))}
+                  disabled={weeklyLoading}
+                  className="text-xs rounded bg-white dark:bg-[#0f1724] border border-gray-200 dark:border-gray-700 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
+                >
+                  {weeklyData && Array.from({ length: weeklyData.totalWeeks }, (_, i) => i + 1).map((week) => (
+                    <option key={week} value={week}>
+                      Minggu {week}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleNextWeek}
+                  disabled={weeklyLoading || (weeklyData && selectedWeek === weeklyData.totalWeeks && selectedYear === new Date().getFullYear())}
+                  className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  →
+                </button>
+              </div>
             </div>
-            <BarChart data={data?.incomeTrend || []} />
+            {weeklyLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+              </div>
+            ) : (
+              <BarChart data={weeklyData?.weekData || []} />
+            )}
           </div>
         </div>
       </section>
