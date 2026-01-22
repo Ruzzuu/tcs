@@ -109,7 +109,19 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
+    console.log('📥 Received POST body:', JSON.stringify(body, null, 2));
+    
     const { name, phone, address, items: submittedItems } = body;
+
+    console.log('📦 Extracted data:', {
+      name,
+      phone,
+      address,
+      submittedItems,
+      hasItems: !!submittedItems,
+      isArray: Array.isArray(submittedItems),
+      length: submittedItems?.length
+    });
 
     // Validation
     const errors: string[] = [];
@@ -124,6 +136,7 @@ export async function POST(request: NextRequest) {
 
     if (!submittedItems || !Array.isArray(submittedItems) || submittedItems.length === 0) {
       errors.push('Minimal 1 item harus diisi');
+      console.log('❌ Items validation failed:', { submittedItems, isArray: Array.isArray(submittedItems) });
     } else {
       // Validate each item only if items array exists
       submittedItems.forEach((item, index) => {
