@@ -7,12 +7,72 @@ export async function GET(request: NextRequest) {
     await connectDB();
     
     const { searchParams } = new URL(request.url);
+    const action = searchParams.get('action');
+    
+    // Action: Get available weeks
+    if (action === 'available') {
+      const yearParam = searchParams.get('year');
+      const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+      
+      const availableWeeks = await Rekap.aggregate([
+        {
+          $match: {
+            immutable: true,
+            createdAt: {
+              $gte: new Date(year, 0, 1),
+              $lte: new Date(year, 11, 31, 23, 59, 59, 999)
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            dates: { $push: '$createdAt' }
+          }
+        }
+      ]);
+      
+      if (!availableWeeks.length || !availableWeeks[0].dates.length) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            year,
+            availableWeeks: []
+          }
+        });
+      }
+      
+      // Calculate week numbers from dates
+      const weekSet = new Set<number>();
+      availableWeeks[0].dates.forEach((date: Date) => {
+        const weekNum = getCurrentWeek(new Date(date));
+        weekSet.add(weekNum);
+      });
+      
+      const sortedWeeks = Array.from(weekSet).sort((a, b) => a - b);
+      
+      return NextResponse.json({
+        success: true,
+        data: {
+          year,
+          availableWeeks: sortedWeeks
+        }
+      });
+    }
+    
+    // Action: Get week data
     const weekParam = searchParams.get('week');
     const yearParam = searchParams.get('year');
     
-    const currentDate = new Date();
-    const year = yearParam ? parseInt(yearParam) : currentDate.getFullYear();
-    const weekNumber = weekParam ? parseInt(weekParam) : getCurrentWeek(currentDate);
+    if (!weekParam) {
+      return NextResponse.json(
+        { success: false, error: 'Week parameter required' },
+        { status: 400 }
+      );
+    }
+    
+    const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+    const weekNumber = parseInt(weekParam);
     
     const { startDate, endDate } = getWeekDateRange(year, weekNumber);
     
@@ -53,8 +113,6 @@ export async function GET(request: NextRequest) {
       };
     });
     
-    const totalWeeks = getWeeksInYear(year);
-    
     return NextResponse.json({
       success: true,
       data: {
@@ -62,7 +120,6 @@ export async function GET(request: NextRequest) {
         year,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        totalWeeks,
         weekData
       }
     });
@@ -94,9 +151,4 @@ function getWeekDateRange(year: number, week: number): { startDate: Date; endDat
   endDate.setHours(23, 59, 59, 999);
   
   return { startDate, endDate };
-}
-
-function getWeeksInYear(year: number): number {
-  const lastDayOfYear = new Date(year, 11, 31);
-  return getCurrentWeek(lastDayOfYear);
 }
