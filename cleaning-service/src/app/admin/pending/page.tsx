@@ -79,9 +79,29 @@ function PendingCard({
           </div>
         ))}
         {itemsList.length > 1 && (
-          <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-            <span className="text-xs text-slate-500">Total: {totalQuantity} item</span>
-            <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(order.finalPrice || order.estimatedPrice || 0)}</span>
+          <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-slate-500">Subtotal ({totalQuantity} item)</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(order.subtotal || order.estimatedPrice || 0)}</span>
+            </div>
+            {order.discount && order.discount.value > 0 && (
+              <>
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs text-slate-500">Diskon ({order.discount.type === 'percentage' ? `${order.discount.value}%` : formatCurrency(order.discount.value)})</span>
+                  <span className="text-xs text-red-600 dark:text-red-400">-{formatCurrency(order.subtotal - order.finalPrice)}</span>
+                </div>
+                <div className="flex justify-between items-center mt-1 pt-1 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Total Bayar</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(order.finalPrice)}</span>
+                </div>
+              </>
+            )}
+            {(!order.discount || order.discount.value === 0) && (
+              <div className="flex justify-between items-center mt-1 pt-1 border-t border-slate-200 dark:border-slate-700">
+                <span className="text-xs font-bold text-slate-900 dark:text-white">Total Bayar</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(order.finalPrice || order.subtotal || 0)}</span>
+              </div>
+            )}
           </div>
         )}
       </div>

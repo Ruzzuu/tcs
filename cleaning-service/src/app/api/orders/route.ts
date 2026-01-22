@@ -204,27 +204,42 @@ export async function POST(request: NextRequest) {
       // Add new item
       existingOrder.items.push(newItem);
       
-      // Recalculate totals
+      // Recalculate totals - ALWAYS recalculate from items array
       const subtotal = existingOrder.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-      existingOrder.subtotal = subtotal;
-      existingOrder.estimatedPrice = subtotal;
       
-      // Handle discount if exists
-      if (existingOrder.discount) {
-        let finalPrice = subtotal;
+      console.log('💰 Recalculating prices:', {
+        itemsCount: existingOrder.items.length,
+        subtotal,
+        hasDiscount: !!existingOrder.discount,
+        discount: existingOrder.discount
+      });
+      
+      // Update all price fields
+      existingOrder.subtotal = subtotal;
+      existingOrder.estimatedPrice = subtotal; // Always sync with subtotal
+      
+      // Calculate final price with discount if exists
+      let finalPrice = subtotal;
+      if (existingOrder.discount && existingOrder.discount.value > 0) {
         const discountValue = Number(existingOrder.discount.value) || 0;
         
         if (existingOrder.discount.type === 'percentage') {
           const discountAmount = Math.round((subtotal * discountValue) / 100);
           finalPrice = subtotal - discountAmount;
+          console.log('💰 Applied percentage discount:', { discountValue, discountAmount, finalPrice });
         } else {
           finalPrice = subtotal - discountValue;
+          console.log('💰 Applied fixed discount:', { discountValue, finalPrice });
         }
-        
-        existingOrder.finalPrice = Math.max(0, finalPrice);
-      } else {
-        existingOrder.finalPrice = subtotal;
       }
+      
+      existingOrder.finalPrice = Math.max(0, finalPrice);
+      
+      console.log('💰 Final prices:', {
+        subtotal: existingOrder.subtotal,
+        estimatedPrice: existingOrder.estimatedPrice,
+        finalPrice: existingOrder.finalPrice
+      });
       
       await existingOrder.save();
       
@@ -252,6 +267,15 @@ export async function POST(request: NextRequest) {
       customerNotes?.trim()
     );
 
+    // Calculate prices correctly
+    const subtotal = orderItem.subtotal; // This is already calculated in createOrderItem
+    
+    console.log('💰 Creating new order with prices:', {
+      subtotal,
+      itemPrice: orderItem.unitPrice,
+      quantity: orderItem.quantity
+    });
+    
     const orderData: any = {
       orderNumber: generateOrderNumber(),
       name: name.trim(),
@@ -266,9 +290,9 @@ export async function POST(request: NextRequest) {
       itemType: itemType, // Keep legacy field for backward compatibility
       customItemType: itemType === 'other' ? customItemType?.trim() : undefined,
       quantity: quantity,
-      subtotal: estimatedPrice,
-      estimatedPrice: estimatedPrice,
-      finalPrice: estimatedPrice,
+      subtotal: subtotal,
+      estimatedPrice: subtotal, // Always equal to subtotal
+      finalPrice: subtotal, // No discount initially
       customerNotes: customerNotes?.trim() || ''
     };
 
