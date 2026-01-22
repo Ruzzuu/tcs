@@ -185,6 +185,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           createdAt: order.finishedAt || new Date()
         });
         
+        // Ensure backward compatibility before saving
+        if (!order.subtotal) {
+          order.subtotal = order.finalPrice || order.estimatedPrice || 0;
+        }
+        
         order.rekapId = rekap._id.toString();
         await order.save();
         
@@ -255,7 +260,19 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       // Soft delete
       order.deleted = true;
       order.archivedAt = new Date();
-      await order.save();
+      
+      // Ensure backward compatibility: set subtotal if missing
+      if (!order.subtotal) {
+        order.subtotal = order.finalPrice || order.estimatedPrice || 0;
+      }
+      
+      try {
+        await order.save();
+        console.log(`✅ Order ${order.orderNumber} soft deleted successfully`);
+      } catch (saveError) {
+        console.error(`❌ Failed to save order ${order.orderNumber}:`, saveError);
+        throw saveError;
+      }
 
       return NextResponse.json({
         success: true,
@@ -308,8 +325,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('DELETE /api/orders/[id] error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Gagal menghapus pesanan';
     return NextResponse.json(
-      { success: false, error: 'Gagal menghapus pesanan' },
+      { success: false, error: 'Gagal menghapus pesanan', details: errorMessage },
       { status: 500 }
     );
   }

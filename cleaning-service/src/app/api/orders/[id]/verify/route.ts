@@ -54,6 +54,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Approve the order
     order.verification.status = 'approved';
     order.verification.verifiedAt = new Date();
+    
+    // Ensure backward compatibility: set subtotal if missing
+    if (!order.subtotal) {
+      order.subtotal = order.finalPrice || order.estimatedPrice || 0;
+    }
+    
     await order.save();
 
     return NextResponse.json({
