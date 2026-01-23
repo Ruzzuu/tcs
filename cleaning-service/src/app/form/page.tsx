@@ -109,29 +109,38 @@ export default function CustomerFormPage() {
     setIsSubmitting(true);
     setError(null);
 
-    console.log('📤 Submitting order with items:', items);
+    console.log('📤 [FORM] Submitting order');
+    console.log('📤 [FORM] Items state:', JSON.stringify(items, null, 2));
 
     try {
-      // Filter out any items with empty itemType
-      const validItems = items.filter(item => item.itemType && item.itemType.trim() !== '');
+      // Filter out any items with empty itemType - more defensive
+      const validItems = items.filter(item => {
+        const hasItemType = item.itemType && 
+                            typeof item.itemType === 'string' && 
+                            item.itemType.trim() !== '';
+        console.log(`📋 [FORM] Item ${item.id}: itemType="${item.itemType}" valid=${hasItemType}`);
+        return hasItemType;
+      });
+      
+      console.log(`📋 [FORM] Valid items count: ${validItems.length}/${items.length}`);
       
       if (validItems.length === 0) {
         throw new Error('Mohon pilih minimal 1 jenis barang');
       }
 
       const payload = {
-        name,
-        phone,
-        address,
+        name: name.trim(),
+        phone: phone.trim(),
+        address: address?.trim() || '',
         items: validItems.map(item => ({
-          itemType: item.itemType,
-          customItemType: item.customItemType || '',
-          quantity: item.quantity,
-          notes: item.notes || ''
+          itemType: item.itemType as string,
+          customItemType: item.customItemType?.trim() || '',
+          quantity: Number(item.quantity) || 1,
+          notes: item.notes?.trim() || ''
         }))
       };
 
-      console.log('📦 Payload to send:', JSON.stringify(payload, null, 2));
+      console.log('📦 [FORM] Final payload:', JSON.stringify(payload, null, 2));
 
       // Submit all items as ONE order with multiple items
       const response = await fetch('/api/orders', {
@@ -141,17 +150,24 @@ export default function CustomerFormPage() {
       });
 
       const result = await response.json();
-      console.log('📬 Response:', result);
+      console.log('📬 [FORM] Response status:', response.status);
+      console.log('📬 [FORM] Response data:', result);
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Gagal membuat pesanan');
+        const errorMsg = result.error || 'Gagal membuat pesanan';
+        console.error('❌ [FORM] Server returned error:', errorMsg);
+        throw new Error(errorMsg);
       }
 
+      console.log('✅ [FORM] Order created successfully:', result.data.orderNumber);
+      
       // Redirect to success page
       router.push('/form/success?orderId=' + result.data.orderId);
     } catch (err) {
-      console.error('Submit error:', err);
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.');
+      console.error('❌ [FORM] Submit error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.';
+      console.error('❌ [FORM] Error message to show:', errorMessage);
+      setError(errorMessage);
       submitAttemptRef.current = false; // Reset on error to allow retry
     } finally {
       setIsSubmitting(false);

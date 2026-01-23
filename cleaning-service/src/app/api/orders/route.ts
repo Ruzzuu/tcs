@@ -106,22 +106,25 @@ export async function GET(request: NextRequest) {
 // POST /api/orders - Create new order (customer submission)
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  console.log(`\n🔵 [${requestId}] NEW ORDER REQUEST RECEIVED`);
+  const timestamp = new Date().toISOString();
+  console.log(`\n🔵 [${requestId}] [${timestamp}] NEW ORDER REQUEST RECEIVED`);
   
   try {
     await connectDB();
 
     const body = await request.json();
     console.log(`📥 [${requestId}] Received POST body:`, JSON.stringify(body, null, 2));
+    console.log(`📥 [${requestId}] Body type:`, typeof body);
+    console.log(`📥 [${requestId}] Body keys:`, Object.keys(body || {}));
     
     const { name, phone, address, items: submittedItems } = body;
 
     console.log(`📦 [${requestId}] Extracted data:`, {
-      name,
-      phone,
-      address,
-      submittedItems,
-      hasItems: !!submittedItems,
+      name: name ? `"${name}"` : 'undefined',
+      phone: phone ? `"${phone}"` : 'undefined',
+      address: address ? `"${address}"` : 'undefined',
+      submittedItems: submittedItems ? 'exists' : 'MISSING',
+      itemsType: typeof submittedItems,
       isArray: Array.isArray(submittedItems),
       length: submittedItems?.length,
       firstItem: submittedItems?.[0]
