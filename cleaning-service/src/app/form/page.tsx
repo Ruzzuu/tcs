@@ -51,9 +51,33 @@ export default function CustomerFormPage() {
   }, [name, phone, items]);
 
   const handleItemChange = (id: number, field: keyof OrderItem, value: string | number) => {
-    setItems(prev => prev.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
+    setItems(prev => {
+      const updatedItems = prev.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      );
+      
+      // Auto-merge: If itemType changed, check for duplicates and merge
+      if (field === 'itemType' && value !== '' && value !== 'other') {
+        const currentItem = updatedItems.find(i => i.id === id);
+        const duplicateItem = updatedItems.find(i => 
+          i.id !== id && 
+          i.itemType === value && 
+          i.itemType !== 'other'
+        );
+        
+        if (duplicateItem && currentItem) {
+          // Merge: add quantity to existing item, remove current
+          return updatedItems
+            .map(i => i.id === duplicateItem.id 
+              ? { ...i, quantity: i.quantity + currentItem.quantity }
+              : i
+            )
+            .filter(i => i.id !== id);
+        }
+      }
+      
+      return updatedItems;
+    });
     setError(null);
   };
 
@@ -380,16 +404,14 @@ export default function CustomerFormPage() {
               *Harga final dikonfirmasi saat penjemputan
             </p>
           </div>
-        </form>
-      </main>
 
-      {/* Sticky Footer Action */}
-      <div className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-[#1a2230]/80 backdrop-blur-lg border-t border-[#dbdfe6] dark:border-[#2a3441] p-4 z-40">
-        <div className="max-w-md mx-auto w-full">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !isFormValid}
-            className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
+          {/* Submit Button - Inside Form for Enter key support */}
+          <div className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-[#1a2230]/80 backdrop-blur-lg border-t border-[#dbdfe6] dark:border-[#2a3441] p-4 z-40">
+            <div className="max-w-md mx-auto w-full">
+              <button
+                type="submit"
+                disabled={isSubmitting || !isFormValid}
+                className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
           >
             {isSubmitting ? (
               <>
@@ -420,8 +442,10 @@ export default function CustomerFormPage() {
               </>
             )}
           </button>
-        </div>
-      </div>
+            </div>
+          </div>
+        </form>
+      </main>
     </div>
   );
 }
