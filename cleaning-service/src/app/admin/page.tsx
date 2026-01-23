@@ -172,23 +172,14 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           </div>
           <div className="flex-1">
             <h3 className="text-sm font-bold text-[#111318] dark:text-white">{order.name}</h3>
-            <div className="flex flex-col gap-0.5 mt-1">
-              {itemsList.map((item, index) => (
-                <div key={index} className="flex items-center gap-1.5">
-                  <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">{item.name}</span>
-                  <span className="text-xs text-gray-400">×{item.quantity}</span>
-                </div>
-              ))}
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-[10px] text-gray-400">Total: {totalQuantity} item</span>
-                {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
-                  <>
-                    <span className="text-[10px] text-gray-300">•</span>
-                    <span className="material-symbols-outlined text-[11px] text-green-500">photo_camera</span>
-                  </>
-                )}
-              </div>
-            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {totalQuantity} item{totalQuantity > 1 ? 's' : ''}
+              {(beforePhotos.length > 0 || afterPhotos.length > 0) && (
+                <span className="inline-flex items-center gap-1 ml-2">
+                  <span className="material-symbols-outlined text-[11px] text-green-500">photo_camera</span>
+                </span>
+              )}
+            </p>
           </div>
         </div>
         <div className="text-right">
@@ -734,13 +725,6 @@ export default function AdminDashboard() {
       <section className="px-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Pesanan Terbaru</h2>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1152d4] text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
-          >
-            <span className="material-symbols-outlined text-[20px]">add</span>
-            <span className="text-sm font-medium">Tambah</span>
-          </button>
         </div>
 
         {/* Add Order Modal - Same as Orders Page */}
