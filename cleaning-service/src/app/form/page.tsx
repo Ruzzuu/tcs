@@ -170,6 +170,9 @@ export default function CustomerFormPage() {
       // Final validation before send
       if (!payload.items || payload.items.length === 0) {
         throw new Error('CRITICAL: Payload items empty after mapping');
+      }
+
+      console.log('📦 [FORM] Final payload:', JSON.stringify(payload, null, 2));
       console.log('🚀 [FORM] About to call fetch() - This should appear ONCE!');
       const fetchStartTime = Date.now();
       
@@ -185,11 +188,7 @@ export default function CustomerFormPage() {
       });
 
       const fetchEndTime = Date.now();
-      console.log(`⏱️ [FORM] Fetch completed in ${fetchEndTime - fetchStartTime}ms`   'Content-Type': 'application/json',
-          'X-Client-Timestamp': new Date().toISOString()
-        },
-        body: JSON.stringify(payload)
-      });
+      console.log(`⏱️ [FORM] Fetch completed in ${fetchEndTime - fetchStartTime}ms`);
 
       const result = await response.json();
       console.log('📬 [FORM] Response status:', response.status);
