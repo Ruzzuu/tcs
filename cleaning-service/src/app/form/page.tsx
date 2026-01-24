@@ -17,11 +17,17 @@ interface OrderItem {
   notes?: string;
 }
 
+// Global submission lock to prevent ANY duplicate submissions
+if (typeof window !== 'undefined') {
+  (window as any).__formSubmissionLock = (window as any).__formSubmissionLock || false;
+}
+
 export default function CustomerFormPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submitAttemptRef = useRef(false);
+  const requestIdRef = useRef<string>('');
   
   // Log version on mount for debugging
   useEffect(() => {
@@ -103,37 +109,56 @@ export default function CustomerFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🔴 [FORM] handleSubmit CALLED - START');
-    console.log('🔴 [FORM] Call stack:', new Error().stack);
-    console.log('🔴 [FORM] Event target:', e.target);
-    console.log('🔴 [FORM] Event type:', e.type);
-    console.log('🔴 [FORM] submitAttemptRef.current:', submitAttemptRef.current);
-    console.log('🔴 [FORM] isSubmitting:', isSubmitting);
+    // Generate unique request ID
+    const requestId = `REQ-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    requestIdRef.current = requestId;
     
-    // Prevent multiple simultaneous submissions
-    if (submitAttemptRef.current || isSubmitting) {
-      console.log('⚠️ [FORM] Duplicate submission attempt blocked');
+    console.log(`🔴 [${requestId}] handleSubmit CALLED - START`);
+    console.log(`🔴 [${requestId}] Call stack:`, new Error().stack);
+    console.log(`🔴 [${requestId}] Event target:`, e.target);
+    console.log(`🔴 [${requestId}] Event type:`, e.type);
+    console.log(`🔴 [${requestId}] submitAttemptRef.current:`, submitAttemptRef.current);
+    console.log(`🔴 [${requestId}] isSubmitting:`, isSubmitting);
+    console.log(`🔴 [${requestId}] window.__formSubmissionLock:`, (window as any).__formSubmissionLock);
+    
+    // TRIPLE LOCK: Check window-level, ref, and state
+    if ((window as any).__formSubmissionLock || submitAttemptRef.current || isSubmitting) {
+      console.log(`⚠️ [${requestId}] BLOCKED: Duplicate submission attempt!`);
+      console.log(`   - window lock: ${(window as any).__formSubmissionLock}`);
+      console.log(`   - ref lock: ${submitAttemptRef.current}`);
+      console.log(`   - state lock: ${isSubmitting}`);
       return;
     }
     
+    // SET ALL LOCKS
+    (window as any).__formSubmissionLock = true;
+    submitAttemptRef.current = true;
+    setIsSubmitting(true);
+    
+    setError(null);
+    
+    console.log(`📤 [${requestId}] Form validation passed`);
+    
     if (!isFormValid) {
+      (window as any).__formSubmissionLock = false;
+      submitAttemptRef.current = false;
+      setIsSubmitting(false);
       setError('Mohon lengkapi semua data yang wajib diisi');
       return;
     }
 
     // Double check items before submit
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.error('❌ [FORM] CRITICAL: Items state is invalid!', { items });
+      console.error(`❌ [${requestId}] CRITICAL: Items state is invalid!`, { items });
+      (window as any).__formSubmissionLock = false;
+      submitAttemptRef.current = false;
+      setIsSubmitting(false);
       setError('Data items tidak valid. Silakan refresh halaman dan coba lagi.');
       return;
     }
 
-    submitAttemptRef.current = true;
-    setIsSubmitting(true);
-    setError(null);
-
-    console.log('📤 [FORM] Submitting order');
-    console.log('📤 [FORM] Items state:', JSON.stringify(items, null, 2));
+    console.log(`📤 [${requestId}] Submitting order`);
+    console.log(`📤 [${requestId}] Items state:`, JSON.stringify(items, null, 2));
 
     try {
       // Filter out any items with empty itemType - more defensive
@@ -149,7 +174,7 @@ export default function CustomerFormPage() {
         return hasItemType;
       });
       
-      console.log(`📋 [FORM] Valid items count: ${validItems.length}/${items.length}`);
+      console.log(`📋 [${requestId}] Valid items count: ${validItems.length}/${items.length}`);
       
       if (validItems.length === 0) {
         throw new Error('Mohon pilih minimal 1 jenis barang');
@@ -172,8 +197,8 @@ export default function CustomerFormPage() {
         throw new Error('CRITICAL: Payload items empty after mapping');
       }
 
-      console.log('📦 [FORM] Final payload:', JSON.stringify(payload, null, 2));
-      console.log('🚀 [FORM] About to call fetch() - This should appear ONCE!');
+      console.log(`📦 [${requestId}] Final payload:`, JSON.stringify(payload, null, 2));
+      console.log(`🚀 [${requestId}] ===== CALLING FETCH - THIS SHOULD APPEAR ONCE! =====`);
       const fetchStartTime = Date.now();
       
       // Submit all items as ONE order with multiple items
@@ -182,37 +207,42 @@ export default function CustomerFormPage() {
         headers: { 
           'Content-Type': 'application/json',
           'X-Client-Timestamp': new Date().toISOString(),
-          'X-App-Version': APP_VERSION
+          'X-App-Version': APP_VERSION,
+          'X-Request-ID': requestId
         },
         body: JSON.stringify(payload)
       });
 
       const fetchEndTime = Date.now();
-      console.log(`⏱️ [FORM] Fetch completed in ${fetchEndTime - fetchStartTime}ms`);
+      console.log(`⏱️ [${requestId}] Fetch completed in ${fetchEndTime - fetchStartTime}ms`);
 
       const result = await response.json();
-      console.log('📬 [FORM] Response status:', response.status);
-      console.log('📬 [FORM] Response data:', result);
+      console.log(`📬 [${requestId}] Response status:`, response.status);
+      console.log(`📬 [${requestId}] Response data:`, result);
 
       if (!response.ok || !result.success) {
         const errorMsg = result.error || 'Gagal membuat pesanan';
-        console.error('❌ [FORM] Server returned error:', errorMsg);
+        console.error(`❌ [${requestId}] Server returned error:`, errorMsg);
         throw new Error(errorMsg);
       }
 
-      console.log('✅ [FORM] Order created successfully:', result.data.orderNumber);
+      console.log(`✅ [${requestId}] Order created successfully:`, result.data.orderNumber);
       
-      // Reset form submission lock before redirect
+      // Reset ALL locks before redirect
+      (window as any).__formSubmissionLock = false;
       submitAttemptRef.current = false;
       
       // Redirect to success page
       router.push('/form/success?orderId=' + result.data.orderId);
     } catch (err) {
-      console.error('❌ [FORM] Submit error:', err);
+      console.error(`❌ [${requestIdRef.current}] Submit error:`, err);
       const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.';
-      console.error('❌ [FORM] Error message to show:', errorMessage);
+      console.error(`❌ [${requestIdRef.current}] Error message to show:`, errorMessage);
       setError(errorMessage);
-      submitAttemptRef.current = false; // Reset on error to allow retry
+      
+      // Release ALL locks on error
+      (window as any).__formSubmissionLock = false;
+      submitAttemptRef.current = false;
     } finally {
       setIsSubmitting(false);
     }
