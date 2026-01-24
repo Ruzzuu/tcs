@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { formatCurrency, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
+
+// Version check for deployment verification
+const APP_VERSION = '2.0.1-fix-race-condition';
 
 interface OrderItem {
   id: number;
@@ -19,6 +22,12 @@ export default function CustomerFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submitAttemptRef = useRef(false);
+  
+  // Log version on mount for debugging
+  useEffect(() => {
+    console.log(`🚀 Form App Version: ${APP_VERSION}`);
+    console.log(`🔧 Deployment: ${process.env.NODE_ENV}`);
+  }, []);
   
   // Customer info
   const [name, setName] = useState('');
