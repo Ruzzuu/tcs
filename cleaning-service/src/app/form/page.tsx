@@ -7,7 +7,7 @@ import { formatCurrency, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
 
 // Version check for deployment verification
-const APP_VERSION = '2.0.1-fix-race-condition';
+const APP_VERSION = '2.0.2-debug-multi-submit';
 
 interface OrderItem {
   id: number;
@@ -103,6 +103,13 @@ export default function CustomerFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔴 [FORM] handleSubmit CALLED - START');
+    console.log('🔴 [FORM] Call stack:', new Error().stack);
+    console.log('🔴 [FORM] Event target:', e.target);
+    console.log('🔴 [FORM] Event type:', e.type);
+    console.log('🔴 [FORM] submitAttemptRef.current:', submitAttemptRef.current);
+    console.log('🔴 [FORM] isSubmitting:', isSubmitting);
+    
     // Prevent multiple simultaneous submissions
     if (submitAttemptRef.current || isSubmitting) {
       console.log('⚠️ [FORM] Duplicate submission attempt blocked');
@@ -163,15 +170,22 @@ export default function CustomerFormPage() {
       // Final validation before send
       if (!payload.items || payload.items.length === 0) {
         throw new Error('CRITICAL: Payload items empty after mapping');
-      }
-
-      console.log('📦 [FORM] Final payload:', JSON.stringify(payload, null, 2));
-
+      console.log('🚀 [FORM] About to call fetch() - This should appear ONCE!');
+      const fetchStartTime = Date.now();
+      
       // Submit all items as ONE order with multiple items
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
+          'X-Client-Timestamp': new Date().toISOString(),
+          'X-App-Version': APP_VERSION
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const fetchEndTime = Date.now();
+      console.log(`⏱️ [FORM] Fetch completed in ${fetchEndTime - fetchStartTime}ms`   'Content-Type': 'application/json',
           'X-Client-Timestamp': new Date().toISOString()
         },
         body: JSON.stringify(payload)
