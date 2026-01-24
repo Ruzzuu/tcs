@@ -1,7 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
+
+// Global submission lock
+if (typeof window !== 'undefined') {
+  (window as any).__adminFormSubmissionLock = (window as any).__adminFormSubmissionLock || false;
+}
 
 interface FormItem {
   service: string;
@@ -18,6 +23,9 @@ export default function AdminForm() {
   const [items, setItems] = useState<FormItem[]>([
     { service: '', quantity: 1, notes: '' }
   ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitAttemptRef = useRef(false);
+  const requestIdRef = useRef<string>('');
 
   const addItem = () => {
     setItems([...items, { service: '', quantity: 1, notes: '' }]);
@@ -57,51 +65,89 @@ export default function AdminForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Generate unique request ID
+    const requestId = `ADMIN-REQ-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    requestIdRef.current = requestId;
+    
+    console.log(`🔴 [${requestId}] Admin form submit START`);
+    
+    // TRIPLE LOCK: Check window-level, ref, and state
+    if ((window as any).__adminFormSubmissionLock || submitAttemptRef.current || isSubmitting) {
+      console.log(`⚠️ [${requestId}] BLOCKED: Duplicate submission!`);
+      return;
+    }
+    
+    // SET ALL LOCKS
+    (window as any).__adminFormSubmissionLock = true;
+    submitAttemptRef.current = true;
+    setIsSubmitting(true);
+    
     const validItems = items.filter(item => item.service && item.quantity > 0);
     if (validItems.length === 0) {
       alert('Tambahkan minimal 1 item layanan');
+      (window as any).__adminFormSubmissionLock = false;
+      submitAttemptRef.current = false;
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      // Send each item as a separate order
-      const promises = validItems.map(item => 
-        fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: formData.customerName,
-            phone: formData.whatsapp,
-            address: formData.address,
-            itemType: item.service,
-            quantity: item.quantity,
-            customerNotes: item.notes
-          })
-        })
-      );
+      // Send ONE request with ALL items as array (NEW FORMAT)
+      const payload = {
+        name: formData.customerName,
+        phone: formData.whatsapp,
+        address: formData.address,
+        items: validItems.map(item => ({
+          itemType: item.service,
+          customItemType: '',
+          quantity: item.quantity,
+          notes: item.notes
+        }))
+      };
+      
+      console.log(`📦 [${requestId}] Payload:`, JSON.stringify(payload, null, 2));
+      console.log(`🚀 [${requestId}] Sending ONE request with ${validItems.length} items`);
 
-      const responses = await Promise.all(promises);
-      const allSuccess = responses.every(res => res.ok);
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Request-ID': requestId,
+          'X-Source': 'admin-form'
+        },
+        body: JSON.stringify(payload)
+      });
 
-      if (allSuccess) {
+      const result = await response.json();
+      console.log(`📬 [${requestId}] Response:`, result);
+
+      if (response.ok && result.success) {
+        console.log(`✅ [${requestId}] Order created:`, result.data.orderNumber);
+        
+        // Release locks before redirect
+        (window as any).__adminFormSubmissionLock = false;
+        submitAttemptRef.current = false;
+        
         // Redirect to success page
         window.location.href = '/admin/orders/success';
       } else {
-        const errors = await Promise.all(
-          responses.map(async (res) => {
-            if (!res.ok) {
-              const error = await res.json();
-              return error.error || 'Gagal mengirim data';
-            }
-            return null;
-          })
-        );
-        const errorMessages = errors.filter(e => e !== null).join(', ');
-        alert(errorMessages || 'Gagal mengirim beberapa data');
+        const errorMsg = result.error || 'Gagal mengirim data';
+        console.error(`❌ [${requestId}] Error:`, errorMsg);
+        alert(errorMsg);
+        
+        // Release locks on error
+        (window as any).__adminFormSubmissionLock = false;
+        submitAttemptRef.current = false;
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error(`❌ [${requestIdRef.current}] Exception:`, error);
       alert('Terjadi kesalahan');
+      
+      // Release locks on error
+      (window as any).__adminFormSubmissionLock = false;
+      submitAttemptRef.current = false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -305,13 +351,37 @@ export default function AdminForm() {
           <div className="pb-4">
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || isSubmitting}
               className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
             >
-              <span>Kirim Data</span>
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
-                arrow_forward
-              </span>
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <span>Mengirim...</span>
+                </>
+              ) : (
+                <>
+                  <span>Kirim Data</span>
+                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
+                    arrow_forward
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </form>
