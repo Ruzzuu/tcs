@@ -107,7 +107,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
   const timestamp = new Date().toISOString();
+  const clientTimestamp = request.headers.get('X-Client-Timestamp');
+  
   console.log(`\n🔵 [${requestId}] [${timestamp}] NEW ORDER REQUEST RECEIVED`);
+  console.log(`🔵 [${requestId}] Client timestamp: ${clientTimestamp}`);
   
   try {
     await connectDB();
@@ -129,6 +132,13 @@ export async function POST(request: NextRequest) {
       length: submittedItems?.length,
       firstItem: submittedItems?.[0]
     });
+    
+    // Additional defensive check
+    if (body && typeof body === 'object' && !submittedItems) {
+      console.error(`❌ [${requestId}] Body exists but items is missing!`);
+      console.error(`❌ [${requestId}] Body structure:`, Object.keys(body));
+      console.error(`❌ [${requestId}] Full body:`, JSON.stringify(body));
+    }
 
     // Validation
     const errors: string[] = [];

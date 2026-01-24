@@ -96,12 +96,19 @@ export default function CustomerFormPage() {
     
     // Prevent multiple simultaneous submissions
     if (submitAttemptRef.current || isSubmitting) {
-      console.log('⚠️ Duplicate submission attempt blocked');
+      console.log('⚠️ [FORM] Duplicate submission attempt blocked');
       return;
     }
     
     if (!isFormValid) {
       setError('Mohon lengkapi semua data yang wajib diisi');
+      return;
+    }
+
+    // Double check items before submit
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error('❌ [FORM] CRITICAL: Items state is invalid!', { items });
+      setError('Data items tidak valid. Silakan refresh halaman dan coba lagi.');
       return;
     }
 
@@ -115,6 +122,10 @@ export default function CustomerFormPage() {
     try {
       // Filter out any items with empty itemType - more defensive
       const validItems = items.filter(item => {
+        if (!item || typeof item !== 'object') {
+          console.warn('⚠️ [FORM] Invalid item object:', item);
+          return false;
+        }
         const hasItemType = item.itemType && 
                             typeof item.itemType === 'string' && 
                             item.itemType.trim() !== '';
@@ -140,12 +151,20 @@ export default function CustomerFormPage() {
         }))
       };
 
+      // Final validation before send
+      if (!payload.items || payload.items.length === 0) {
+        throw new Error('CRITICAL: Payload items empty after mapping');
+      }
+
       console.log('📦 [FORM] Final payload:', JSON.stringify(payload, null, 2));
 
       // Submit all items as ONE order with multiple items
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Client-Timestamp': new Date().toISOString()
+        },
         body: JSON.stringify(payload)
       });
 
@@ -160,6 +179,9 @@ export default function CustomerFormPage() {
       }
 
       console.log('✅ [FORM] Order created successfully:', result.data.orderNumber);
+      
+      // Reset form submission lock before redirect
+      submitAttemptRef.current = false;
       
       // Redirect to success page
       router.push('/form/success?orderId=' + result.data.orderId);
