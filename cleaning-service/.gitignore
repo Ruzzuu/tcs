@@ -51,3 +51,6 @@ next-env.d.ts
 .vercel
 
 .vercel
+
+# VS Code workspace settings
+.vscode/
