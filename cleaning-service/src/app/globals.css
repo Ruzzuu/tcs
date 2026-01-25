@@ -92,13 +92,95 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Form input styles */
+/* ============================================
+   FORM INPUT STYLES - Cross-Device Safe
+   ============================================ */
+
+/* Base input focus styles */
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
   ring: 2px;
   ring-color: rgba(17, 82, 212, 0.5);
+}
+
+/* Fix autofill background and text color - Chrome, Edge, Safari */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111318 !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #111318 !important;
+}
+
+/* Fix autofill in dark mode */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #1a2230 inset !important;
+  box-shadow: 0 0 0 1000px #1a2230 inset !important;
+  caret-color: #ffffff !important;
+}
+
+/* Autofill helper class for consistent styling */
+.autofill-fix {
+  background-clip: padding-box !important;
+}
+
+/* Ensure text is always visible - high contrast */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+textarea {
+  color: #111318;
+  background-color: #ffffff;
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="tel"],
+.dark input[type="number"],
+.dark textarea {
+  color: #ffffff;
+  background-color: #1a2230;
+}
+
+/* Windows High Contrast Mode Support */
+@media (forced-colors: active) {
+  input,
+  textarea,
+  select {
+    border: 2px solid ButtonBorder;
+    color: ButtonText;
+    background: Field;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* Mobile Safari iOS - prevent zoom on focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Button active state */

@@ -143,9 +143,10 @@ export default function ForgotPasswordPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl text-[#111318] focus:outline-none focus:ring-2 focus:ring-[#1152d4]/20 border border-[#dbdfe6] bg-white focus:border-[#1152d4] h-14 placeholder:text-[#616f89] pl-12 pr-4 text-base font-normal transition-all duration-200 shadow-sm"
+                    className="w-full rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/20 border-2 border-gray-300 bg-white focus:border-[#1152d4] h-14 placeholder:text-gray-400 pl-12 pr-4 text-base font-normal transition-all duration-200 shadow-sm autofill-fix"
                     placeholder="admin@cleaningservice.com"
                     required
+                    autoComplete="email"
                   />
                 </div>
               </div>

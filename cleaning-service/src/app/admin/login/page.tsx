@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#1152d4] focus:ring-2 focus:ring-[#1152d4]/20 transition-all px-4 text-base outline-none"
+                  className="w-full h-12 rounded-xl bg-white border-2 border-gray-300 focus:border-[#1152d4] focus:ring-2 focus:ring-[#1152d4]/20 transition-all px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none autofill-fix"
                   placeholder="admin@gmail.com"
                   required
                   autoComplete="username"
@@ -103,7 +103,7 @@ export default function AdminLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#1152d4] focus:ring-2 focus:ring-[#1152d4]/20 transition-all px-4 pr-12 text-base outline-none"
+                  className="w-full h-12 rounded-xl bg-white border-2 border-gray-300 focus:border-[#1152d4] focus:ring-2 focus:ring-[#1152d4]/20 transition-all px-4 pr-12 text-base text-gray-900 placeholder:text-gray-400 outline-none autofill-fix"
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
