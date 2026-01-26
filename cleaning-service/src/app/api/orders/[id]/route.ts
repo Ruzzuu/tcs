@@ -200,6 +200,50 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Update Rekap if discount/finalPrice changed on a finished order with existing Rekap
+    if (order.status === 'finished' && order.rekapId && ('discount' in body || 'finalPrice' in body)) {
+      try {
+        const newAmount = order.finalPrice ?? order.subtotal ?? 0;
+        const currentRekap = await Rekap.findById(order.rekapId);
+        
+        if (currentRekap && currentRekap.amount !== newAmount) {
+          const oldAmount = currentRekap.amount;
+          const amountDifference = newAmount - oldAmount;
+          
+          // Update the Rekap entry amount
+          currentRekap.amount = newAmount;
+          
+          // Recalculate balance snapshots for this and all subsequent Rekap entries
+          // Get all Rekap entries ordered by creation date
+          const allRekaps = await Rekap.find().sort({ createdAt: 1 });
+          
+          let recalculate = false;
+          let runningBalance = 0;
+          
+          for (const rekap of allRekaps) {
+            if (rekap._id.toString() === currentRekap._id.toString()) {
+              recalculate = true;
+            }
+            
+            if (recalculate) {
+              // Recalculate from this point forward
+              runningBalance += rekap.amount;
+              rekap.balanceSnapshot = runningBalance;
+              await rekap.save();
+            } else {
+              // Just accumulate the balance
+              runningBalance = rekap.balanceSnapshot;
+            }
+          }
+          
+          console.log(`Updated Rekap for order ${order.orderNumber}: ${oldAmount.toLocaleString('id-ID')} → ${newAmount.toLocaleString('id-ID')} (${amountDifference > 0 ? '+' : ''}${amountDifference.toLocaleString('id-ID')})`);
+        }
+      } catch (rekapError) {
+        console.error('Failed to update Rekap:', rekapError);
+        // Don't fail the whole request, just log the error
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: order.toObject(),
