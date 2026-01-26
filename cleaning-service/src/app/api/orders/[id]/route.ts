@@ -210,8 +210,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           const oldAmount = currentRekap.amount;
           const amountDifference = newAmount - oldAmount;
           
-          // Update the Rekap entry amount
-          currentRekap.amount = newAmount;
+          console.log(`🔄 Updating Rekap for order ${order.orderNumber}: Rp ${oldAmount.toLocaleString('id-ID')} → Rp ${newAmount.toLocaleString('id-ID')} (${amountDifference > 0 ? '+' : ''}Rp ${Math.abs(amountDifference).toLocaleString('id-ID')})`);
           
           // Recalculate balance snapshots for this and all subsequent Rekap entries
           // Get all Rekap entries ordered by creation date
@@ -222,21 +221,22 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           
           for (const rekap of allRekaps) {
             if (rekap._id.toString() === currentRekap._id.toString()) {
+              // Found the rekap to update - change its amount and start recalculating from here
               recalculate = true;
+              rekap.amount = newAmount; // Update amount in the database copy
             }
             
             if (recalculate) {
-              // Recalculate from this point forward
+              // Recalculate from this point forward using the updated amount
               runningBalance += rekap.amount;
               rekap.balanceSnapshot = runningBalance;
               await rekap.save();
+              console.log(`  ↳ Updated balance for ${rekap._id}: amount=${rekap.amount}, balance=${runningBalance}`);
             } else {
-              // Just accumulate the balance
+              // Just accumulate the balance from previous entries
               runningBalance = rekap.balanceSnapshot;
             }
           }
-          
-          console.log(`Updated Rekap for order ${order.orderNumber}: ${oldAmount.toLocaleString('id-ID')} → ${newAmount.toLocaleString('id-ID')} (${amountDifference > 0 ? '+' : ''}${amountDifference.toLocaleString('id-ID')})`);
         }
       } catch (rekapError) {
         console.error('Failed to update Rekap:', rekapError);
