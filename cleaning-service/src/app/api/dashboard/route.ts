@@ -2,19 +2,38 @@
 // DASHBOARD API - KPIs and Aggregations
 // ============================================
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { SERVICE_COLORS } from '@/lib/services';
 import { ServiceType } from '@/types';
 
-// GET /api/dashboard - Get dashboard data
-export async function GET() {
+// GET /api/dashboard - Get dashboard data with pagination
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const statusFilter = searchParams.get('status') || 'all';
+    const sortBy = searchParams.get('sort') || 'createdAt:desc';
+
+    // Parse sort
+    const [sortField, sortOrder] = sortBy.split(':');
+    const sortDirection = sortOrder === 'asc' ? 1 : -1;
+
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Build filter for orders list
+    const ordersFilter: any = { 
+      'verification.status': 'approved', 
+      deleted: { $ne: true } 
+    };
+    if (statusFilter !== 'all') {
+      ordersFilter.status = statusFilter;
+    }
 
     // Run all aggregations in parallel
     const [
@@ -22,6 +41,7 @@ export async function GET() {
       unverifiedCount,
       serviceDistribution,
       incomeTrend,
+      totalOrders,
       recentOrders
     ] = await Promise.all([
       // KPI counts (only verified orders, exclude deleted)
@@ -114,10 +134,14 @@ export async function GET() {
         { $sort: { _id: 1 } }
       ]),
 
-      // Recent orders (last 10 verified, exclude deleted)
-      Order.find({ 'verification.status': 'approved', deleted: { $ne: true } })
-        .sort({ createdAt: -1 })
-        .limit(10)
+      // Total orders count for pagination
+      Order.countDocuments(ordersFilter),
+
+      // Recent orders with pagination (verified, exclude deleted)
+      Order.find(ordersFilter)
+        .sort({ [sortField]: sortDirection })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .lean()
     ]);
 
@@ -152,6 +176,8 @@ export async function GET() {
       });
     }
 
+    const totalPages = Math.ceil(totalOrders / limit);
+
     return NextResponse.json({
       success: true,
       data: {
@@ -164,6 +190,12 @@ export async function GET() {
         serviceDistribution: serviceDistributionWithColors,
         incomeTrend: incomeTrendFormatted,
         recentOrders
+      },
+      meta: {
+        total: totalOrders,
+        page,
+        limit,
+        totalPages
       }
     });
   } catch (error) {

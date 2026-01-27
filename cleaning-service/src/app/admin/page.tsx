@@ -256,6 +256,12 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const PAGE_SIZE = 10;
+  
   // Week selector state
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -293,14 +299,26 @@ export default function AdminDashboard() {
     return service ? service.price * formData.quantity : 0;
   }, [formData.itemType, formData.quantity]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (page = 1, status: OrderStatus | 'all' = 'all') => {
     try {
       setLoading(true);
-      const response = await fetch('/api/dashboard');
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: PAGE_SIZE.toString(),
+        sort: 'createdAt:desc'
+      });
+      if (status !== 'all') {
+        params.append('status', status);
+      }
+      
+      const response = await fetch(`/api/dashboard?${params}`);
       const result = await response.json();
       
       if (result.success) {
         setData(result.data);
+        setTotalPages(result.meta.totalPages);
+        setTotalOrders(result.meta.total);
+        setCurrentPage(result.meta.page);
       } else {
         setError(result.error || 'Failed to load dashboard');
       }
@@ -309,14 +327,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [PAGE_SIZE]);
 
   useEffect(() => {
-    fetchData();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    fetchData(currentPage, statusFilter);
+  }, [currentPage, statusFilter, fetchData]);
 
   // Fetch available weeks
   const fetchAvailableWeeks = useCallback(async (year?: number) => {
@@ -453,7 +468,7 @@ export default function AdminDashboard() {
 
       if (result.success) {
         resetForm();
-        fetchData(); // Refresh dashboard
+        fetchData(currentPage, statusFilter); // Refresh current page
       } else {
         setFormError(result.error || 'Gagal menambahkan pesanan');
       }
@@ -493,15 +508,8 @@ export default function AdminDashboard() {
       const result = await response.json();
       
       if (result.success) {
-        // Remove from local state
-        setData(prev => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            recentOrders: prev.recentOrders.filter(o => o._id !== orderId),
-            total: prev.total - 1
-          };
-        });
+        // Refetch current page to update list
+        await fetchData(currentPage, statusFilter);
       } else {
         alert(result.error || 'Gagal menghapus pesanan');
       }
@@ -554,7 +562,7 @@ export default function AdminDashboard() {
         <span className="material-symbols-outlined text-6xl text-red-400 mb-4">error</span>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-4">{error}</p>
         <button
-          onClick={fetchData}
+          onClick={() => fetchData(currentPage, statusFilter)}
           className="px-6 py-2 bg-[#1152d4] text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           Coba Lagi
@@ -963,7 +971,10 @@ export default function AdminDashboard() {
           {statusOptions.map(option => (
             <button
               key={option.value}
-              onClick={() => setStatusFilter(option.value)}
+              onClick={() => {
+                setStatusFilter(option.value);
+                setCurrentPage(1); // Reset to page 1 when filter changes
+              }}
               className={`flex h-9 shrink-0 items-center justify-center gap-2 rounded-full px-4 transition-all ${
                 statusFilter === option.value
                   ? 'bg-[#1152d4] text-white shadow-md'
@@ -989,6 +1000,71 @@ export default function AdminDashboard() {
             ))
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Menampilkan {totalOrders === 0 ? 0 : ((currentPage - 1) * PAGE_SIZE + 1)} - {Math.min(currentPage * PAGE_SIZE, totalOrders)} dari {totalOrders}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Halaman sebelumnya"
+              >
+                <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+              </button>
+
+              <div className="hidden sm:flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                  // Show condensed pagination for many pages
+                  if (totalPages > 7) {
+                    if (page !== 1 && page !== totalPages && Math.abs(page - currentPage) > 2) {
+                      // Show ellipsis
+                      if (page === 2 && currentPage > 4) {
+                        return <span key={page} className="px-2 text-gray-400">…</span>;
+                      }
+                      if (page === totalPages - 1 && currentPage < totalPages - 3) {
+                        return <span key={page} className="px-2 text-gray-400">…</span>;
+                      }
+                      return null;
+                    }
+                  }
+                  
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`min-w-[36px] px-3 py-1.5 rounded-lg transition-colors ${
+                        page === currentPage
+                          ? 'bg-[#1152d4] text-white'
+                          : 'bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Mobile: Show current page only */}
+              <div className="sm:hidden px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400">
+                {currentPage} / {totalPages}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Halaman berikutnya"
+              >
+                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
