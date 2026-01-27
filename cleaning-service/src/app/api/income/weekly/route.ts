@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
       const dayData = dailyData.find(d => d._id === dateStr);
       
       return {
-        day: dayLabels[date.getDay()],
+        day: dayLabels[date.getUTCDay()],
         amount: dayData?.total || 0,
         date: dateStr
       };
@@ -166,9 +166,15 @@ export async function GET(request: NextRequest) {
 }
 
 function getCurrentWeek(date: Date): number {
+  // Convert to GMT+7 timezone
+  const gmt7Date = new Date(date);
+  const utcTime = gmt7Date.getTime() + (gmt7Date.getTimezoneOffset() * 60000);
+  const gmt7Time = utcTime + (7 * 3600 * 1000);
+  const gmt7DateWithOffset = new Date(gmt7Time);
+
   // ISO week date calculation
   // Week starts on Sunday (0) in JavaScript, but we want Monday as week start
-  const d = new Date(date);
+  const d = new Date(gmt7DateWithOffset);
   d.setHours(0, 0, 0, 0);
   
   // Get January 1st of the year
@@ -184,21 +190,25 @@ function getCurrentWeek(date: Date): number {
 }
 
 function getWeekDateRange(year: number, week: number): { startDate: Date; endDate: Date } {
-  // Get January 1st
+  // Get January 1st in GMT+7
   const yearStart = new Date(year, 0, 1);
-  
+  const utcTime = yearStart.getTime() + (yearStart.getTimezoneOffset() * 60000);
+  const gmt7Time = utcTime + (7 * 3600 * 1000);
+  const yearStartGmt7 = new Date(gmt7Time);
+
   // Calculate the first Sunday of the year (or Jan 1 if it's already Sunday)
-  const firstSunday = new Date(year, 0, 1 - yearStart.getDay());
+  const firstSunday = new Date(yearStartGmt7);
+  firstSunday.setDate(1 - firstSunday.getDay());
   
   // Calculate start date of the requested week (Sunday)
   const startDate = new Date(firstSunday);
   startDate.setDate(firstSunday.getDate() + (week - 1) * 7);
-  startDate.setHours(0, 0, 0, 0);
+  startDate.setUTCHours(0, 0, 0, 0);
   
   // Calculate end date (Saturday)
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
+  endDate.setUTCHours(23, 59, 59, 999);
   
   return { startDate, endDate };
 }

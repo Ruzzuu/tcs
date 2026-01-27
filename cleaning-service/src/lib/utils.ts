@@ -173,6 +173,20 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Format date in GMT+7 timezone
+ */
+export function formatDateGMT7(date: Date | string): string {
+  const dateObj = new Date(date);
+  const utcTime = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+  const gmt7Time = utcTime + (7 * 3600 * 1000);
+  const gmt7Date = new Date(gmt7Time);
+  return gmt7Date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short'
+  });
+}
+
+/**
  * Format time for display
  */
 export function formatTime(date: Date | string): string {

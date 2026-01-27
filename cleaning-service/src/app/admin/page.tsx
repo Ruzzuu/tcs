@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus } from '@/types';
-import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber } from '@/lib/utils';
+import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 
@@ -674,7 +674,7 @@ export default function AdminDashboard() {
                   <div>
                     <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan</p>
                     <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
-                      Minggu ke-{selectedWeek || '...'} — {weeklyData && new Date(weeklyData.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} s/d {weeklyData && new Date(weeklyData.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      Minggu ke-{selectedWeek || '...'} — {weeklyData && formatDateGMT7(new Date(weeklyData.startDate))} s/d {weeklyData && formatDateGMT7(new Date(weeklyData.endDate))}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
