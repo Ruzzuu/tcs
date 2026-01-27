@@ -173,6 +173,17 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Get current date/time in WIB timezone (GMT+7)
+ * Use this instead of new Date() for Indonesian time
+ */
+export function getWIBDate(): Date {
+  const now = new Date();
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const wibTime = utcTime + (7 * 3600 * 1000);
+  return new Date(wibTime);
+}
+
+/**
  * Format date in GMT+7 timezone
  */
 export function formatDateGMT7(date: Date | string): string {

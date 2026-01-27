@@ -150,8 +150,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Set finishedAt when status changes to finished AND create Rekap
     if (updateData.status === 'finished') {
-      updateData.finishedAt = new Date();
-      // Set TTL for auto-deletion (30 days)
+      // Use WIB timezone (GMT+7) for Indonesian time
+      const now = new Date();
+      const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const wibTime = utcTime + (7 * 3600 * 1000);
+      updateData.finishedAt = new Date(wibTime);
+      // Set TTL for auto-deletion (30 days from now)
       updateData.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     }
 
@@ -177,12 +181,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         const previousBalance = lastRekap?.balanceSnapshot ?? 0;
         const newBalance = previousBalance + amount;
         
+        // Use WIB timezone for Rekap timestamp
+        const now = new Date();
+        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const wibTime = utcTime + (7 * 3600 * 1000);
+        const wibDate = new Date(wibTime);
+        
         const rekap = await Rekap.create({
           orderId: order._id,
           amount,
           immutable: true,
           balanceSnapshot: newBalance,
-          createdAt: order.finishedAt || new Date()
+          createdAt: order.finishedAt || wibDate
         });
         
         // Ensure backward compatibility before saving

@@ -44,20 +44,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const previousBalance = lastRekap?.balanceSnapshot ?? 0;
       const newBalance = previousBalance + amount;
 
+      // Use WIB timezone (GMT+7) for Indonesian time
+      const now = new Date();
+      const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const wibTime = utcTime + (7 * 3600 * 1000);
+      const wibDate = new Date(wibTime);
+
       const rekap = await Rekap.create(
         [{
           orderId: order._id,
           amount,
           immutable: true,
           balanceSnapshot: newBalance,
-          createdAt: new Date()
+          createdAt: wibDate
         }],
         { session }
       );
 
       order.status = 'finished';
       order.rekapId = rekap[0]._id.toString();
-      order.finishedAt = new Date();
+      order.finishedAt = wibDate;
       await order.save({ session });
 
       return { order, rekap: rekap[0], existed: false };
