@@ -51,3 +51,4 @@ const Rekap: Model<RekapDocument> =
   mongoose.models.Rekap || mongoose.model<RekapDocument>('Rekap', RekapSchema);
 
 export default Rekap;
+// ---
