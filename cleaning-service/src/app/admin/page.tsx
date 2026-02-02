@@ -575,38 +575,38 @@ export default function AdminDashboard() {
     <div className="flex flex-col gap-6 pb-20">
       {/* KPI Cards */}
       <section className="px-4 pt-6">
-        <div className="grid grid-cols-2 gap-3">
-          {/* Total Orders - Full Width */}
-          <div className="col-span-2 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a202c] dark:to-[#2d3748] p-5 shadow-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 transition-all hover:shadow-lg hover:scale-[1.01]">
-            <div className="absolute top-0 right-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-2xl" />
-            <div className="relative flex items-center justify-between">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
-                    <span className="material-symbols-outlined text-white text-[22px]">list_alt</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Total Orders */}
+          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a202c] dark:to-[#2d3748] p-5 shadow-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 transition-all hover:shadow-lg hover:scale-[1.01]">
+            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-xl" />
+            <div className="relative flex h-full flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
+                    <span className="material-symbols-outlined text-white text-[20px]">list_alt</span>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Orders</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Total Orders</p>
                 </div>
-                <p className="mt-1 text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
-                  {data?.total.toLocaleString() || 0}
-                </p>
+                <div className="flex h-7 items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5">
+                  <span className="material-symbols-outlined text-[14px] text-blue-600 dark:text-blue-400">trending_up</span>
+                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">All</span>
+                </div>
               </div>
-              <div className="flex h-8 items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-900/20 px-3 py-1">
-                <span className="material-symbols-outlined text-[16px] text-blue-600 dark:text-blue-400">trending_up</span>
-                <span className="text-xs font-bold text-blue-600 dark:text-blue-400">All Time</span>
-              </div>
+              <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
+                {data?.total.toLocaleString() || 0}
+              </p>
             </div>
           </div>
 
           {/* In Progress */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50/50 to-blue-100/50 dark:from-blue-900/10 dark:to-blue-800/10 p-5 shadow-md ring-1 ring-blue-200/50 dark:ring-blue-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-gradient-to-br from-blue-400/20 to-blue-600/20 blur-xl" />
-            <div className="relative flex flex-col gap-2">
+          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-blue-50/50 to-blue-100/50 dark:from-blue-900/10 dark:to-blue-800/10 p-5 shadow-md ring-1 ring-blue-200/50 dark:ring-blue-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-blue-400/20 to-blue-600/20 blur-xl" />
+            <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
-                  <span className="material-symbols-outlined text-white text-[22px]">autorenew</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+                  <span className="material-symbols-outlined text-white text-[20px]">autorenew</span>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Proses</p>
+                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Proses</p>
               </div>
               <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
                 {data?.inProgress || 0}
@@ -615,14 +615,14 @@ export default function AdminDashboard() {
           </div>
 
           {/* Out (Delivered) */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50/50 to-purple-100/50 dark:from-purple-900/10 dark:to-purple-800/10 p-5 shadow-md ring-1 ring-purple-200/50 dark:ring-purple-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-gradient-to-br from-purple-400/20 to-purple-600/20 blur-xl" />
-            <div className="relative flex flex-col gap-2">
+          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-purple-50/50 to-purple-100/50 dark:from-purple-900/10 dark:to-purple-800/10 p-5 shadow-md ring-1 ring-purple-200/50 dark:ring-purple-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-purple-400/20 to-purple-600/20 blur-xl" />
+            <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30">
-                  <span className="material-symbols-outlined text-white text-[22px]">local_shipping</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30">
+                  <span className="material-symbols-outlined text-white text-[20px]">local_shipping</span>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Diantar</p>
+                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Diantar</p>
               </div>
               <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
                 {data?.delivered || 0}
@@ -631,14 +631,14 @@ export default function AdminDashboard() {
           </div>
 
           {/* Finished */}
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50/50 to-emerald-100/50 dark:from-emerald-900/10 dark:to-emerald-800/10 p-5 shadow-md ring-1 ring-emerald-200/50 dark:ring-emerald-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 blur-xl" />
-            <div className="relative flex flex-col gap-2">
+          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-emerald-50/50 to-emerald-100/50 dark:from-emerald-900/10 dark:to-emerald-800/10 p-5 shadow-md ring-1 ring-emerald-200/50 dark:ring-emerald-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 blur-xl" />
+            <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30">
-                  <span className="material-symbols-outlined text-white text-[22px]">check_circle</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30">
+                  <span className="material-symbols-outlined text-white text-[20px]">check_circle</span>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Selesai</p>
+                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Selesai</p>
               </div>
               <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
                 {data?.finished.toLocaleString() || 0}
