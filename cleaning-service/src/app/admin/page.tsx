@@ -460,7 +460,7 @@ export default function AdminDashboard() {
           quantity: formData.quantity,
           customerNotes: formData.customerNotes,
           estimatedPrice: estimatedPrice,
-          verified: true
+          status: 'pending'
         })
       });
 
@@ -588,26 +588,6 @@ export default function AdminDashboard() {
               {data?.total.toLocaleString() || 0}
             </p>
           </div>
-
-          {/* Pending */}
-          <Link href="/admin/pending" className="flex flex-col gap-2 rounded-xl p-4 bg-white dark:bg-[#1a202c] shadow-sm border-l-4 border-l-amber-400 border-y border-r border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-                <span className="material-symbols-outlined text-[18px]">pending_actions</span>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider">Verifikasi</p>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-[#111318] dark:text-white text-2xl font-bold leading-tight">
-                {data?.unverified || 0}
-              </p>
-              {(data?.unverified || 0) > 0 && (
-                <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full animate-pulse">
-                  NEW
-                </span>
-              )}
-            </div>
-          </Link>
 
           {/* In Progress */}
           <div className="flex flex-col gap-2 rounded-xl p-4 bg-white dark:bg-[#1a202c] shadow-sm border-l-4 border-l-[#1152d4] border-y border-r border-gray-100 dark:border-gray-800">

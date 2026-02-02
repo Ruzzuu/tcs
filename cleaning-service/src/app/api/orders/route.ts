@@ -241,7 +241,8 @@ export async function POST(request: NextRequest) {
       address: address?.trim() || '',
       status: 'pending',
       verification: {
-        status: 'unverified'
+        status: 'approved',
+        verifiedAt: new Date()
       },
       items: orderItems,
       // Legacy fields for backward compatibility  

@@ -80,7 +80,7 @@ export default function SuccessPage() {
               <ul className="text-sm text-[#616f89] dark:text-gray-400 space-y-2">
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5">1.</span>
-                  Admin akan memverifikasi data Anda
+                  Pesanan Anda telah dikonfirmasi
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5">2.</span>

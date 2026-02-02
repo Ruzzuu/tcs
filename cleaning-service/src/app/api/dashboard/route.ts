@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
     // Run all aggregations in parallel
     const [
       kpiResult,
-      unverifiedCount,
       serviceDistribution,
       incomeTrend,
       totalOrders,
@@ -72,9 +71,6 @@ export async function GET(request: NextRequest) {
           }
         }
       ]),
-
-      // Unverified count (for pending verification badge, exclude deleted)
-      Order.countDocuments({ 'verification.status': 'unverified', deleted: { $ne: true } }),
 
       // Service distribution pie chart - count all individual items (exclude deleted)
       Order.aggregate([
@@ -186,7 +182,6 @@ export async function GET(request: NextRequest) {
         inProgress: kpiData.inProgress,
         delivered: kpiData.delivered || 0,
         finished: kpiData.finished,
-        unverified: unverifiedCount,
         serviceDistribution: serviceDistributionWithColors,
         incomeTrend: incomeTrendFormatted,
         recentOrders

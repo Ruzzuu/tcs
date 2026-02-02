@@ -22,7 +22,6 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: 'dashboard' },
-    { href: '/admin/pending', label: 'Verifikasi', icon: 'pending_actions' },
     { href: '/admin/orders', label: 'Form', icon: 'edit_note' },
   ];
 
