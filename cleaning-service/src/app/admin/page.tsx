@@ -577,20 +577,14 @@ export default function AdminDashboard() {
       <section className="px-4 pt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Total Orders */}
-          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a202c] dark:to-[#2d3748] p-5 shadow-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 transition-all hover:shadow-lg hover:scale-[1.01]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-xl" />
+          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-orange-50/50 to-orange-100/50 dark:from-orange-900/10 dark:to-orange-800/10 p-5 shadow-md ring-1 ring-orange-200/50 dark:ring-orange-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-orange-400/20 to-orange-600/20 blur-xl" />
             <div className="relative flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
-                    <span className="material-symbols-outlined text-white text-[20px]">list_alt</span>
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Total Orders</p>
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30">
+                  <span className="material-symbols-outlined text-white text-[20px]">list_alt</span>
                 </div>
-                <div className="flex h-7 items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5">
-                  <span className="material-symbols-outlined text-[14px] text-blue-600 dark:text-blue-400">trending_up</span>
-                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">All</span>
-                </div>
+                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Total Orders</p>
               </div>
               <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
                 {data?.total.toLocaleString() || 0}
