@@ -5,11 +5,48 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
+import PhoneNumber from '@/lib/models/PhoneNumber';
 import { SERVICES } from '@/lib/services';
 import { generateOrderNumber, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { createOrderItem, shouldAppendToOrder } from '@/lib/orderUtils';
+
+// Phone numbers to exclude from auto-saving
+const EXCLUDED_PHONES = [
+  '81515263851',
+  '085859461424',
+  '085731854878'
+];
+
+// Helper function to auto-save phone number
+async function autoSavePhoneNumber(phone: string) {
+  try {
+    // Clean phone for comparison
+    const cleanPhone = phone.replace(/^0/, '');
+    
+    // Check if phone is excluded
+    const isExcluded = EXCLUDED_PHONES.some(excluded => {
+      const cleanExcluded = excluded.replace(/^0/, '');
+      return cleanPhone === cleanExcluded || phone === excluded;
+    });
+    
+    if (isExcluded) {
+      console.log('⏭️  Phone number is excluded, skipping auto-save:', phone);
+      return;
+    }
+
+    // Check if phone already exists
+    const existing = await PhoneNumber.findOne({ phone });
+    if (!existing) {
+      await PhoneNumber.create({ phone });
+      console.log('💾 Auto-saved new phone number:', phone);
+    }
+  } catch (error) {
+    // Log error but don't fail the order creation
+    console.error('⚠️  Failed to auto-save phone number:', error);
+  }
+}
 
 // GET /api/orders - List orders (for admin)
 export async function GET(request: NextRequest) {
@@ -259,6 +296,11 @@ export async function POST(request: NextRequest) {
     await order.save();
 
     console.log('✅ Order created:', order.orderNumber);
+
+    // Auto-save phone number to autocomplete list (async, non-blocking)
+    autoSavePhoneNumber(phone.trim()).catch(err => 
+      console.error('Failed to auto-save phone:', err)
+    );
 
     return NextResponse.json({
       success: true,

@@ -38,6 +38,7 @@ export default function PhoneAutocomplete({
           // Check if cache is still valid (less than 1 hour old)
           if (now - cacheData.timestamp < CACHE_DURATION) {
             setAllPhones(cacheData.phones);
+            console.log('📱 Loaded', cacheData.phones.length, 'phones from cache');
             return;
           }
         } catch (error) {
@@ -48,6 +49,7 @@ export default function PhoneAutocomplete({
       // Cache expired or doesn't exist, fetch from API
       setIsLoading(true);
       try {
+        console.log('🔄 Fetching phones from API...');
         const response = await fetch('/api/admin/phones');
         if (response.ok) {
           const phones: string[] = await response.json();
@@ -56,6 +58,7 @@ export default function PhoneAutocomplete({
           const uniquePhones = Array.from(new Set(phones));
           
           setAllPhones(uniquePhones);
+          console.log('✅ Loaded', uniquePhones.length, 'phones from API');
           
           // Save to localStorage with timestamp
           const cacheData: PhoneCacheData = {

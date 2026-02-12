@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "npx ts-node --skip-project scripts/seed.ts"
+    "seed": "npx ts-node --skip-project scripts/seed.ts",
+    "migrate:phones": "node --loader ts-node/esm scripts/migrate-phones.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
