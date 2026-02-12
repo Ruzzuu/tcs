@@ -163,3 +163,17 @@ export interface UpdateOrderData {
   afterPhoto?: string;
   finalPrice?: number;
 }
+
+// Phone Autocomplete Component
+export interface PhoneAutocompleteProps {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+  className?: string;
+}
+
+export interface PhoneCacheData {
+  phones: string[];
+  timestamp: number;
+}

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
+import PhoneAutocomplete from '@/components/PhoneAutocomplete';
 
 // Global submission lock
 if (typeof window !== 'undefined') {
@@ -190,13 +191,11 @@ export default function AdminForm() {
               Nomor WhatsApp <span className="text-red-500">*</span>
             </label>
             <div className="relative flex items-center">
-              <input
-                type="tel"
-                required
+              <PhoneAutocomplete
                 value={formData.whatsapp}
                 onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                className="w-full h-12 pl-4 pr-12 rounded-xl border border-[#dbdfe6] dark:border-[#2a3441] bg-white dark:bg-[#1a2230] text-[#111318] dark:text-white placeholder:text-[#616f89] dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 focus:border-[#1152d4] transition-all"
                 placeholder="0812xxxx..."
+                required
               />
               <div className="absolute right-4 text-[#616f89] dark:text-gray-500 flex items-center pointer-events-none">
                 <span className="material-symbols-outlined text-xl">call</span>

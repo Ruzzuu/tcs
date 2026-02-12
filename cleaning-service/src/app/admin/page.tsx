@@ -6,6 +6,7 @@ import { DashboardData, Order, OrderStatus } from '@/types';
 import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
+import PhoneAutocomplete from '@/components/PhoneAutocomplete';
 
 // Simple Pie Chart Component (CSS-based, matching original design)
 function PieChart({ data }: { data: Array<{ name: string; value: number; color: string }> }) {
@@ -773,11 +774,9 @@ export default function AdminDashboard() {
                   <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
                     Nomor WhatsApp <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="tel"
+                  <PhoneAutocomplete
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
                     placeholder="0812xxxx..."
                     required
                   />
