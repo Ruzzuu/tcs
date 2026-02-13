@@ -495,43 +495,24 @@ export default function CustomerFormPage() {
             </p>
           </div>
 
-          {/* Submit Button - Inside Form for Enter key support */}
+          {/* Submit Button - Disabled */}
           <div className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-[#1a2230]/80 backdrop-blur-lg border-t border-[#dbdfe6] dark:border-[#2a3441] p-4 z-40">
             <div className="max-w-md mx-auto w-full">
+              <div className="mb-2 text-center">
+                <p className="text-xs text-[#616f89] dark:text-gray-400">
+                  Form ini sedang tidak aktif. Untuk pemesanan, hubungi admin.
+                </p>
+              </div>
               <button
-                type="submit"
-                disabled={isSubmitting || !isFormValid}
-                className="w-full h-14 bg-[#1152d4] hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#1152d4]/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1152d4]"
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                <span>Mengirim...</span>
-              </>
-            ) : (
-              <>
-                <span>Kirim Data</span>
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
-                  arrow_forward
+                type="button"
+                disabled
+                className="w-full h-14 bg-gray-400 dark:bg-gray-600 text-white rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+              >
+                <span>Form Tidak Aktif</span>
+                <span className="material-symbols-outlined">
+                  block
                 </span>
-              </>
-            )}
-          </button>
+              </button>
             </div>
           </div>
         </form>
