@@ -506,30 +506,37 @@ export default function AdminForm() {
             </p>
           </div>
         {/* Proof of Work Photos Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-6">Proof of Work Photos</h2>
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#1152d4]/10 text-[#1152d4] p-2 rounded-lg">
+              <span className="material-symbols-outlined text-xl">photo_camera</span>
+            </div>
+            <h3 className="font-bold text-[#111318] dark:text-white text-sm uppercase tracking-wide">
+              Foto Bukti Pengerjaan
+            </h3>
+          </div>
           
           <div className="grid md:grid-cols-2 gap-6">
             {/* Before Photos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Before Photos
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-[#111318] dark:text-gray-200">
+                Foto Sebelum
               </label>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {proofOfWork.before.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-3">
                     {proofOfWork.before.map((image, index) => (
                       <div key={image.publicId} className="relative group">
                         <img
                           src={image.url}
                           alt={`Before ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-lg"
+                          className="w-full h-32 object-cover rounded-xl border border-[#dbdfe6] dark:border-[#2a3441]"
                         />
                         <button
                           type="button"
                           onClick={() => handleDeletePhoto(image.publicId, 'before')}
                           disabled={deletingPhoto === image.publicId}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 disabled:opacity-50 shadow-lg"
                         >
                           {deletingPhoto === image.publicId ? (
                             <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -546,7 +553,7 @@ export default function AdminForm() {
                     ))}
                   </div>
                 )}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors">
+                <div className="border-2 border-dashed border-[#1152d4]/30 rounded-xl p-6 text-center bg-[#f6f6f8] dark:bg-[#101622] hover:border-[#1152d4] hover:bg-[#1152d4]/5 transition-all">
                   <input
                     type="file"
                     accept="image/*"
@@ -558,22 +565,23 @@ export default function AdminForm() {
                   />
                   <label
                     htmlFor="before-upload"
-                    className={`cursor-pointer flex flex-col items-center ${uploading.before ? 'opacity-50' : ''}`}
+                    className={`cursor-pointer flex flex-col items-center gap-2 ${uploading.before ? 'opacity-50' : ''}`}
                   >
                     {uploading.before ? (
                       <>
-                        <svg className="animate-spin h-8 w-8 text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-10 w-10 text-[#1152d4] mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span className="text-sm text-gray-600">Uploading... {uploadProgress.before}%</span>
+                        <span className="text-sm font-medium text-[#1152d4]">Mengupload... {uploadProgress.before}%</span>
                       </>
                     ) : (
                       <>
-                        <svg className="h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span className="text-sm text-gray-600">Upload Before Photos</span>
+                        <div className="bg-[#1152d4]/10 text-[#1152d4] p-3 rounded-xl mb-1">
+                          <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
+                        </div>
+                        <span className="text-sm font-medium text-[#111318] dark:text-white">Upload Foto Sebelum</span>
+                        <span className="text-xs text-[#616f89] dark:text-gray-400">Klik atau seret file kesini</span>
                       </>
                     )}
                   </label>
@@ -582,25 +590,25 @@ export default function AdminForm() {
             </div>
 
             {/* After Photos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                After Photos
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-[#111318] dark:text-gray-200">
+                Foto Sesudah
               </label>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {proofOfWork.after.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-3">
                     {proofOfWork.after.map((image, index) => (
                       <div key={image.publicId} className="relative group">
                         <img
                           src={image.url}
                           alt={`After ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-lg"
+                          className="w-full h-32 object-cover rounded-xl border border-[#dbdfe6] dark:border-[#2a3441]"
                         />
                         <button
                           type="button"
                           onClick={() => handleDeletePhoto(image.publicId, 'after')}
                           disabled={deletingPhoto === image.publicId}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 disabled:opacity-50 shadow-lg"
                         >
                           {deletingPhoto === image.publicId ? (
                             <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -617,7 +625,7 @@ export default function AdminForm() {
                     ))}
                   </div>
                 )}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors">
+                <div className="border-2 border-dashed border-[#1152d4]/30 rounded-xl p-6 text-center bg-[#f6f6f8] dark:bg-[#101622] hover:border-[#1152d4] hover:bg-[#1152d4]/5 transition-all">
                   <input
                     type="file"
                     accept="image/*"
@@ -629,22 +637,23 @@ export default function AdminForm() {
                   />
                   <label
                     htmlFor="after-upload"
-                    className={`cursor-pointer flex flex-col items-center ${uploading.after ? 'opacity-50' : ''}`}
+                    className={`cursor-pointer flex flex-col items-center gap-2 ${uploading.after ? 'opacity-50' : ''}`}
                   >
                     {uploading.after ? (
                       <>
-                        <svg className="animate-spin h-8 w-8 text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-10 w-10 text-[#1152d4] mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span className="text-sm text-gray-600">Uploading... {uploadProgress.after}%</span>
+                        <span className="text-sm font-medium text-[#1152d4]">Mengupload... {uploadProgress.after}%</span>
                       </>
                     ) : (
                       <>
-                        <svg className="h-8 w-8 text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span className="text-sm text-gray-600">Upload After Photos</span>
+                        <div className="bg-[#1152d4]/10 text-[#1152d4] p-3 rounded-xl mb-1">
+                          <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
+                        </div>
+                        <span className="text-sm font-medium text-[#111318] dark:text-white">Upload Foto Sesudah</span>
+                        <span className="text-xs text-[#616f89] dark:text-gray-400">Klik atau seret file kesini</span>
                       </>
                     )}
                   </label>
