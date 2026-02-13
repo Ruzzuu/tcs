@@ -1001,7 +1001,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || loading}
                 className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title="Halaman sebelumnya"
               >
@@ -1028,11 +1028,12 @@ export default function AdminDashboard() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
+                      disabled={loading}
                       className={`min-w-[36px] px-3 py-1.5 rounded-lg transition-colors ${
                         page === currentPage
                           ? 'bg-[#1152d4] text-white'
                           : 'bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                      }`}
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {page}
                     </button>
@@ -1047,7 +1048,7 @@ export default function AdminDashboard() {
 
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || loading}
                 className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title="Halaman berikutnya"
               >
