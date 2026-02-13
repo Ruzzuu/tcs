@@ -557,6 +557,7 @@ export default function AdminForm() {
                   <input
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     multiple
                     onChange={(e) => handleImageUpload(e, 'before')}
                     disabled={uploading.before}
@@ -581,7 +582,7 @@ export default function AdminForm() {
                           <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
                         </div>
                         <span className="text-sm font-medium text-[#111318] dark:text-white">Upload Foto Sebelum</span>
-                        <span className="text-xs text-[#616f89] dark:text-gray-400">Klik atau seret file kesini</span>
+                        <span className="text-xs text-[#616f89] dark:text-gray-400">Ambil foto atau pilih dari galeri</span>
                       </>
                     )}
                   </label>
@@ -629,6 +630,7 @@ export default function AdminForm() {
                   <input
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     multiple
                     onChange={(e) => handleImageUpload(e, 'after')}
                     disabled={uploading.after}
@@ -653,7 +655,7 @@ export default function AdminForm() {
                           <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
                         </div>
                         <span className="text-sm font-medium text-[#111318] dark:text-white">Upload Foto Sesudah</span>
-                        <span className="text-xs text-[#616f89] dark:text-gray-400">Klik atau seret file kesini</span>
+                        <span className="text-xs text-[#616f89] dark:text-gray-400">Ambil foto atau pilih dari galeri</span>
                       </>
                     )}
                   </label>
