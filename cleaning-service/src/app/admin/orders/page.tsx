@@ -101,11 +101,15 @@ export default function AdminForm() {
           throw new Error(errorData.error || 'Failed to upload image');
         }
 
-        const data = await response.json();
-        uploadedImages.push({
-          url: data.url,
-          publicId: data.publicId,
-        });
+        const result = await response.json();
+        if (result.success && result.data) {
+          uploadedImages.push({
+            url: result.data.url,
+            publicId: result.data.publicId,
+          });
+        } else {
+          throw new Error(result.error || 'Upload failed: No data returned');
+        }
 
         // Update progress
         setUploadProgress(prev => ({
