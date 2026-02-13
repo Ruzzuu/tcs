@@ -296,34 +296,6 @@ export default function AdminForm() {
 
   return (
     <div className="bg-[#f6f6f8] dark:bg-[#101622] min-h-screen flex flex-col">
-      {/* Header Navigation */}
-      <header className="sticky top-0 z-50 bg-[#1a2230] dark:bg-[#1a2230] border-b border-gray-800 px-4 py-3">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1152d4]/20 text-[#1152d4]">
-              <span className="material-symbols-outlined text-xl">cleaning_services</span>
-            </div>
-            <h1 className="text-white text-lg font-bold">Teman Cuci Sepatu</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href="/admin"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-            >
-              <span className="material-symbols-outlined text-xl">dashboard</span>
-              <span className="text-sm font-medium">Dashboard</span>
-            </a>
-            <a
-              href="/admin/orders"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1152d4] text-white shadow-lg shadow-[#1152d4]/20"
-            >
-              <span className="material-symbols-outlined text-xl">edit_note</span>
-              <span className="text-sm font-medium">Form</span>
-            </a>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex-1 w-full max-w-md mx-auto px-4 py-6 pb-24">
         <div className="mb-8 text-center">

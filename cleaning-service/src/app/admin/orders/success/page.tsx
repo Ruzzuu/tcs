@@ -5,12 +5,6 @@ import Link from 'next/link';
 export default function OrderSuccessPage() {
   return (
     <div className="bg-[#f6f6f8] dark:bg-[#101622] min-h-screen flex flex-col">
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a2230]/95 backdrop-blur-md border-b border-[#dbdfe6] dark:border-[#2a3441] px-4 py-3 flex items-center justify-center">
-        <h1 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-tight">
-          Konfirmasi
-        </h1>
-      </div>
-
       <main className="flex-1 w-full max-w-md mx-auto px-4 py-12 flex flex-col items-center justify-center text-center">
         {/* Success Icon */}
         <div className="relative mb-8">
