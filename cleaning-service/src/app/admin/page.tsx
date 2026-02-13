@@ -774,12 +774,17 @@ export default function AdminDashboard() {
                   <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
                     Nomor WhatsApp <span className="text-red-500">*</span>
                   </label>
-                  <PhoneAutocomplete
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="0812xxxx..."
-                    required
-                  />
+                  <div className="relative">
+                    <PhoneAutocomplete
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="0812xxxx..."
+                      required
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#616f89] dark:text-gray-500 pointer-events-none">
+                      <span className="material-symbols-outlined text-xl">call</span>
+                    </div>
+                  </div>
                   {formData.phone && !isValidPhoneNumber(formData.phone) && (
                     <p className="text-red-500 text-xs">Format nomor tidak valid</p>
                   )}

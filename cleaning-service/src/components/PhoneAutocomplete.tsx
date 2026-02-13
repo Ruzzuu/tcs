@@ -133,7 +133,7 @@ export default function PhoneAutocomplete({
         value={value}
         onChange={onChange}
         onFocus={handleFocus}
-        className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
+        className="w-full h-12 pl-4 pr-12 rounded-xl border border-[#dbdfe6] dark:border-[#2a3441] bg-white dark:bg-[#1a2230] text-[#111318] dark:text-white placeholder:text-[#616f89] dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 focus:border-[#1152d4] transition-all"
         placeholder={placeholder}
         required={required}
         autoComplete="off"
@@ -141,7 +141,7 @@ export default function PhoneAutocomplete({
       
       {/* Loading indicator */}
       {isLoading && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+        <div className="absolute right-10 top-1/2 -translate-y-1/2">
           <div className="w-4 h-4 border-2 border-gray-300 border-t-[#1152d4] rounded-full animate-spin"></div>
         </div>
       )}

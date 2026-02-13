@@ -190,14 +190,14 @@ export default function AdminForm() {
             <label className="text-[#111318] dark:text-gray-200 text-sm font-medium">
               Nomor WhatsApp <span className="text-red-500">*</span>
             </label>
-            <div className="relative flex items-center">
+            <div className="relative">
               <PhoneAutocomplete
                 value={formData.whatsapp}
                 onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                 placeholder="0812xxxx..."
                 required
               />
-              <div className="absolute right-4 text-[#616f89] dark:text-gray-500 flex items-center pointer-events-none">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#616f89] dark:text-gray-500 pointer-events-none">
                 <span className="material-symbols-outlined text-xl">call</span>
               </div>
             </div>
