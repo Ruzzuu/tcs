@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { DashboardData, Order, OrderStatus } from '@/types';
+import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
 import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
@@ -284,6 +284,12 @@ export default function AdminDashboard() {
     customerNotes: ''
   });
 
+  // Image upload state for form
+  const [formProofOfWork, setFormProofOfWork] = useState<{ beforePhotos: CloudinaryImage[], afterPhotos: CloudinaryImage[] }>({ beforePhotos: [], afterPhotos: [] });
+  const [formUploading, setFormUploading] = useState<'before' | 'after' | null>(null);
+  const [formUploadProgress, setFormUploadProgress] = useState<{ type: 'before' | 'after', current: number, total: number } | null>(null);
+  const [formDeletingPhoto, setFormDeletingPhoto] = useState<string | null>(null);
+
   // Form validation
   const isFormValid = useMemo(() => {
     const hasValidCustomer = formData.name.trim().length >= 2 && isValidPhoneNumber(formData.phone);
@@ -436,6 +442,141 @@ export default function AdminDashboard() {
     }
   };
 
+  // Handle multiple image upload for form
+  const handleFormImageUpload = async (type: 'before' | 'after', files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    setFormUploading(type);
+    setFormUploadProgress({ type, current: 0, total: fileArray.length });
+
+    const successfulUploads: CloudinaryImage[] = [];
+
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i];
+      
+      try {
+        const tempId = `temp-${Date.now()}-${i}`;
+        const tempImage: CloudinaryImage = {
+          url: URL.createObjectURL(file),
+          publicId: tempId,
+        };
+
+        if (type === 'before') {
+          setFormProofOfWork(prev => ({ ...prev, beforePhotos: [...prev.beforePhotos, tempImage] }));
+        } else {
+          setFormProofOfWork(prev => ({ ...prev, afterPhotos: [...prev.afterPhotos, tempImage] }));
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          const realImage: CloudinaryImage = {
+            url: result.data.url,
+            publicId: result.data.publicId,
+          };
+
+          if (type === 'before') {
+            setFormProofOfWork(prev => ({
+              ...prev,
+              beforePhotos: prev.beforePhotos.map(img => 
+                img.publicId === tempId ? realImage : img
+              )
+            }));
+          } else {
+            setFormProofOfWork(prev => ({
+              ...prev,
+              afterPhotos: prev.afterPhotos.map(img => 
+                img.publicId === tempId ? realImage : img
+              )
+            }));
+          }
+
+          successfulUploads.push(realImage);
+        } else {
+          if (type === 'before') {
+            setFormProofOfWork(prev => ({
+              ...prev,
+              beforePhotos: prev.beforePhotos.filter(img => img.publicId !== tempId)
+            }));
+          } else {
+            setFormProofOfWork(prev => ({
+              ...prev,
+              afterPhotos: prev.afterPhotos.filter(img => img.publicId !== tempId)
+            }));
+          }
+          console.error('Upload failed:', result.error);
+        }
+
+        setFormUploadProgress({ type, current: i + 1, total: fileArray.length });
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
+
+    setFormUploading(null);
+    setFormUploadProgress(null);
+
+    if (successfulUploads.length > 0) {
+      alert(`${successfulUploads.length} foto berhasil diunggah!`);
+    }
+  };
+
+  const handleFormDeletePhoto = async (type: 'before' | 'after', publicId: string) => {
+    if (!confirm('Hapus foto ini?')) return;
+
+    const backup = type === 'before' ? [...formProofOfWork.beforePhotos] : [...formProofOfWork.afterPhotos];
+
+    if (type === 'before') {
+      setFormProofOfWork(prev => ({
+        ...prev,
+        beforePhotos: prev.beforePhotos.filter(img => img.publicId !== publicId)
+      }));
+    } else {
+      setFormProofOfWork(prev => ({
+        ...prev,
+        afterPhotos: prev.afterPhotos.filter(img => img.publicId !== publicId)
+      }));
+    }
+
+    setFormDeletingPhoto(publicId);
+
+    try {
+      const response = await fetch(`/api/upload?publicId=${publicId}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        if (type === 'before') {
+          setFormProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
+        } else {
+          setFormProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
+        }
+        alert(result.error || 'Gagal menghapus foto');
+      }
+    } catch (error) {
+      if (type === 'before') {
+        setFormProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
+      } else {
+        setFormProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
+      }
+      alert('Gagal menghapus foto');
+    } finally {
+      setFormDeletingPhoto(null);
+    }
+  };
+
   // Handle Add Order Form Submit
   const handleAddOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -449,6 +590,11 @@ export default function AdminDashboard() {
     setFormError(null);
 
     try {
+      const cleanProofOfWork = {
+        beforePhotos: formProofOfWork.beforePhotos.filter(p => !p.publicId.startsWith('temp-')),
+        afterPhotos: formProofOfWork.afterPhotos.filter(p => !p.publicId.startsWith('temp-'))
+      };
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -461,7 +607,8 @@ export default function AdminDashboard() {
           quantity: formData.quantity,
           customerNotes: formData.customerNotes,
           estimatedPrice: estimatedPrice,
-          status: 'pending'
+          status: 'pending',
+          proofOfWork: (cleanProofOfWork.beforePhotos.length > 0 || cleanProofOfWork.afterPhotos.length > 0) ? cleanProofOfWork : undefined
         })
       });
 
@@ -490,6 +637,10 @@ export default function AdminDashboard() {
       quantity: 1,
       customerNotes: ''
     });
+    setFormProofOfWork({ beforePhotos: [], afterPhotos: [] });
+    setFormUploadProgress(null);
+    setFormUploading(null);
+    setFormDeletingPhoto(null);
     setFormError(null);
     setShowAddForm(false);
   };
@@ -885,6 +1036,137 @@ export default function AdminDashboard() {
                     className="w-full min-h-[80px] p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all resize-none"
                     placeholder="Catatan tambahan..."
                   />
+                </div>
+
+                {/* Proof of Work Photos */}
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-sm font-medium text-[#111318] dark:text-gray-200">
+                    Foto Bukti Pekerjaan <span className="text-gray-400 text-xs">(Opsional)</span>
+                  </h3>
+
+                  {/* Before Photos */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm text-gray-600 dark:text-gray-400">Foto Sebelum</label>
+                    <div className="flex flex-wrap gap-3">
+                      {formProofOfWork.beforePhotos.map((photo, index) => (
+                        <div key={photo.publicId} className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 group">
+                          <img 
+                            src={photo.url} 
+                            alt={`Before ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {photo.publicId.startsWith('temp-') && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                          {!photo.publicId.startsWith('temp-') && (
+                            <button
+                              type="button"
+                              onClick={() => handleFormDeletePhoto('before', photo.publicId)}
+                              disabled={formDeletingPhoto === photo.publicId}
+                              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                            >
+                              {formDeletingPhoto === photo.publicId ? (
+                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <span className="material-symbols-outlined text-sm">close</span>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Upload Button */}
+                      <label className={`w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#1152d4] dark:hover:border-[#1152d4] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all ${formUploading === 'before' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => e.target.files && handleFormImageUpload('before', e.target.files)}
+                          disabled={formUploading === 'before'}
+                          className="hidden"
+                        />
+                        {formUploading === 'before' ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-[#1152d4] border-t-transparent rounded-full animate-spin mb-1"></div>
+                            {formUploadProgress && formUploadProgress.type === 'before' && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {formUploadProgress.current}/{formUploadProgress.total}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span className="material-symbols-outlined text-gray-400 text-2xl">add_photo_alternate</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* After Photos */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm text-gray-600 dark:text-gray-400">Foto Sesudah</label>
+                    <div className="flex flex-wrap gap-3">
+                      {formProofOfWork.afterPhotos.map((photo, index) => (
+                        <div key={photo.publicId} className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 group">
+                          <img 
+                            src={photo.url} 
+                            alt={`After ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {photo.publicId.startsWith('temp-') && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                          {!photo.publicId.startsWith('temp-') && (
+                            <button
+                              type="button"
+                              onClick={() => handleFormDeletePhoto('after', photo.publicId)}
+                              disabled={formDeletingPhoto === photo.publicId}
+                              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                            >
+                              {formDeletingPhoto === photo.publicId ? (
+                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <span className="material-symbols-outlined text-sm">close</span>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Upload Button */}
+                      <label className={`w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#1152d4] dark:hover:border-[#1152d4] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all ${formUploading === 'after' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => e.target.files && handleFormImageUpload('after', e.target.files)}
+                          disabled={formUploading === 'after'}
+                          className="hidden"
+                        />
+                        {formUploading === 'after' ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-[#1152d4] border-t-transparent rounded-full animate-spin mb-1"></div>
+                            {formUploadProgress && formUploadProgress.type === 'after' && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {formUploadProgress.current}/{formUploadProgress.total}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span className="material-symbols-outlined text-gray-400 text-2xl">add_photo_alternate</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Price Summary */}

@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     console.log(`📥 [${requestId}] Body type:`, typeof body);
     console.log(`📥 [${requestId}] Body keys:`, Object.keys(body || {}));
     
-    const { name, phone, address, items: submittedItems } = body;
+    const { name, phone, address, items: submittedItems, proofOfWork } = body;
 
     console.log(`📦 [${requestId}] Extracted data:`, {
       name: name ? `"${name}"` : 'undefined',
@@ -291,6 +291,11 @@ export async function POST(request: NextRequest) {
       finalPrice: subtotal,
       customerNotes: orderItems.map((i: any) => i.notes).filter(Boolean).join('; ')
     };
+
+    // Add proof of work photos if provided
+    if (proofOfWork && (proofOfWork.beforePhotos?.length > 0 || proofOfWork.afterPhotos?.length > 0)) {
+      orderData.proofOfWork = proofOfWork;
+    }
 
     const order = new Order(orderData);
     await order.save();
