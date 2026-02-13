@@ -240,8 +240,8 @@ export default function AdminForm() {
           notes: item.notes
         })),
         proofOfWork: {
-          before: proofOfWork.before.map(img => ({ url: img.url, publicId: img.publicId })),
-          after: proofOfWork.after.map(img => ({ url: img.url, publicId: img.publicId })),
+          beforePhotos: proofOfWork.before.map(img => ({ url: img.url, publicId: img.publicId })),
+          afterPhotos: proofOfWork.after.map(img => ({ url: img.url, publicId: img.publicId })),
         }
       };
       
