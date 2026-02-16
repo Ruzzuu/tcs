@@ -25,9 +25,9 @@ export default function AdminForm() {
   const [items, setItems] = useState<FormItem[]>([
     { service: '', quantity: 1, notes: '' }
   ]);
-  const [proofOfWork, setProofOfWork] = useState<{ before: CloudinaryImage[], after: CloudinaryImage[] }>({ before: [], after: [] });
-  const [uploading, setUploading] = useState<{ before: boolean, after: boolean }>({ before: false, after: false });
-  const [uploadProgress, setUploadProgress] = useState<{ before: number, after: number }>({ before: 0, after: 0 });
+  const [proofOfWork, setProofOfWork] = useState<{ before: CloudinaryImage[] }>({ before: [] });
+  const [uploading, setUploading] = useState<{ before: boolean }>({ before: false });
+  const [uploadProgress, setUploadProgress] = useState<{ before: number }>({ before: 0 });
   const [deletingPhoto, setDeletingPhoto] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitAttemptRef = useRef(false);
@@ -60,27 +60,26 @@ export default function AdminForm() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after') => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    setUploading(prev => ({ ...prev, [type]: true }));
-    setUploadProgress(prev => ({ ...prev, [type]: 0 }));
+    setUploading(prev => ({ ...prev, before: true }));
+    setUploadProgress(prev => ({ ...prev, before: 0 }));
 
     try {
       const uploadedImages: CloudinaryImage[] = [];
       const filesToUpload = Array.from(files);
-      
+
       // Create temporary preview images
       const tempImages: CloudinaryImage[] = filesToUpload.map((file, index) => ({
         url: URL.createObjectURL(file),
-        publicId: `temp-${type}-${Date.now()}-${index}`
+        publicId: `temp-before-${Date.now()}-${index}`
       }));
 
       // Add temporary images to state immediately (optimistic update)
       setProofOfWork(prev => ({
-        ...prev,
-        [type]: [...prev[type], ...tempImages]
+        before: [...prev.before, ...tempImages]
       }));
 
       // Upload each file
@@ -88,7 +87,7 @@ export default function AdminForm() {
         const file = filesToUpload[i];
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('type', type);
+        formData.append('type', 'before');
         formData.append('orderId', tempOrderIdRef.current);
 
         const response = await fetch('/api/upload', {
@@ -114,16 +113,15 @@ export default function AdminForm() {
         // Update progress
         setUploadProgress(prev => ({
           ...prev,
-          [type]: Math.round(((i + 1) / filesToUpload.length) * 100)
+          before: Math.round(((i + 1) / filesToUpload.length) * 100)
         }));
       }
 
       // Replace temporary images with real uploaded images
       setProofOfWork(prev => {
-        const filteredImages = prev[type].filter(img => !img.publicId.startsWith(`temp-${type}-`));
+        const filteredImages = prev.before.filter(img => !img.publicId.startsWith('temp-before-'));
         return {
-          ...prev,
-          [type]: [...filteredImages, ...uploadedImages]
+          before: [...filteredImages, ...uploadedImages]
         };
       });
 
@@ -133,32 +131,30 @@ export default function AdminForm() {
     } catch (error) {
       console.error('Error uploading images:', error);
       alert(error instanceof Error ? error.message : 'Failed to upload images. Please try again.');
-      
+
       // Remove temporary images on error
       setProofOfWork(prev => ({
-        ...prev,
-        [type]: prev[type].filter(img => !img.publicId.startsWith(`temp-${type}-`))
+        before: prev.before.filter(img => !img.publicId.startsWith('temp-before-'))
       }));
     } finally {
-      setUploading(prev => ({ ...prev, [type]: false }));
-      setUploadProgress(prev => ({ ...prev, [type]: 0 }));
+      setUploading(prev => ({ ...prev, before: false }));
+      setUploadProgress(prev => ({ ...prev, before: 0 }));
     }
   };
 
-  const handleDeletePhoto = async (publicId: string, type: 'before' | 'after') => {
+  const handleDeletePhoto = async (publicId: string) => {
     if (!confirm('Are you sure you want to delete this photo?')) {
       return;
     }
 
     setDeletingPhoto(publicId);
-    
+
     // Store the image in case we need to restore it
-    const imageToDelete = proofOfWork[type].find(img => img.publicId === publicId);
-    
+    const imageToDelete = proofOfWork.before.find(img => img.publicId === publicId);
+
     // Optimistically remove from UI
     setProofOfWork(prev => ({
-      ...prev,
-      [type]: prev[type].filter(img => img.publicId !== publicId)
+      before: prev.before.filter(img => img.publicId !== publicId)
     }));
 
     try {
@@ -176,12 +172,11 @@ export default function AdminForm() {
     } catch (error) {
       console.error('Error deleting image:', error);
       alert('Failed to delete image. Please try again.');
-      
+
       // Restore the image on error
       if (imageToDelete) {
         setProofOfWork(prev => ({
-          ...prev,
-          [type]: [...prev[type], imageToDelete]
+          before: [...prev.before, imageToDelete]
         }));
       }
     } finally {
@@ -233,15 +228,14 @@ export default function AdminForm() {
         name: formData.customerName,
         phone: formData.whatsapp,
         address: formData.address,
-        items: validItems.map(item => ({
+        items: validItems.map(item =>({
           itemType: item.service,
           customItemType: '',
           quantity: item.quantity,
           notes: item.notes
         })),
         proofOfWork: {
-          beforePhotos: proofOfWork.before.map(img => ({ url: img.url, publicId: img.publicId })),
-          afterPhotos: proofOfWork.after.map(img => ({ url: img.url, publicId: img.publicId })),
+          beforePhotos: proofOfWork.before.map(img => ({ url: img.url, publicId: img.publicId }))
         }
       };
       
@@ -292,7 +286,7 @@ export default function AdminForm() {
   };
 
   const isFormValid = formData.customerName && formData.whatsapp && items.some(item => item.service);
-  const isUploadingImages = uploading.before || uploading.after;
+  const isUploadingImages = uploading.before;
 
   return (
     <div className="bg-[#f6f6f8] dark:bg-[#101622] min-h-screen flex flex-col">
@@ -512,12 +506,12 @@ export default function AdminForm() {
                           alt={`Before ${index + 1}`}
                           className="w-full h-32 object-cover rounded-xl border border-[#dbdfe6] dark:border-[#2a3441]"
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleDeletePhoto(image.publicId, 'before')}
-                          disabled={deletingPhoto === image.publicId}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 disabled:opacity-50 shadow-lg"
-                        >
+                         <button
+                           type="button"
+                           onClick={() => handleDeletePhoto(image.publicId)}
+                           disabled={deletingPhoto === image.publicId}
+                           className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 disabled:opacity-50 shadow-lg"
+                         >
                           {deletingPhoto === image.publicId ? (
                             <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -539,7 +533,7 @@ export default function AdminForm() {
                     accept="image/*"
                     capture="environment"
                     multiple
-                    onChange={(e) => handleImageUpload(e, 'before')}
+                    onChange={(e) => handleImageUpload(e)}
                     disabled={uploading.before}
                     className="hidden"
                     id="before-upload"
@@ -569,81 +563,9 @@ export default function AdminForm() {
                 </div>
               </div>
             </div>
-
-            {/* After Photos */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#111318] dark:text-gray-200">
-                Foto Sesudah
-              </label>
-              <div className="space-y-3">
-                {proofOfWork.after.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {proofOfWork.after.map((image, index) => (
-                      <div key={image.publicId} className="relative group">
-                        <img
-                          src={image.url}
-                          alt={`After ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-xl border border-[#dbdfe6] dark:border-[#2a3441]"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleDeletePhoto(image.publicId, 'after')}
-                          disabled={deletingPhoto === image.publicId}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 disabled:opacity-50 shadow-lg"
-                        >
-                          {deletingPhoto === image.publicId ? (
-                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="border-2 border-dashed border-[#1152d4]/30 rounded-xl p-6 text-center bg-[#f6f6f8] dark:bg-[#101622] hover:border-[#1152d4] hover:bg-[#1152d4]/5 transition-all">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    multiple
-                    onChange={(e) => handleImageUpload(e, 'after')}
-                    disabled={uploading.after}
-                    className="hidden"
-                    id="after-upload"
-                  />
-                  <label
-                    htmlFor="after-upload"
-                    className={`cursor-pointer flex flex-col items-center gap-2 ${uploading.after ? 'opacity-50' : ''}`}
-                  >
-                    {uploading.after ? (
-                      <>
-                        <svg className="animate-spin h-10 w-10 text-[#1152d4] mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span className="text-sm font-medium text-[#1152d4]">Mengupload... {uploadProgress.after}%</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="bg-[#1152d4]/10 text-[#1152d4] p-3 rounded-xl mb-1">
-                          <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
-                        </div>
-                        <span className="text-sm font-medium text-[#111318] dark:text-white">Upload Foto Sesudah</span>
-                        <span className="text-xs text-[#616f89] dark:text-gray-400">Ambil foto atau pilih dari galeri</span>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
+
 
 
 
