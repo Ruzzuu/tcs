@@ -1272,7 +1272,7 @@ export default function AdminDashboard() {
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">{option.icon}</span>
-              <span className="text-sm font-medium">{option.label}({getStatusCount(option.value)})</span>
+              <span className="text-sm font-medium">{option.label} ({getStatusCount(option.value)})</span>
             </button>
           ))}
         </div>
