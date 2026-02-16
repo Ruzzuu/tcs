@@ -201,12 +201,6 @@ const OrderSchema = new Schema<OrderDocument>(
     },
     archivedAt: {
       type: Date
-    },
-    
-    // TTL Auto-deletion
-    expireAt: {
-      type: Date
-      // Note: index is defined separately with TTL options below
     }
   },
   {
@@ -216,22 +210,10 @@ const OrderSchema = new Schema<OrderDocument>(
   }
 );
 
-// TTL Index: Auto-delete documents after expireAt
-OrderSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
-
 // Compound indexes for common queries
 OrderSchema.index({ 'verification.status': 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
 OrderSchema.index({ name: 'text', phone: 'text' }); // Text search
-
-// Pre-save middleware
-OrderSchema.pre('save', function () {
-  // Set expireAt when order is finished (30 days TTL)
-  if (this.status === 'finished' && !this.expireAt) {
-    this.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    this.finishedAt = new Date();
-  }
-});
 
 // Static methods
 OrderSchema.statics.findPending = function () {

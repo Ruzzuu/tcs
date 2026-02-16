@@ -75,7 +75,6 @@ export interface Order {
   createdAt: Date;
   updatedAt: Date;
   finishedAt?: Date;
-  expireAt?: Date;
   
   // Rekap reference
   rekapId?: string;

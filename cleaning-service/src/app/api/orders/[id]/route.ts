@@ -155,8 +155,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
       const wibTime = utcTime + (7 * 3600 * 1000);
       updateData.finishedAt = new Date(wibTime);
-      // Set TTL for auto-deletion (30 days from now)
-      updateData.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     }
 
     const order = await Order.findByIdAndUpdate(
