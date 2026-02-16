@@ -285,9 +285,9 @@ export default function AdminDashboard() {
   });
 
   // Image upload state for form
-  const [formProofOfWork, setFormProofOfWork] = useState<{ beforePhotos: CloudinaryImage[], afterPhotos: CloudinaryImage[] }>({ beforePhotos: [], afterPhotos: [] });
-  const [formUploading, setFormUploading] = useState<'before' | 'after' | null>(null);
-  const [formUploadProgress, setFormUploadProgress] = useState<{ type: 'before' | 'after', current: number, total: number } | null>(null);
+  const [formProofOfWork, setFormProofOfWork] = useState<{ beforePhotos: CloudinaryImage[] }>({ beforePhotos: [] });
+  const [formUploading, setFormUploading] = useState<'before' | null>(null);
+  const [formUploadProgress, setFormUploadProgress] = useState<{ type: 'before', current: number, total: number } | null>(null);
   const [formDeletingPhoto, setFormDeletingPhoto] = useState<string | null>(null);
 
   // Form validation
@@ -443,18 +443,18 @@ export default function AdminDashboard() {
   };
 
   // Handle multiple image upload for form
-  const handleFormImageUpload = async (type: 'before' | 'after', files: FileList | File[]) => {
+  const handleFormImageUpload = async (files: FileList | File[]) => {
     const fileArray = Array.from(files);
     if (fileArray.length === 0) return;
 
-    setFormUploading(type);
-    setFormUploadProgress({ type, current: 0, total: fileArray.length });
+    setFormUploading('before');
+    setFormUploadProgress({ type: 'before', current: 0, total: fileArray.length });
 
     const successfulUploads: CloudinaryImage[] = [];
 
     for (let i = 0; i < fileArray.length; i++) {
       const file = fileArray[i];
-      
+
       try {
         const tempId = `temp-${Date.now()}-${i}`;
         const tempImage: CloudinaryImage = {
@@ -462,15 +462,11 @@ export default function AdminDashboard() {
           publicId: tempId,
         };
 
-        if (type === 'before') {
-          setFormProofOfWork(prev => ({ ...prev, beforePhotos: [...prev.beforePhotos, tempImage] }));
-        } else {
-          setFormProofOfWork(prev => ({ ...prev, afterPhotos: [...prev.afterPhotos, tempImage] }));
-        }
+        setFormProofOfWork(prev => ({ beforePhotos: [...prev.beforePhotos, tempImage] }));
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('type', type);
+        formData.append('type', 'before');
 
         const response = await fetch('/api/upload', {
           method: 'POST',
@@ -485,39 +481,21 @@ export default function AdminDashboard() {
             publicId: result.data.publicId,
           };
 
-          if (type === 'before') {
-            setFormProofOfWork(prev => ({
-              ...prev,
-              beforePhotos: prev.beforePhotos.map(img => 
-                img.publicId === tempId ? realImage : img
-              )
-            }));
-          } else {
-            setFormProofOfWork(prev => ({
-              ...prev,
-              afterPhotos: prev.afterPhotos.map(img => 
-                img.publicId === tempId ? realImage : img
-              )
-            }));
-          }
+          setFormProofOfWork(prev => ({
+            beforePhotos: prev.beforePhotos.map(img =>
+              img.publicId === tempId ? realImage : img
+            )
+          }));
 
           successfulUploads.push(realImage);
         } else {
-          if (type === 'before') {
-            setFormProofOfWork(prev => ({
-              ...prev,
-              beforePhotos: prev.beforePhotos.filter(img => img.publicId !== tempId)
-            }));
-          } else {
-            setFormProofOfWork(prev => ({
-              ...prev,
-              afterPhotos: prev.afterPhotos.filter(img => img.publicId !== tempId)
-            }));
-          }
+          setFormProofOfWork(prev => ({
+            beforePhotos: prev.beforePhotos.filter(img => img.publicId !== tempId)
+          }));
           console.error('Upload failed:', result.error);
         }
 
-        setFormUploadProgress({ type, current: i + 1, total: fileArray.length });
+        setFormUploadProgress({ type: 'before', current: i + 1, total: fileArray.length });
       } catch (error) {
         console.error('Error uploading file:', error);
       }
@@ -531,22 +509,14 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleFormDeletePhoto = async (type: 'before' | 'after', publicId: string) => {
+  const handleFormDeletePhoto = async (publicId: string) => {
     if (!confirm('Hapus foto ini?')) return;
 
-    const backup = type === 'before' ? [...formProofOfWork.beforePhotos] : [...formProofOfWork.afterPhotos];
+    const backup = [...formProofOfWork.beforePhotos];
 
-    if (type === 'before') {
-      setFormProofOfWork(prev => ({
-        ...prev,
-        beforePhotos: prev.beforePhotos.filter(img => img.publicId !== publicId)
-      }));
-    } else {
-      setFormProofOfWork(prev => ({
-        ...prev,
-        afterPhotos: prev.afterPhotos.filter(img => img.publicId !== publicId)
-      }));
-    }
+    setFormProofOfWork(prev => ({
+      beforePhotos: prev.beforePhotos.filter(img => img.publicId !== publicId)
+    }));
 
     setFormDeletingPhoto(publicId);
 
@@ -558,19 +528,11 @@ export default function AdminDashboard() {
       const result = await response.json();
 
       if (!result.success) {
-        if (type === 'before') {
-          setFormProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
-        } else {
-          setFormProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
-        }
+        setFormProofOfWork(prev => ({ beforePhotos: backup }));
         alert(result.error || 'Gagal menghapus foto');
       }
     } catch (error) {
-      if (type === 'before') {
-        setFormProofOfWork(prev => ({ ...prev, beforePhotos: backup }));
-      } else {
-        setFormProofOfWork(prev => ({ ...prev, afterPhotos: backup }));
-      }
+      setFormProofOfWork(prev => ({ beforePhotos: backup }));
       alert('Gagal menghapus foto');
     } finally {
       setFormDeletingPhoto(null);
@@ -591,8 +553,7 @@ export default function AdminDashboard() {
 
     try {
       const cleanProofOfWork = {
-        beforePhotos: formProofOfWork.beforePhotos.filter(p => !p.publicId.startsWith('temp-')),
-        afterPhotos: formProofOfWork.afterPhotos.filter(p => !p.publicId.startsWith('temp-'))
+        beforePhotos: formProofOfWork.beforePhotos.filter(p => !p.publicId.startsWith('temp-'))
       };
 
       const response = await fetch('/api/orders', {
@@ -608,7 +569,7 @@ export default function AdminDashboard() {
           customerNotes: formData.customerNotes,
           estimatedPrice: estimatedPrice,
           status: 'pending',
-          proofOfWork: (cleanProofOfWork.beforePhotos.length > 0 || cleanProofOfWork.afterPhotos.length > 0) ? cleanProofOfWork : undefined
+          proofOfWork: cleanProofOfWork.beforePhotos.length > 0 ? cleanProofOfWork : undefined
         })
       });
 
@@ -637,7 +598,7 @@ export default function AdminDashboard() {
       quantity: 1,
       customerNotes: ''
     });
-    setFormProofOfWork({ beforePhotos: [], afterPhotos: [] });
+    setFormProofOfWork({ beforePhotos: [] });
     setFormUploadProgress(null);
     setFormUploading(null);
     setFormDeletingPhoto(null);
@@ -1075,7 +1036,7 @@ export default function AdminDashboard() {
                           {!photo.publicId.startsWith('temp-') && (
                             <button
                               type="button"
-                              onClick={() => handleFormDeletePhoto('before', photo.publicId)}
+                              onClick={() => handleFormDeletePhoto(photo.publicId)}
                               disabled={formDeletingPhoto === photo.publicId}
                               className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                             >
@@ -1095,7 +1056,7 @@ export default function AdminDashboard() {
                           type="file"
                           accept="image/*"
                           multiple
-                          onChange={(e) => e.target.files && handleFormImageUpload('before', e.target.files)}
+                          onChange={(e) => e.target.files && handleFormImageUpload(e.target.files)}
                           disabled={formUploading === 'before'}
                           className="hidden"
                         />
@@ -1103,68 +1064,6 @@ export default function AdminDashboard() {
                           <>
                             <div className="w-5 h-5 border-2 border-[#1152d4] border-t-transparent rounded-full animate-spin mb-1"></div>
                             {formUploadProgress && formUploadProgress.type === 'before' && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {formUploadProgress.current}/{formUploadProgress.total}
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <span className="material-symbols-outlined text-gray-400 text-2xl">add_photo_alternate</span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload</span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* After Photos */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Foto Sesudah</label>
-                    <div className="flex flex-wrap gap-3">
-                      {formProofOfWork.afterPhotos.map((photo, index) => (
-                        <div key={photo.publicId} className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 group">
-                          <img 
-                            src={photo.url} 
-                            alt={`After ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          {photo.publicId.startsWith('temp-') && (
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                          )}
-                          {!photo.publicId.startsWith('temp-') && (
-                            <button
-                              type="button"
-                              onClick={() => handleFormDeletePhoto('after', photo.publicId)}
-                              disabled={formDeletingPhoto === photo.publicId}
-                              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
-                            >
-                              {formDeletingPhoto === photo.publicId ? (
-                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
-                              ) : (
-                                <span className="material-symbols-outlined text-sm">close</span>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      
-                      {/* Upload Button */}
-                      <label className={`w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#1152d4] dark:hover:border-[#1152d4] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all ${formUploading === 'after' ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={(e) => e.target.files && handleFormImageUpload('after', e.target.files)}
-                          disabled={formUploading === 'after'}
-                          className="hidden"
-                        />
-                        {formUploading === 'after' ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-[#1152d4] border-t-transparent rounded-full animate-spin mb-1"></div>
-                            {formUploadProgress && formUploadProgress.type === 'after' && (
                               <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {formUploadProgress.current}/{formUploadProgress.total}
                               </span>
