@@ -59,14 +59,11 @@ export async function GET(request: NextRequest) {
             delivered: {
               $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] }
             },
+            pickedUp: {
+              $sum: { $cond: [{ $eq: ['$status', 'picked_up'] }, 1, 0] }
+            },
             finished: {
-              $sum: { 
-                $cond: [
-                  { $in: ['$status', ['finished', 'picked_up']] }, 
-                  1, 
-                  0
-                ] 
-              }
+              $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] }
             }
           }
         }
@@ -147,6 +144,7 @@ export async function GET(request: NextRequest) {
       pending: 0,
       inProgress: 0,
       delivered: 0,
+      pickedUp: 0,
       finished: 0
     };
 
@@ -181,6 +179,7 @@ export async function GET(request: NextRequest) {
         pending: kpiData.pending,
         inProgress: kpiData.inProgress,
         delivered: kpiData.delivered || 0,
+        pickedUp: kpiData.pickedUp || 0,
         finished: kpiData.finished,
         serviceDistribution: serviceDistributionWithColors,
         incomeTrend: incomeTrendFormatted,

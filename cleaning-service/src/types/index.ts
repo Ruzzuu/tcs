@@ -121,6 +121,7 @@ export interface DashboardData {
   pending: number;
   inProgress: number;
   delivered: number;
+  pickedUp: number;
   finished: number;
   unverified: number;
   serviceDistribution: Array<{

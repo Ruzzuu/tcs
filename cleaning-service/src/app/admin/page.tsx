@@ -681,6 +681,18 @@ export default function AdminDashboard() {
     { value: 'finished', label: 'Selesai', icon: 'check_circle' }
   ];
 
+  const getStatusCount = (status: OrderStatus | 'all'): number => {
+    if (status === 'all') return data?.total || 0;
+    switch (status) {
+      case 'pending': return data?.pending || 0;
+      case 'in_progress': return data?.inProgress || 0;
+      case 'delivered': return data?.delivered || 0;
+      case 'picked_up': return data?.pickedUp || 0;
+      case 'finished': return data?.finished || 0;
+      default: return 0;
+    }
+  };
+
   // Filter recent orders by search, date, and status
   const filteredOrders = data?.recentOrders.filter(order => {
     // Search filter
@@ -1260,7 +1272,7 @@ export default function AdminDashboard() {
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">{option.icon}</span>
-              <span className="text-sm font-medium">{option.label}</span>
+              <span className="text-sm font-medium">{option.label}({getStatusCount(option.value)})</span>
             </button>
           ))}
         </div>
