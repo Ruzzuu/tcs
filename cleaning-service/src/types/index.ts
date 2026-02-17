@@ -88,7 +88,7 @@ export type ServiceType =
   // Cleaning - Normal
   | 'Deepclean'
   | 'sandal'
-  | 'tas_ransel'
+  | 'deepclean_tas'  // Changed from 'tas_ransel'
   | 'tas_gunung'
   | 'topi'
   | 'helm'
