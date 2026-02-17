@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "npx ts-node --skip-project scripts/seed.ts",
-    "migrate:phones": "node --loader ts-node/esm scripts/migrate-phones.ts"
+    "migrate:phones": "node --loader ts-node/esm scripts/migrate-phones.ts",
+    "migrate:sepatu": "npx ts-node --skip-project scripts/migrate-sepatu-to-deepclean.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",

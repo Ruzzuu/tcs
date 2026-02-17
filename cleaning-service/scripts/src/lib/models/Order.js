@@ -46,7 +46,7 @@ var OrderItemSchema = new mongoose_1.Schema({
     serviceType: {
         type: String,
         required: true,
-        enum: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other']
+        enum: ['Deepclean', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other']
     },
     quantity: {
         type: Number,
@@ -112,7 +112,7 @@ var OrderSchema = new mongoose_1.Schema({
     itemType: {
         type: String,
         enum: {
-            values: ['sepatu', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'],
+            values: ['Deepclean', 'sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'],
             message: 'Jenis barang tidak valid'
         }
     },

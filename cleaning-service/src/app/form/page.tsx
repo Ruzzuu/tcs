@@ -454,7 +454,7 @@ export default function CustomerFormPage() {
                   value={item.notes || ''}
                   onChange={(e) => handleItemChange(item.id, 'notes', e.target.value)}
                   className="w-full min-h-[80px] p-3 rounded-xl border border-[#dbdfe6] dark:border-[#2a3441] bg-[#f6f6f8] dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-[#616f89] dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 focus:border-[#1152d4] transition-all resize-none text-sm"
-                  placeholder="Contoh: Noda tinta di bagian samping, tali sepatu diganti, dll..."
+                  placeholder="Contoh: Noda tinta di bagian samping, tali Deepclean diganti, dll..."
                 />
               </div>
 

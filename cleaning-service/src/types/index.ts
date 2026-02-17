@@ -84,14 +84,14 @@ export interface Order {
   archivedAt?: Date;
 }
 
-export type ServiceType = 
+export type ServiceType =
   // Cleaning - Normal
-  | 'sepatu' 
-  | 'sandal' 
-  | 'tas_ransel' 
-  | 'tas_gunung' 
-  | 'topi' 
-  | 'helm' 
+  | 'Deepclean'
+  | 'sandal'
+  | 'tas_ransel'
+  | 'tas_gunung'
+  | 'topi'
+  | 'helm'
   | 'one_day_service'
   // Treatment
   | 'unyellowing'

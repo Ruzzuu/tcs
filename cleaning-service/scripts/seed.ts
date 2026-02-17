@@ -15,10 +15,10 @@ const OrderSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String, required: true },
   address: { type: String, default: '' },
-  itemType: { 
-    type: String, 
+  itemType: {
+    type: String,
     required: true,
-    enum: ['sepatu', 'tas', 'helm', 'sofa', 'karpet', 'gorden']
+    enum: ['Deepclean', 'tas', 'helm', 'sofa', 'karpet', 'gorden']
   },
   quantity: { type: Number, required: true, min: 1, default: 1 },
   estimatedPrice: { type: Number, required: true },
@@ -52,7 +52,7 @@ const sampleOrders = [
     name: 'Budi Santoso',
     phone: '081234567890',
     address: 'Jl. Sudirman No. 10, Jakarta Selatan',
-    itemType: 'sepatu',
+    itemType: 'Deepclean',
     quantity: 2,
     estimatedPrice: 70000,
     status: 'pending',
@@ -124,7 +124,7 @@ const sampleOrders = [
     name: 'Andi Pratama',
     phone: '087890123456',
     address: 'Jl. Pondok Indah No. 20',
-    itemType: 'sepatu',
+    itemType: 'Deepclean',
     quantity: 3,
     estimatedPrice: 105000,
     finalPrice: 105000,

@@ -52,14 +52,14 @@ export function generateWhatsAppLink(phone: string, message?: string): string {
  * WhatsApp message templates
  */
 export const WA_TEMPLATES = {
-  newOrderVerification: (order: Order) => 
+  newOrderVerification: (order: Order) =>
     `Halo ${order.name}, terima kasih telah menghubungi ${BUSINESS_INFO.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
-  
+
   orderInProgress: (order: Order) =>
-    `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan sepatu ke *Teman Cuci Sepatu*.\n\nSaat ini sepatu Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,
-  
+    `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan Deepclean ke *Teman Cuci Sepatu*.\n\nSaat ini Deepclean Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,
+
   orderCompleted: (order: Order) =>
-    `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nSepatu Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice || 0)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan sepatu Kakak ke *Teman Cuci Sepatu*.`
+    `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nDeepclean Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice || 0)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan Deepclean Kakak ke *Teman Cuci Sepatu*.`
 };
 
 /**

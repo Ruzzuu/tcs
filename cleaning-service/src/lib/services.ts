@@ -7,9 +7,9 @@ import { ServiceConfig, ServiceType } from '@/types';
 
 export const SERVICES: Record<ServiceType, ServiceConfig> = {
   // Cleaning - Normal
-  sepatu: {
-    name: 'Sepatu',
-    nameEn: 'Shoes',
+  Deepclean: {
+    name: 'Deepclean',
+    nameEn: 'Deepclean',
     price: 35000,
     icon: 'steps'
   },
@@ -101,7 +101,7 @@ export const SERVICE_CATEGORIES = [
   {
     name: 'Cleaning',
     services: [
-      { value: 'sepatu', label: 'Sepatu', price: 35000 },
+      { value: 'Deepclean', label: 'Deepclean', price: 35000 },
       { value: 'sandal', label: 'Sandal', price: 25000 },
       { value: 'tas_ransel', label: 'Tas Ransel', price: 40000 },
       { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
@@ -143,7 +143,7 @@ export const SERVICE_OPTIONS = Object.entries(SERVICES).map(([key, value]) => ({
 
 // Color mapping for charts
 export const SERVICE_COLORS: Record<ServiceType, string> = {
-  sepatu: '#1152d4',
+  Deepclean: '#1152d4',
   sandal: '#3B82F6',
   tas_ransel: '#10B981',
   tas_gunung: '#059669',
