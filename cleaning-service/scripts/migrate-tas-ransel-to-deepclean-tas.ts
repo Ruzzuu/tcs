@@ -57,26 +57,19 @@ async function migrateTasRanselToDeepcleanTas() {
     // STEP 4: UPDATE MULTI-ITEM ORDERS (serviceType + price)
     let itemsUpdated = 0;
     if (multiItemCount > 0) {
-      // Find all orders with tas_ransel items
-      const ordersToUpdate = await Order.find({
-        'items.serviceType': OLD_VALUE
-      });
-
-      // Update each order individually to handle subtotal calculation
-      for (const order of ordersToUpdate) {
-        const hasTasRanselItem = order.items?.some(item => item.serviceType === 'deepclean_tas');
-        
-        if (hasTasRanselItem) {
-          // Update each item's serviceType and recalculate subtotal
-          const updatedItems = order.items!.map(item => {
-            if (item.serviceType === 'deepclean_tas') {
-              return {
-                ...item,
-                serviceType: NEW_VALUE,
-                unitPrice: NEW_PRICE,
-                subtotal: item.quantity * NEW_PRICE
-              };
-            }
+      // First, update all items with new serviceType
+      await Order.updateMany(
+        { 'items.serviceType': OLD_VALUE },
+        {
+          $set: {
+            'items.$[elem].serviceType': NEW_VALUE
+          }
+        }
+      );
+      itemsUpdated = result.modifiedCount;
+      console.log(`✅ Updated ${itemsUpdated} orders with items array: tas_ransel → deepclean_tas`);
+      console.log(`✅ Updated subtotals for ${itemsUpdated} orders with new price: Rp ${NEW_PRICE}`);
+    }
             return item;
           });
 

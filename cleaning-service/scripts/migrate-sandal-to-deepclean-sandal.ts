@@ -21,7 +21,7 @@ async function migrateSandalToDeepcleanSandal() {
     const OLD_VALUE = 'sandal';
     const NEW_VALUE = 'Deepclean_Sandal';
     const OLD_PRICE = 25000;
-    const NEW_PRICE = 25000;
+    const NEW_PRICE = 25000; // Same price
 
     // STEP 1: COUNT LEGACY ORDERS
     const legacyCount = await Order.countDocuments({ itemType: OLD_VALUE });
@@ -36,43 +36,47 @@ async function migrateSandalToDeepcleanSandal() {
       process.exit(0);
     }
 
-    // STEP 3: UPDATE LEGACY ORDERS (itemType + price)
+    // STEP 3: UPDATE LEGACY ORDERS (itemType)
     let legacyUpdated = 0;
     if (legacyCount > 0) {
       const result = await Order.updateMany(
         { itemType: OLD_VALUE },
-        {
-          $set: {
-            itemType: NEW_VALUE,
-            estimatedPrice: NEW_PRICE,
-            finalPrice: NEW_PRICE
-          }
-        }
+        { $set: { itemType: NEW_VALUE } }
       );
       legacyUpdated = result.modifiedCount;
       console.log(`✅ Updated ${legacyUpdated} legacy orders: sandal → Deepclean_Sandal`);
-      console.log(`✅ Updated price: Rp ${OLD_PRICE} → Rp ${NEW_PRICE}`);
+      console.log(`✅ Price unchanged: Rp ${OLD_PRICE}`);
     }
 
     // STEP 4: UPDATE MULTI-ITEM ORDERS (serviceType + price)
     let itemsUpdated = 0;
     if (multiItemCount > 0) {
-      const result = await Order.updateMany(
-        { 'items.serviceType': OLD_VALUE },
-        {
-          $set: {
-            'items.$[elem].serviceType': NEW_VALUE,
-            'items.$[elem].unitPrice': NEW_PRICE,
-            'items.$[elem].subtotal': { $multiply: ['$items.$[elem].quantity', NEW_PRICE] }
-          }
-        },
-        {
-          arrayFilters: [{ 'elem.serviceType': OLD_VALUE }]
+      // For each order with sandal items, update those specific items only
+      const ordersToUpdate = await Order.find({ 'items.serviceType': OLD_VALUE });
+      
+      for (const order of ordersToUpdate) {
+        // Find the specific items with itemType = 'sandal'
+        const sandalItems = order.items?.filter(item => item.serviceType === 'sandal') || [];
+        
+        if (sandalItems.length > 0) {
+          // Update only the sandal items (not other items)
+          const updatedItems = sandalItems.map(item => {
+            if (item.serviceType === 'sandal') {
+              return { ...item, serviceType: 'Deepclean_Sandal' };
+            }
+            return item;
+          });
+
+          await Order.updateOne(
+            { _id: order._id },
+            { $set: { items: updatedItems } }
+          );
+
+          itemsUpdated++;
         }
-      );
-      itemsUpdated = result.modifiedCount;
-      console.log(`✅ Updated ${itemsUpdated} orders with items array: sandal → Deepclean_Sandal`);
-      console.log(`✅ Updated prices: Rp ${OLD_PRICE} → Rp ${NEW_PRICE}`);
+      }
+      
+      console.log(`✅ Updated ${itemsUpdated} orders with sandal items → Deepclean_Sandal`);
     }
 
     // STEP 5: VERIFICATION
@@ -88,7 +92,7 @@ async function migrateSandalToDeepcleanSandal() {
     console.log(`   Duration: ${duration}s`);
     console.log(`   Legacy orders updated: ${legacyUpdated}`);
     console.log(`   Multi-item orders updated: ${itemsUpdated}`);
-    console.log(`   Total documents affected: ${Math.max(legacyUpdated, itemsUpdated)}`);
+    console.log(`   Total documents affected: ${legacyUpdated + itemsUpdated}`);
     console.log(`\n🔍 Verification:`);
     console.log(`   Before: sandal (${legacyCount + multiItemCount})`);
     console.log(`   After: Deepclean_Sandal (${newCount + itemsNewCount})`);
@@ -98,14 +102,14 @@ async function migrateSandalToDeepcleanSandal() {
     if (remainingLegacy === 0 && remainingItems === 0 && legacyCount === newCount && multiItemCount === itemsNewCount) {
       console.log('\n✨ Migration completed successfully!');
       console.log(`✅ All sandal values migrated to Deepclean_Sandal`);
-      console.log(`✅ Price updated: Rp ${OLD_PRICE} → Rp ${NEW_PRICE}`);
+      console.log(`✅ Price unchanged: Rp ${OLD_PRICE}`);
       console.log(`⏱️  Time taken: ${duration}s`);
       process.exit(0);
     } else {
       console.log('\n⚠️  Migration completed with warnings:');
-      console.log(`   Remaining sandal (itemType): ${remainingLegacy}`);
-      console.log(`   Remaining sandal (items.serviceType): ${remainingItems}`);
-      console.log(`   Expected: ${legacyCount} legacy + ${multiItemCount} orders`);
+      console.log(`   ${remainingLegacy} orders still have itemType = 'sandal'`);
+      console.log(`   ${remainingItems} items still have serviceType = 'sandal'`);
+      console.log(`   Expected: ${legacyCount} legacy + multiItemCount} orders`);
       console.log(`   Got: ${newCount} + itemsNewCount} total`);
       process.exit(1);
     }
