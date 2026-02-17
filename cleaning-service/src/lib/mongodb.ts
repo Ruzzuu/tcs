@@ -5,13 +5,6 @@
 
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  // In development, we'll use a fallback for testing
-  console.warn('Warning: MONGODB_URI not defined. Using local MongoDB.');
-}
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -35,6 +28,14 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
+    // Read MONGODB_URI at runtime, not module load time
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (!MONGODB_URI) {
+      // In development, we'll use a fallback for testing
+      console.warn('Warning: MONGODB_URI not defined. Using local MongoDB.');
+    }
+
     const uri = MONGODB_URI || 'mongodb://localhost:27017/cleaning-service';
     
     const opts = {

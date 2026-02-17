@@ -2,6 +2,9 @@
 // MIGRATE SEPATU TO DEEPCLEAN
 // ============================================
 
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import connectDB from '../src/lib/mongodb';
 import Order from '../src/lib/models/Order';
 
