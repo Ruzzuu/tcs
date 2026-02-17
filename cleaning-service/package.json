@@ -9,9 +9,9 @@
     "lint": "eslint",
     "seed": "npx ts-node --skip-project scripts/seed.ts",
     "migrate:phones": "node --loader ts-node/esm scripts/migrate-phones.ts",
-    "migrate:sepatu": "npx ts-node --skip-project scripts/migrate-sepatu-to-deepclean.ts",
+    "migrate:sepatu": "npx tsx scripts/migrate-sepatu-to-deepclean.ts",
     "migrate:tas-ransel": "npx tsx scripts/migrate-tas-ransel-to-deepclean-tas.ts",
-    "update:deepclean-tas-price": "npx tsx scripts/update-deepclean-tas-price.ts"
+    "migrate:sandal": "npx tsx scripts/migrate-sandal-to-deepclean-sandal.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",

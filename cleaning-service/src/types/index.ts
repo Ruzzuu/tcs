@@ -87,8 +87,7 @@ export interface Order {
 export type ServiceType =
   // Cleaning - Normal
   | 'Deepclean'
-  | 'sandal'
-  | 'deepclean_tas'  // Changed from 'tas_ransel'
+  | 'Deepclean_Sandal'  // Changed from 'sandal'
   | 'tas_gunung'
   | 'topi'
   | 'helm'

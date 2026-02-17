@@ -9,7 +9,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
   // Cleaning - Normal
   Deepclean: {
     name: 'Deepclean',
-    nameEn: 'Deepclean',
+    nameEn: 'Deepclean Backpack',
     price: 35000,
     icon: 'steps'
   },
@@ -18,12 +18,6 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     nameEn: 'Sandals',
     price: 25000,
     icon: 'footprint'
-  },
-  deepclean_tas: {
-    name: 'Deepclean Tas',
-    nameEn: 'Deepclean Backpack',
-    price: 45000,
-    icon: 'backpack'
   },
   tas_gunung: {
     name: 'Tas Gunung',
@@ -103,7 +97,6 @@ export const SERVICE_CATEGORIES = [
     services: [
       { value: 'Deepclean', label: 'Deepclean', price: 35000 },
       { value: 'sandal', label: 'Sandal', price: 25000 },
-      { value: 'deepclean_tas', label: 'Deepclean Tas', price: 45000 },
       { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
       { value: 'topi', label: 'Topi', price: 25000 },
       { value: 'helm', label: 'Helm', price: 30000 },
@@ -158,85 +151,3 @@ export const SERVICE_COLORS: Record<ServiceType, string> = {
   repaint_suede: '#0EA5E9',
   other: '#6B7280'
 };
-
-// Business Info
-export const BUSINESS_INFO = {
-  name: 'Cuci Premium',
-  tagline: 'Layanan Cuci Premium',
-  address: 'Jl. Contoh No. 123, Jakarta',
-  phone: '081234567890', // Replace with actual phone
-  whatsapp: '6281234567890' // Replace with actual WhatsApp (with country code)
-};
-
-// ============================================
-// PRICING INTERFACES & HELPERS
-// ============================================
-
-export type ServiceKey = ServiceType;
-
-export interface ServiceSelection {
-  serviceKey: ServiceKey;
-  quantity: number;
-  price: number; // Price at time of order
-}
-
-export interface PricingResult {
-  subtotal: number;
-  discountAmount: number;
-  total: number;
-}
-
-export interface Discount {
-  type: 'percentage' | 'fixed';
-  value: number;
-}
-
-/**
- * Calculate subtotal from service selections
- */
-export function calculateSubtotal(items: ServiceSelection[]): number {
-  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-}
-
-/**
- * Calculate total with optional discount
- * @param items - Array of service selections with price and quantity
- * @param discount - Optional discount object with type and value
- * @returns PricingResult with subtotal, discountAmount, and total
- */
-export function calculateTotal(items: ServiceSelection[], discount?: Discount | null): PricingResult {
-  const subtotal = calculateSubtotal(items);
-  let discountAmount = 0;
-
-  if (discount) {
-    if (discount.type === 'percentage') {
-      // Percentage discount (0-100)
-      const percentage = Math.max(0, Math.min(100, discount.value));
-      discountAmount = Math.round((subtotal * percentage) / 100);
-    } else if (discount.type === 'fixed') {
-      // Fixed amount discount
-      discountAmount = Math.max(0, discount.value);
-    }
-  }
-
-  // Ensure total never goes below 0
-  const total = Math.max(0, subtotal - discountAmount);
-
-  return {
-    subtotal,
-    discountAmount,
-    total,
-  };
-}
-
-/**
- * Format amount to Indonesian Rupiah
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
