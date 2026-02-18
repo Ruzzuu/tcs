@@ -230,7 +230,7 @@ button:active {
     -webkit-transform: translateZ(0);
   }
 
-  [class*="date-display"] {
+  .date-display {
     -webkit-transform: translateZ(0) !important;
     -webkit-backface-visibility: visible !important;
     -webkit-font-smoothing: antialiased !important;
