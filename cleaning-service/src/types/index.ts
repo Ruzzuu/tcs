@@ -73,7 +73,17 @@ export type ServiceType =
   | 'deepclean_bag_large'
   | 'one_day_service'
   | 'unyellowing'
-  | 'sewing';
+  | 'sewing'
+  | 'sewing_dan_cuci'
+  | 'deepclean_kids'
+  | 'deepclean_topi'
+  | 'deepclean_fantofel'
+  | 'deepclean_member'
+  | 'deepclean_helm'
+  | 'whitening'
+  | 'repaint_leather'
+  | 'repaint_canvas'
+  | 'repaint_suede';
 
 export type OrderStatus = 'pending' | 'in_progress' | 'finished' | 'delivered' | 'picked_up' | 'rejected';
 
