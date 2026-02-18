@@ -223,9 +223,56 @@ button:active {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Mobile WebKit Date Input Fixes */
+@media screen and (max-width: 768px) {
+  input[type="date"] {
+    -webkit-appearance: none;
+    -webkit-transform: translateZ(0);
+  }
+
+  [class*="date-display"] {
+    -webkit-transform: translateZ(0) !important;
+    -webkit-backface-visibility: visible !important;
+    -webkit-font-smoothing: antialiased !important;
+  }
+
+  .date-display-overlay {
+    opacity: 1 !important;
+    -webkit-opacity: 1 !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: #111318 !important;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  }
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #1a2230 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill {
+  background-color: #1a2230 !important;
+}
+
+.dark input:-webkit-autofill::selection {
+  background-color: #1152d4 !important;
+  color: #ffffff !important;
+}
+
 /* ============================================
-   CUSTOM SCROLLBAR - Thin & Elegant
-   ============================================ */
+    CUSTOM SCROLLBAR - Thin & Elegant
+    ============================================ */
 
 /* Custom scrollbar for horizontal scroll containers */
 .custom-scrollbar {
