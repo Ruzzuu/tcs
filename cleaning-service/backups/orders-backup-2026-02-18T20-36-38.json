@@ -1,0 +1,4536 @@
+[
+  {
+    "_id": "6968d056856f65e76eb72f78",
+    "orderNumber": "ORD-MKFDEGGJ-EPZ",
+    "name": "Rendi",
+    "phone": "085859461424",
+    "address": "Jl.Kemanggisan no 10",
+    "itemType": "helm",
+    "quantity": 1,
+    "estimatedPrice": 30000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-15T11:42:24.385Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "notes": "",
+    "createdAt": "2026-01-15T11:32:39.004Z",
+    "updatedAt": "2026-01-22T21:58:44.041Z",
+    "__v": 0,
+    "discount": {
+      "type": "percentage",
+      "value": 60
+    },
+    "finalPrice": 12000,
+    "subtotal": 30000,
+    "expireAt": "2026-02-21T10:22:59.366Z",
+    "finishedAt": "2026-01-22T10:22:59.366Z",
+    "customerNotes": "",
+    "deleted": true,
+    "rekapId": "6971fa8557c3a9335818e0bf",
+    "archivedAt": "2026-01-22T21:58:44.041Z"
+  },
+  {
+    "_id": "697098f90a8fe2d650fcd797",
+    "orderNumber": "ORD-MKNT3Z35-VUW",
+    "name": "feafaewaefw",
+    "phone": "08123123123",
+    "address": "afeafaew",
+    "items": [
+      {
+        "id": "item-1768986873185-wjlkmasw4",
+        "serviceType": "repaint_leather",
+        "quantity": 1,
+        "unitPrice": 75000,
+        "subtotal": 75000,
+        "notes": "",
+        "createdAt": "2026-01-21T09:14:33.185Z",
+        "_id": "697098f90a8fe2d650fcd798"
+      },
+      {
+        "id": "item-1768986875310-ksezyxbs2",
+        "serviceType": "repaint_suede",
+        "quantity": 1,
+        "unitPrice": 75000,
+        "subtotal": 75000,
+        "notes": "",
+        "createdAt": "2026-01-21T09:14:35.310Z",
+        "_id": "697098fb3285d92757d0ec35"
+      },
+      {
+        "id": "item-1768986875359-3azcyqxbn",
+        "serviceType": "whitening",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-21T09:14:35.359Z",
+        "_id": "697098fbfc3feb7343824fef"
+      }
+    ],
+    "estimatedPrice": 200000,
+    "subtotal": 200000,
+    "finalPrice": 200000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-21T09:14:52.593Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988768148?_a=BAMAAARk0",
+          "publicId": "cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988768148",
+          "_id": "6970a09ff0abab2d2e04edec"
+        },
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988780175?_a=BAMAAARk0",
+          "publicId": "cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988780175",
+          "_id": "6970a09ff0abab2d2e04eded"
+        },
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988806519?_a=BAMAAARk0",
+          "publicId": "cleaning-app/orders/before/697098f90a8fe2d650fcd797_1768988806519",
+          "_id": "6970a09ff0abab2d2e04edef"
+        }
+      ],
+      "afterPhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/after/697098f90a8fe2d650fcd797_1768988776100?_a=BAMAAARk0",
+          "publicId": "cleaning-app/orders/after/697098f90a8fe2d650fcd797_1768988776100",
+          "_id": "6970a09ff0abab2d2e04ede8"
+        }
+      ]
+    },
+    "customerNotes": "",
+    "notes": "",
+    "createdAt": "2026-01-21T09:14:33.192Z",
+    "updatedAt": "2026-02-18T07:01:37.803Z",
+    "__v": 0,
+    "expireAt": "2026-02-20T09:47:11.448Z",
+    "finishedAt": "2026-01-21T09:47:11.448Z",
+    "archivedAt": "2026-01-22T22:28:22.824Z",
+    "deleted": true
+  },
+  {
+    "_id": "6971de01d2cb3b46296643ff",
+    "orderNumber": "ORD-REKAP-001",
+    "name": "Budi Santoso",
+    "phone": "081234567890",
+    "address": "Jl. Merdeka No. 123",
+    "items": [
+      {
+        "id": "item-1",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "Deep clean",
+        "_id": "6971de01d2cb3b4629664400",
+        "createdAt": "2026-01-22T08:21:21.839Z"
+      }
+    ],
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T08:21:21.525Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "finishedAt": "2026-01-22T08:21:21.846Z",
+    "deleted": true,
+    "createdAt": "2026-01-15T08:21:21.525Z",
+    "updatedAt": "2026-02-18T07:01:37.837Z",
+    "expireAt": "2026-02-21T08:21:21.846Z",
+    "__v": 0,
+    "rekapId": "6971de01d2cb3b4629664404",
+    "archivedAt": "2026-01-22T21:58:46.436Z"
+  },
+  {
+    "_id": "6971de02d2cb3b4629664409",
+    "orderNumber": "ORD-REKAP-002",
+    "name": "Siti Nurhaliza",
+    "phone": "081298765432",
+    "address": "Jl. Sudirman No. 456",
+    "items": [
+      {
+        "id": "item-1",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 50000,
+        "createdAt": "2026-01-22T08:21:22.028Z",
+        "_id": "6971de02d2cb3b462966440a"
+      }
+    ],
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T08:21:21.525Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "finishedAt": "2026-01-22T08:21:22.029Z",
+    "deleted": true,
+    "createdAt": "2026-01-17T08:21:21.525Z",
+    "updatedAt": "2026-02-18T07:14:32.454Z",
+    "expireAt": "2026-02-21T08:21:22.029Z",
+    "__v": 0,
+    "rekapId": "6971de02d2cb3b462966440e",
+    "archivedAt": "2026-01-22T21:58:40.443Z"
+  },
+  {
+    "_id": "6971de02d2cb3b4629664413",
+    "orderNumber": "ORD-REKAP-003",
+    "name": "Ahmad Dahlan",
+    "phone": "081345678901",
+    "address": "Jl. Gatot Subroto No. 789",
+    "items": [
+      {
+        "id": "item-1",
+        "serviceType": "helm",
+        "quantity": 3,
+        "unitPrice": 25000,
+        "subtotal": 75000,
+        "_id": "6971de02d2cb3b4629664414",
+        "createdAt": "2026-01-22T08:21:22.132Z"
+      }
+    ],
+    "subtotal": 75000,
+    "finalPrice": 75000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T08:21:21.525Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "finishedAt": "2026-01-22T08:21:22.133Z",
+    "deleted": true,
+    "createdAt": "2026-01-19T08:21:21.525Z",
+    "updatedAt": "2026-02-18T07:01:37.904Z",
+    "expireAt": "2026-02-21T08:21:22.133Z",
+    "__v": 0,
+    "rekapId": "6971de02d2cb3b4629664417",
+    "archivedAt": "2026-01-22T21:58:36.169Z"
+  },
+  {
+    "_id": "6971fec2523d3b703fb49b2b",
+    "orderNumber": "ORD-MKPBN52D-ZU7",
+    "name": "Tres",
+    "phone": "085859461424",
+    "address": "Jl.jambu",
+    "items": [
+      {
+        "id": "item-1769078466661-yce8erqmy",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:06.661Z",
+        "_id": "6971fec2523d3b703fb49b2c"
+      },
+      {
+        "id": "item-1769078468660-usll8flp2",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:08.660Z",
+        "_id": "6971fec4523d3b703fb49b2f"
+      },
+      {
+        "id": "item-1769078468105-ss2ny81my",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:08.105Z",
+        "_id": "6971fec5bcca4b79c083e08b"
+      },
+      {
+        "id": "item-1769078468133-7ss5uf4it",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:08.133Z",
+        "_id": "6971fec5034cac82e8cbb8b1"
+      },
+      {
+        "id": "item-1769078468649-m4i4u3t5l",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:08.649Z",
+        "_id": "6971fec6bcca4b79c083e096"
+      },
+      {
+        "id": "item-1769078468646-x0dswt2gs",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:08.646Z",
+        "_id": "6971fec6034cac82e8cbb8be"
+      },
+      {
+        "id": "item-1769078470101-39pz9250r",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.101Z",
+        "_id": "6971fec6bcca4b79c083e099"
+      },
+      {
+        "id": "item-1769078470110-jmt6avl8b",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.111Z",
+        "_id": "6971fec6523d3b703fb49b36"
+      },
+      {
+        "id": "item-1769078470091-xzql5nnvm",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.092Z",
+        "_id": "6971fec6034cac82e8cbb8c1"
+      },
+      {
+        "id": "item-1769078470276-psrqznlst",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.276Z",
+        "_id": "6971fec6523d3b703fb49b39"
+      },
+      {
+        "id": "item-1769078470450-jp8s9dftw",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.450Z",
+        "_id": "6971fec6523d3b703fb49b45"
+      },
+      {
+        "id": "item-1769078470274-jrr768s5r",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.274Z",
+        "_id": "6971fec6034cac82e8cbb8cc"
+      },
+      {
+        "id": "item-1769078470578-uh4fc32cy",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.578Z",
+        "_id": "6971fec6bcca4b79c083e0af"
+      },
+      {
+        "id": "item-1769078470447-qbpvpdz1d",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.447Z",
+        "_id": "6971fec6bcca4b79c083e0ad"
+      },
+      {
+        "id": "item-1769078470456-x7tyhtryx",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.456Z",
+        "_id": "6971fec6034cac82e8cbb8d9"
+      },
+      {
+        "id": "item-1769078470747-yt9s9b7ek",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.747Z",
+        "_id": "6971fec6bcca4b79c083e0b1"
+      },
+      {
+        "id": "item-1769078470750-jx71h3cp2",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.750Z",
+        "_id": "6971fec6523d3b703fb49b60"
+      },
+      {
+        "id": "item-1769078470577-i2w2su7hx",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.577Z",
+        "_id": "6971fec6034cac82e8cbb8e8"
+      },
+      {
+        "id": "item-1769078469913-c09yoakan",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:09.913Z",
+        "_id": "6971fec7bcca4b79c083e0e1"
+      },
+      {
+        "id": "item-1769078469912-i62ejgmzk",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:09.912Z",
+        "_id": "6971fec7034cac82e8cbb90d"
+      },
+      {
+        "id": "item-1769078469933-lw87d26yb",
+        "serviceType": "repaint_leather",
+        "quantity": 2,
+        "unitPrice": 75000,
+        "subtotal": 150000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:09.933Z",
+        "_id": "6971fec7034cac82e8cbb90f"
+      },
+      {
+        "id": "item-1769078470279-bc4764qvd",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.279Z",
+        "_id": "6971fec7bcca4b79c083e0f7"
+      },
+      {
+        "id": "item-1769078470577-3y5z1eags",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.577Z",
+        "_id": "6971fec8523d3b703fb49b75"
+      },
+      {
+        "id": "item-1769078470736-7cpa91nu8",
+        "serviceType": "tas_gunung",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-22T10:41:10.736Z",
+        "_id": "6971fec8523d3b703fb49b77"
+      }
+    ],
+    "itemType": "tas_gunung",
+    "quantity": 2,
+    "estimatedPrice": 2320000,
+    "subtotal": 2360000,
+    "finalPrice": 2355000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T11:31:17.760Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T10:41:06.669Z",
+    "updatedAt": "2026-02-18T07:14:32.506Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T13:42:39.557Z",
+    "finishedAt": "2026-01-23T13:42:39.557Z",
+    "rekapId": "69737ad048fd520e5aad4119",
+    "discount": {
+      "type": "fixed",
+      "value": 5000
+    },
+    "archivedAt": "2026-01-27T17:36:15.238Z"
+  },
+  {
+    "_id": "6972a046328506718e3e4e42",
+    "orderNumber": "ORD-MKQ09DH6-V7A",
+    "name": "Test Complete Delete",
+    "phone": "081999888666",
+    "address": "Jl. Test Complete No. 888",
+    "items": [
+      {
+        "id": "item-1769119814777-r39svpbvb",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "Test completed order",
+        "createdAt": "2026-01-22T22:10:14.777Z",
+        "_id": "6972a046328506718e3e4e43"
+      }
+    ],
+    "itemType": "Deepclean_Tas",
+    "quantity": 1,
+    "estimatedPrice": 45000,
+    "subtotal": 45000,
+    "finalPrice": 45000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test completed order",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:10:14.782Z",
+    "updatedAt": "2026-02-18T07:01:37.970Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:10:14.840Z",
+    "finishedAt": "2026-01-22T22:10:14.840Z",
+    "rekapId": "6972a046328506718e3e4e48",
+    "archivedAt": "2026-01-22T22:10:15.550Z"
+  },
+  {
+    "_id": "6972a5463e8bd491b2a24939",
+    "orderNumber": "ORD-MKQ10SWV-XUK",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769121094493-88k8oipj7",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T22:31:34.493Z",
+        "_id": "6972a5463e8bd491b2a2493a"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:31:34.502Z",
+    "updatedAt": "2026-02-18T07:01:38.002Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:31:34.687Z",
+    "finishedAt": "2026-01-22T22:31:34.687Z",
+    "rekapId": "6972a5463e8bd491b2a2493f",
+    "archivedAt": "2026-01-22T22:31:34.877Z"
+  },
+  {
+    "_id": "6972a5f2183985ca0867d1b8",
+    "orderNumber": "ORD-MKQ14HU4-CKC",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769121266762-fxp8kebd8",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T22:34:26.762Z",
+        "_id": "6972a5f2183985ca0867d1b9"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:34:26.778Z",
+    "updatedAt": "2026-02-18T07:01:38.035Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:34:28.002Z",
+    "finishedAt": "2026-01-22T22:34:28.002Z",
+    "rekapId": "6972a5f4183985ca0867d1be",
+    "archivedAt": "2026-01-22T22:34:28.207Z"
+  },
+  {
+    "_id": "6972a78c183985ca0867d1db",
+    "orderNumber": "ORD-MKQ1DA3P-FTZ",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769121676643-661voty7k",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T22:41:16.643Z",
+        "_id": "6972a78c183985ca0867d1dc"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:41:16.647Z",
+    "updatedAt": "2026-02-18T07:01:38.069Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:41:16.799Z",
+    "finishedAt": "2026-01-22T22:41:16.799Z",
+    "rekapId": "6972a78c183985ca0867d1e1",
+    "archivedAt": "2026-01-22T22:41:16.980Z"
+  },
+  {
+    "_id": "6972a94b183985ca0867d20f",
+    "orderNumber": "ORD-MKQ1MUL7-CZE",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769122123097-r6skegi6r",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T22:48:43.097Z",
+        "_id": "6972a94b183985ca0867d210"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:48:43.104Z",
+    "updatedAt": "2026-02-18T07:01:38.101Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:48:43.265Z",
+    "finishedAt": "2026-01-22T22:48:43.265Z",
+    "rekapId": "6972a94b183985ca0867d215",
+    "archivedAt": "2026-01-22T22:48:43.471Z"
+  },
+  {
+    "_id": "6972a9bd183985ca0867d235",
+    "orderNumber": "ORD-MKQ1PB1A-5YN",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769122237724-ddlxp6roz",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T22:50:37.724Z",
+        "_id": "6972a9bd183985ca0867d236"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T22:50:37.728Z",
+    "updatedAt": "2026-02-18T07:01:38.133Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T22:50:37.874Z",
+    "finishedAt": "2026-01-22T22:50:37.874Z",
+    "rekapId": "6972a9bd183985ca0867d23b",
+    "archivedAt": "2026-01-22T22:50:38.100Z"
+  },
+  {
+    "_id": "6972ac99183985ca0867d25f",
+    "orderNumber": "ORD-MKQ24ZUE-OA4",
+    "name": "Test Soft Delete",
+    "phone": "081999000111",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769122969716-61dwewax4",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Test",
+        "createdAt": "2026-01-22T23:02:49.716Z",
+        "_id": "6972ac99183985ca0867d260"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "unverified"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Test",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T23:02:49.721Z",
+    "updatedAt": "2026-02-18T07:01:38.166Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T23:02:49.774Z",
+    "finishedAt": "2026-01-22T23:02:49.774Z",
+    "rekapId": "6972ac99183985ca0867d265",
+    "archivedAt": "2026-01-22T23:02:49.956Z"
+  },
+  {
+    "_id": "6972aed1183985ca0867d27f",
+    "orderNumber": "ORD-MKQ2H5KD-W2Z",
+    "name": "Test Customer",
+    "phone": "081234567890",
+    "address": "Jl. Test No. 123",
+    "items": [
+      {
+        "id": "item-1769123537002-pypafjxrx",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "Clean carefully",
+        "createdAt": "2026-01-22T23:12:17.002Z",
+        "_id": "6972aed1183985ca0867d280"
+      },
+      {
+        "id": "item-1769123537002-t82ad7skb",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T23:12:17.002Z",
+        "_id": "6972aed1183985ca0867d281"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 110000,
+    "subtotal": 115000,
+    "finalPrice": 115000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T23:12:18.235Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Clean carefully",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T23:12:17.008Z",
+    "updatedAt": "2026-02-18T07:14:32.539Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T23:12:18.291Z",
+    "finishedAt": "2026-01-22T23:12:18.291Z",
+    "rekapId": "6972aed2183985ca0867d28b",
+    "archivedAt": "2026-01-22T23:12:18.484Z"
+  },
+  {
+    "_id": "6972b06d183985ca0867d294",
+    "orderNumber": "ORD-MKQ2PZO6-OX1",
+    "name": "Test Customer",
+    "phone": "081234567890",
+    "address": "Jl. Test No. 123",
+    "items": [
+      {
+        "id": "item-1769123949266-rzmxewkbi",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "Clean carefully",
+        "createdAt": "2026-01-22T23:19:09.266Z",
+        "_id": "6972b06d183985ca0867d295"
+      },
+      {
+        "id": "item-1769123949266-ysk4rkysg",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-22T23:19:09.266Z",
+        "_id": "6972b06d183985ca0867d296"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 110000,
+    "subtotal": 115000,
+    "finalPrice": 115000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-22T23:19:09.444Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Clean carefully",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-22T23:19:09.274Z",
+    "updatedAt": "2026-02-18T07:14:32.573Z",
+    "__v": 0,
+    "expireAt": "2026-02-21T23:19:09.503Z",
+    "finishedAt": "2026-01-22T23:19:09.503Z",
+    "rekapId": "6972b06d183985ca0867d2a0",
+    "archivedAt": "2026-01-22T23:19:09.701Z"
+  },
+  {
+    "_id": "6973db4123be872708af1102",
+    "orderNumber": "ORD-MKRC9NJ6-TXV",
+    "name": "Test Dashboard User",
+    "phone": "081234567890",
+    "address": "Test Address",
+    "items": [
+      {
+        "id": "item-1769200449378-47ijgryui",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "createdAt": "2026-01-23T20:34:09.378Z",
+        "_id": "6973db4123be872708af1103"
+      },
+      {
+        "id": "item-1769200449378-ogjt274nn",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "createdAt": "2026-01-23T20:34:09.378Z",
+        "_id": "6973db4123be872708af1104"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 110000,
+    "subtotal": 115000,
+    "finalPrice": 115000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T20:34:09.533Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T20:34:09.383Z",
+    "updatedAt": "2026-02-18T07:14:32.605Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T20:34:09.862Z",
+    "finishedAt": "2026-01-23T20:34:09.862Z",
+    "rekapId": "6973db4123be872708af1128",
+    "archivedAt": "2026-01-23T20:34:10.821Z"
+  },
+  {
+    "_id": "6973f75323be872708af1222",
+    "orderNumber": "ORD-MKRGJO22-P8Q",
+    "name": "Status Test",
+    "phone": "081234567009",
+    "address": "Jl Test",
+    "items": [
+      {
+        "id": "item-1769207635081-3yrr7f7if",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "createdAt": "2026-01-23T22:33:55.081Z",
+        "_id": "6973f75323be872708af1223"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T22:33:55.166Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T22:33:55.084Z",
+    "updatedAt": "2026-02-18T07:01:38.296Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T22:33:55.447Z",
+    "finishedAt": "2026-01-23T22:33:55.447Z",
+    "rekapId": "6973f75323be872708af1232",
+    "archivedAt": "2026-01-23T22:33:55.680Z"
+  },
+  {
+    "_id": "6973f75423be872708af1256",
+    "orderNumber": "ORD-MKRGJOYP-JMJ",
+    "name": "Delete Revenue Test",
+    "phone": "081234567011",
+    "address": "Jl Test",
+    "items": [
+      {
+        "id": "item-1769207636257-tno3k112h",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "createdAt": "2026-01-23T22:33:56.257Z",
+        "_id": "6973f75423be872708af1257"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T22:33:56.366Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T22:33:56.259Z",
+    "updatedAt": "2026-02-18T07:01:38.328Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T22:33:56.418Z",
+    "finishedAt": "2026-01-23T22:33:56.418Z",
+    "rekapId": "6973f75423be872708af125f",
+    "archivedAt": "2026-01-23T22:33:56.605Z"
+  },
+  {
+    "_id": "6973fce8f4f95eea831d2e58",
+    "orderNumber": "ORD-MKRHEB9R-HBP",
+    "name": "Test Production 1769209063230",
+    "phone": "081234567890",
+    "address": "Jl Test Production Server",
+    "items": [
+      {
+        "id": "item-1769209064847-c8dlz60cp",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "createdAt": "2026-01-23T22:57:44.847Z",
+        "_id": "6973fce8f4f95eea831d2e59"
+      },
+      {
+        "id": "item-1769209064847-fuym1czfy",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "createdAt": "2026-01-23T22:57:44.847Z",
+        "_id": "6973fce8f4f95eea831d2e5a"
+      },
+      {
+        "id": "item-1769209064847-cdjqywmwi",
+        "serviceType": "helm",
+        "quantity": 3,
+        "unitPrice": 30000,
+        "subtotal": 90000,
+        "createdAt": "2026-01-23T22:57:44.847Z",
+        "_id": "6973fce8f4f95eea831d2e5b"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 6,
+    "estimatedPrice": 200000,
+    "subtotal": 205000,
+    "finalPrice": 205000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T22:57:46.644Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T22:57:44.852Z",
+    "updatedAt": "2026-02-18T07:14:32.638Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T22:57:56.286Z",
+    "finishedAt": "2026-01-23T22:57:56.286Z",
+    "rekapId": "6973fcf4f4f95eea831d2e9d",
+    "archivedAt": "2026-01-23T22:57:59.240Z"
+  },
+  {
+    "_id": "6973fdf023be872708af12ee",
+    "orderNumber": "ORD-MKRHJYOG-LEN",
+    "name": "Test Status 1769209328454",
+    "phone": "081234567890",
+    "address": "Jl Test",
+    "items": [
+      {
+        "id": "item-1769209328463-cos2cxq83",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "createdAt": "2026-01-23T23:02:08.463Z",
+        "_id": "6973fdf023be872708af12ef"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "picked_up",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T23:02:08.569Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T23:02:08.467Z",
+    "updatedAt": "2026-02-18T07:01:38.393Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T23:02:08.694Z",
+    "finishedAt": "2026-01-23T23:02:08.694Z",
+    "rekapId": "6973fdf023be872708af12f9",
+    "archivedAt": "2026-01-23T23:02:09.304Z"
+  },
+  {
+    "_id": "6973fe51069fe973a53fa7a0",
+    "orderNumber": "ORD-MKRHM1L4-YF2",
+    "name": "Test Production 1769209423959",
+    "phone": "081234567890",
+    "address": "Jl Test Production Server",
+    "items": [
+      {
+        "id": "item-1769209425544-owvwi20pv",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "createdAt": "2026-01-23T23:03:45.544Z",
+        "_id": "6973fe51069fe973a53fa7a1"
+      },
+      {
+        "id": "item-1769209425544-kbd10mgq9",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "createdAt": "2026-01-23T23:03:45.544Z",
+        "_id": "6973fe51069fe973a53fa7a2"
+      },
+      {
+        "id": "item-1769209425544-ivqoizmlk",
+        "serviceType": "helm",
+        "quantity": 3,
+        "unitPrice": 30000,
+        "subtotal": 90000,
+        "createdAt": "2026-01-23T23:03:45.544Z",
+        "_id": "6973fe51069fe973a53fa7a3"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 6,
+    "estimatedPrice": 200000,
+    "subtotal": 205000,
+    "finalPrice": 205000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-23T23:03:47.336Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-23T23:03:45.551Z",
+    "updatedAt": "2026-02-18T07:14:32.676Z",
+    "__v": 0,
+    "expireAt": "2026-02-22T23:03:57.233Z",
+    "finishedAt": "2026-01-23T23:03:57.233Z",
+    "rekapId": "6973fe5d069fe973a53fa7e5",
+    "archivedAt": "2026-01-23T23:04:00.733Z"
+  },
+  {
+    "_id": "697477dbbfbf07f45c42ebbd",
+    "orderNumber": "ORD-MKS04XB5-62F",
+    "name": "Yiiyiy",
+    "phone": "08523352525",
+    "address": "Ggg",
+    "items": [
+      {
+        "id": "item-1769240539553-pzveqrweh",
+        "serviceType": "unyellowing",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-24T07:42:19.553Z",
+        "_id": "697477dbbfbf07f45c42ebbe"
+      },
+      {
+        "id": "item-1769240539553-91ljvz3ra",
+        "serviceType": "unyellowing",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-24T07:42:19.553Z",
+        "_id": "697477dbbfbf07f45c42ebbf"
+      },
+      {
+        "id": "item-1769240539553-fmph8sq68",
+        "serviceType": "whitening",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-24T07:42:19.553Z",
+        "_id": "697477dbbfbf07f45c42ebc0"
+      }
+    ],
+    "itemType": "unyellowing",
+    "quantity": 3,
+    "estimatedPrice": 150000,
+    "subtotal": 150000,
+    "finalPrice": 125000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-24T07:42:33.612Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-24T07:42:19.571Z",
+    "updatedAt": "2026-02-18T07:01:38.461Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 25000
+    },
+    "expireAt": "2026-02-23T07:43:57.425Z",
+    "finishedAt": "2026-01-24T07:43:57.425Z",
+    "rekapId": "6974783dbfbf07f45c42ebfc",
+    "archivedAt": "2026-01-24T07:44:21.415Z"
+  },
+  {
+    "_id": "6977414331094a549ab2e143",
+    "orderNumber": "ORD-MKV0VCWF-9UL",
+    "name": "Marcgela",
+    "phone": "082171079434",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769423171343-j8ato4qz1",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-01-26T10:26:11.343Z",
+        "_id": "6977414331094a549ab2e144"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-26T10:26:30.341Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-26T10:26:11.357Z",
+    "updatedAt": "2026-02-18T07:01:38.494Z",
+    "__v": 0,
+    "expireAt": "2026-02-25T10:27:17.860Z",
+    "finishedAt": "2026-01-26T10:27:17.860Z",
+    "rekapId": "697741865885e1105846a7e2"
+  },
+  {
+    "_id": "6977c733a7e3a10429149b08",
+    "orderNumber": "ORD-MKVLA9H0-UPC",
+    "name": "Fai",
+    "phone": "081515263851",
+    "address": "Thybt",
+    "items": [
+      {
+        "id": "item-1769457459060-1tr1by5m5",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "Tes",
+        "createdAt": "2026-01-26T19:57:39.060Z",
+        "_id": "6977c733a7e3a10429149b09"
+      },
+      {
+        "id": "item-1769457459060-9k8mczuf1",
+        "serviceType": "whitening",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "Halo",
+        "createdAt": "2026-01-26T19:57:39.060Z",
+        "_id": "6977c733a7e3a10429149b0a"
+      },
+      {
+        "id": "item-1769457459060-mmqn46hkr",
+        "serviceType": "repaint_canvas",
+        "quantity": 1,
+        "unitPrice": 75000,
+        "subtotal": 75000,
+        "notes": "Tes",
+        "createdAt": "2026-01-26T19:57:39.060Z",
+        "_id": "6977c733a7e3a10429149b0b"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 4,
+    "estimatedPrice": 195000,
+    "subtotal": 195000,
+    "finalPrice": 150150,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-26T19:58:44.423Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Tes; Halo; Tes",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-26T19:57:39.063Z",
+    "updatedAt": "2026-02-18T07:01:38.532Z",
+    "__v": 0,
+    "expireAt": "2026-02-25T23:29:33.635Z",
+    "finishedAt": "2026-01-26T23:29:33.635Z",
+    "rekapId": "6977cf3e58835e1f566a5bfa",
+    "discount": {
+      "type": "percentage",
+      "value": 23
+    },
+    "archivedAt": "2026-01-27T17:23:19.590Z"
+  },
+  {
+    "_id": "6977c762a7e3a10429149b0e",
+    "orderNumber": "ORD-MKVLB9XT-N38",
+    "name": "Hatg",
+    "phone": "081515263851",
+    "address": "Ugughuuh",
+    "items": [
+      {
+        "id": "item-1769457506321-4itmv8ztu",
+        "serviceType": "helm",
+        "quantity": 2,
+        "unitPrice": 30000,
+        "subtotal": 60000,
+        "notes": "Ybybyb",
+        "createdAt": "2026-01-26T19:58:26.321Z",
+        "_id": "6977c762a7e3a10429149b0f"
+      },
+      {
+        "id": "item-1769457506321-x242p7b2x",
+        "serviceType": "unyellowing",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "Hyhyb",
+        "createdAt": "2026-01-26T19:58:26.321Z",
+        "_id": "6977c762a7e3a10429149b10"
+      },
+      {
+        "id": "item-1769457506321-cy2qsm9ux",
+        "serviceType": "sewing",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "Tuj",
+        "createdAt": "2026-01-26T19:58:26.321Z",
+        "_id": "6977c762a7e3a10429149b11"
+      },
+      {
+        "id": "item-1769457506321-cyqxuclsr",
+        "serviceType": "whitening",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "Ybyb",
+        "createdAt": "2026-01-26T19:58:26.321Z",
+        "_id": "6977c762a7e3a10429149b12"
+      }
+    ],
+    "itemType": "helm",
+    "quantity": 5,
+    "estimatedPrice": 195000,
+    "subtotal": 195000,
+    "finalPrice": 170000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-26T19:58:46.164Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "Ybybyb; Hyhyb; Tuj; Ybyb",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-26T19:58:26.324Z",
+    "updatedAt": "2026-02-18T07:01:38.567Z",
+    "__v": 0,
+    "expireAt": "2026-02-25T20:05:39.828Z",
+    "finishedAt": "2026-01-26T20:05:39.828Z",
+    "rekapId": "6977c85ba7e3a10429149b48",
+    "discount": {
+      "type": "fixed",
+      "value": 25000
+    },
+    "archivedAt": "2026-01-26T20:17:08.129Z"
+  },
+  {
+    "_id": "697819ee4cb7bcd76b2d2b03",
+    "orderNumber": "ORD-MKVXW7KG-TA9",
+    "name": "Rerta",
+    "phone": "085731854878",
+    "address": "Jl.minggir",
+    "items": [
+      {
+        "id": "item-1769478638416-firwjekha",
+        "serviceType": "Deepclean_Sandal",
+        "quantity": 2,
+        "unitPrice": 25000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-27T01:50:38.416Z",
+        "_id": "697819ee4cb7bcd76b2d2b05"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 8,
+    "estimatedPrice": 265000,
+    "subtotal": 50000,
+    "finalPrice": 20000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T01:50:52.508Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-27T01:50:38.428Z",
+    "updatedAt": "2026-02-18T07:14:32.708Z",
+    "__v": 0,
+    "discount": {
+      "type": "percentage",
+      "value": 60
+    },
+    "expireAt": "2026-02-26T01:57:00.597Z",
+    "finishedAt": "2026-01-27T01:57:00.597Z",
+    "rekapId": "69781b6d4cb7bcd76b2d2b44",
+    "archivedAt": "2026-01-27T17:23:09.381Z"
+  },
+  {
+    "_id": "6978b64a2d09541384092344",
+    "orderNumber": "ORD-MKWLQ5EO-D3D",
+    "name": "Hojijihi",
+    "phone": "085731854878",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769518666464-ocm6rlu6c",
+        "serviceType": "tas_gunung",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-27T12:57:46.464Z",
+        "_id": "6978b64a2d09541384092345"
+      }
+    ],
+    "itemType": "tas_gunung",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T12:59:10.298Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-27T12:57:46.466Z",
+    "updatedAt": "2026-02-18T07:01:38.634Z",
+    "__v": 0,
+    "expireAt": "2026-02-26T17:21:08.377Z",
+    "finishedAt": "2026-01-28T00:21:08.377Z",
+    "rekapId": "6978f404601b9abb0e8d7404",
+    "archivedAt": "2026-01-27T17:21:36.666Z"
+  },
+  {
+    "_id": "6978b6572d09541384092348",
+    "orderNumber": "ORD-MKWLQF69-D0K",
+    "name": "Hoho",
+    "phone": "085859461424",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769518679121-o6lsmuk41",
+        "serviceType": "topi",
+        "quantity": 5,
+        "unitPrice": 25000,
+        "subtotal": 125000,
+        "notes": "",
+        "createdAt": "2026-01-27T12:57:59.121Z",
+        "_id": "6978b6572d09541384092349"
+      }
+    ],
+    "itemType": "topi",
+    "quantity": 5,
+    "estimatedPrice": 125000,
+    "subtotal": 125000,
+    "finalPrice": 125000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T12:59:09.136Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-27T12:57:59.123Z",
+    "updatedAt": "2026-02-18T07:01:38.666Z",
+    "__v": 0,
+    "expireAt": "2026-02-26T17:20:38.653Z",
+    "finishedAt": "2026-01-28T00:20:38.653Z",
+    "rekapId": "6978f3e7b50d407c463788d7",
+    "archivedAt": "2026-01-27T17:21:28.942Z"
+  },
+  {
+    "_id": "6978b6652d09541384092352",
+    "orderNumber": "ORD-MKWLQPWA-4AE",
+    "name": "Huty",
+    "phone": "085731584876",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769518693017-9lsed7fp0",
+        "serviceType": "tas_gunung",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-27T12:58:13.017Z",
+        "_id": "6978b6652d09541384092353"
+      }
+    ],
+    "itemType": "tas_gunung",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T12:59:07.893Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-27T12:58:13.019Z",
+    "updatedAt": "2026-02-18T07:01:38.699Z",
+    "__v": 0,
+    "expireAt": "2026-02-26T17:09:43.935Z",
+    "finishedAt": "2026-01-27T17:09:43.935Z",
+    "rekapId": "6978f158af819d32bf603dc3",
+    "archivedAt": "2026-01-27T17:16:27.012Z"
+  },
+  {
+    "_id": "6978b6952d0954138409235c",
+    "orderNumber": "ORD-MKWLRRGZ-LVV",
+    "name": "Huhuht",
+    "phone": "08595976245",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769518741715-m57cskozl",
+        "serviceType": "helm",
+        "quantity": 3,
+        "unitPrice": 30000,
+        "subtotal": 90000,
+        "notes": "",
+        "createdAt": "2026-01-27T12:59:01.715Z",
+        "_id": "6978b6952d0954138409235d"
+      }
+    ],
+    "itemType": "helm",
+    "quantity": 3,
+    "estimatedPrice": 90000,
+    "subtotal": 90000,
+    "finalPrice": 90000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T12:59:06.626Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-27T12:59:01.717Z",
+    "updatedAt": "2026-02-18T07:01:38.735Z",
+    "__v": 0,
+    "expireAt": "2026-02-26T17:08:49.241Z",
+    "finishedAt": "2026-01-27T17:08:49.241Z",
+    "rekapId": "6978f121af819d32bf603d94",
+    "archivedAt": "2026-01-27T17:09:16.183Z"
+  },
+  {
+    "_id": "6978f54db50d407c46378936",
+    "orderNumber": "ORD-MKWVBWJA-6CM",
+    "name": "avisa",
+    "phone": "08477282993",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769534797941-wo24dlsan",
+        "serviceType": "Deepclean",
+        "quantity": 3,
+        "unitPrice": 35000,
+        "subtotal": 105000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:26:37.941Z",
+        "_id": "6978f54db50d407c46378937"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 105000,
+    "subtotal": 105000,
+    "finalPrice": 105000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:29:48.830Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f54db50d407c46378936_1769617675920?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f54db50d407c46378936_1769617675920",
+          "_id": "697a390e6935383411b6f690"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:26:37.948Z",
+    "updatedAt": "2026-02-18T07:01:38.768Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:26:23.548Z",
+    "finishedAt": "2026-02-06T19:26:23.548Z",
+    "rekapId": "6985ddef9e0bd922aca6f783"
+  },
+  {
+    "_id": "6978f562b50d407c4637893b",
+    "orderNumber": "ORD-MKWVCC3P-CJB",
+    "name": "lia",
+    "phone": "08232943432",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769534818117-7ls7ataik",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:26:58.117Z",
+        "_id": "6978f562b50d407c4637893c"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:29:49.668Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f562b50d407c4637893b_1769535314741?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f562b50d407c4637893b_1769535314741",
+          "_id": "6978f755601b9abb0e8d7617"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:26:58.120Z",
+    "updatedAt": "2026-02-18T07:01:38.801Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:26:46.023Z",
+    "finishedAt": "2026-02-06T19:26:46.023Z",
+    "rekapId": "6985de060f5239e46bd5f729"
+  },
+  {
+    "_id": "6978f5acb50d407c46378948",
+    "orderNumber": "ORD-MKWVDXOE-3MA",
+    "name": "bagas",
+    "phone": "081233832728",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769534892734-2h81dovn0",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:28:12.734Z",
+        "_id": "6978f5acb50d407c46378949"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:29:51.581Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f5acb50d407c46378948_1769535113627?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f5acb50d407c46378948_1769535113627",
+          "_id": "6978f68d601b9abb0e8d75f0"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:28:12.736Z",
+    "updatedAt": "2026-02-18T07:01:38.836Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:27:09.199Z",
+    "finishedAt": "2026-02-06T19:27:09.199Z",
+    "rekapId": "6985de1d0f5239e46bd5f740"
+  },
+  {
+    "_id": "6978f5e4b50d407c46378950",
+    "orderNumber": "ORD-MKWVF4DO-NBC",
+    "name": "Hessi Candra",
+    "phone": "082228518318",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769534948076-dn62djcyq",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:29:08.076Z",
+        "_id": "6978f5e4b50d407c46378951"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:29:53.639Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f5e4b50d407c46378950_1769535064838?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f5e4b50d407c46378950_1769535064838",
+          "_id": "6978f65bb50d407c4637897d"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:29:08.078Z",
+    "updatedAt": "2026-02-18T07:01:38.869Z",
+    "__v": 0,
+    "expireAt": "2026-02-28T10:33:29.538Z",
+    "finishedAt": "2026-01-29T17:33:29.538Z",
+    "rekapId": "697b3779c6ec88bc659af53e"
+  },
+  {
+    "_id": "6978f604b50d407c46378954",
+    "orderNumber": "ORD-MKWVFTA9-GGA",
+    "name": "satrio",
+    "phone": "08232323223",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769534980353-y5picic05",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:29:40.353Z",
+        "_id": "6978f604b50d407c46378955"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:29:57.842Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f604b50d407c46378954_1769535025303?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f604b50d407c46378954_1769535025303",
+          "_id": "6978f634601b9abb0e8d75dd"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:29:40.355Z",
+    "updatedAt": "2026-02-18T07:01:38.904Z",
+    "__v": 0,
+    "expireAt": "2026-02-28T10:33:04.244Z",
+    "finishedAt": "2026-01-29T17:33:04.244Z",
+    "rekapId": "697b3760c6ec88bc659af52c"
+  },
+  {
+    "_id": "6978f6d0b50d407c4637899c",
+    "orderNumber": "ORD-MKWVK6UI-173",
+    "name": "rizal",
+    "phone": "0823232445",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769535184554-g0yj5fih8",
+        "serviceType": "one_day_service",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:33:04.554Z",
+        "_id": "6978f6d0b50d407c4637899d"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:33:56.031Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f6d0b50d407c4637899c_1769535284349?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f6d0b50d407c4637899c_1769535284349",
+          "_id": "6978f738b50d407c463789cd"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:33:04.557Z",
+    "updatedAt": "2026-02-18T07:01:38.942Z",
+    "__v": 0,
+    "expireAt": "2026-02-27T10:44:15.100Z",
+    "finishedAt": "2026-01-28T17:44:15.100Z",
+    "rekapId": "6979e87f550eb8a82ec1d1b0"
+  },
+  {
+    "_id": "6978f6f7b50d407c463789af",
+    "orderNumber": "ORD-MKWVL0LL-G9F",
+    "name": "keysa",
+    "phone": "081266455770",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769535223113-bzrkf1apg",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-27T17:33:43.113Z",
+        "_id": "6978f6f7b50d407c463789b0"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-27T17:33:54.553Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6978f6f7b50d407c463789af_1769535255367?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6978f6f7b50d407c463789af_1769535255367",
+          "_id": "6978f71d601b9abb0e8d7609"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-27T17:33:43.114Z",
+    "updatedAt": "2026-02-18T07:01:38.980Z",
+    "__v": 0,
+    "expireAt": "2026-02-28T10:32:21.744Z",
+    "finishedAt": "2026-01-29T17:32:21.744Z",
+    "rekapId": "697b3736c6ec88bc659af514"
+  },
+  {
+    "_id": "6979e1000343dfa39831e2ab",
+    "orderNumber": "ORD-MKXV9600-2TS",
+    "name": "Hessi candra",
+    "phone": "082228518318",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769595136416-x6ksaaian",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-28T10:12:16.416Z",
+        "_id": "6979e1000343dfa39831e2ac"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-28T10:12:25.767Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6979e1000343dfa39831e2ab_1769595162818?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6979e1000343dfa39831e2ab_1769595162818",
+          "_id": "6979e12a0343dfa39831e2d5"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-28T10:12:16.427Z",
+    "updatedAt": "2026-02-18T07:01:39.014Z",
+    "__v": 0,
+    "expireAt": "2026-03-04T09:55:43.236Z",
+    "finishedAt": "2026-02-02T16:55:43.236Z",
+    "rekapId": "6979e12a0343dfa39831e2da"
+  },
+  {
+    "_id": "697a0ab1b59407d93c25a354",
+    "orderNumber": "ORD-MKY1LXDY-V4I",
+    "name": "Dd",
+    "phone": "085555828655",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769605809478-62aiaxjeq",
+        "serviceType": "Deepclean",
+        "quantity": 4,
+        "unitPrice": 35000,
+        "subtotal": 140000,
+        "notes": "",
+        "createdAt": "2026-01-28T13:10:09.478Z",
+        "_id": "697a0ab1b59407d93c25a355"
+      },
+      {
+        "id": "item-1769605809478-1rz4cpl7z",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-01-28T13:10:09.478Z",
+        "_id": "697a0ab1b59407d93c25a356"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 5,
+    "estimatedPrice": 180000,
+    "subtotal": 185000,
+    "finalPrice": 55500,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-28T13:10:23.277Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697a0ab1b59407d93c25a354_1769605859644?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/697a0ab1b59407d93c25a354_1769605859644",
+          "_id": "697a0ae91af3e4338f9da9ef"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-01-28T13:10:09.494Z",
+    "updatedAt": "2026-02-18T07:14:32.741Z",
+    "__v": 0,
+    "expireAt": "2026-02-27T13:13:14.853Z",
+    "finishedAt": "2026-01-28T20:13:14.853Z",
+    "rekapId": "697a0b07b59407d93c25a381",
+    "discount": {
+      "type": "percentage",
+      "value": 70
+    },
+    "archivedAt": "2026-01-29T10:45:45.725Z"
+  },
+  {
+    "_id": "697a3925fb509166ed445389",
+    "orderNumber": "ORD-MKY8OTDP-9Z7",
+    "name": "Wahyu",
+    "phone": "081389294056",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769617701565-c3r4f830l",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-28T16:28:21.565Z",
+        "_id": "697a3925fb509166ed44538a"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-28T16:28:27.111Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697a3925fb509166ed445389_1769617784436?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/697a3925fb509166ed445389_1769617784436",
+          "_id": "697a397afb509166ed4453a4"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-28T16:28:21.574Z",
+    "updatedAt": "2026-02-18T07:01:39.081Z",
+    "__v": 0,
+    "expireAt": "2026-03-04T09:56:06.155Z",
+    "finishedAt": "2026-02-02T16:56:06.155Z",
+    "rekapId": "698074b6f19bbefcda6c207f"
+  },
+  {
+    "_id": "697b6c6f94ff94dfec9828a2",
+    "orderNumber": "ORD-MKZJIW6X-KKK",
+    "name": "Risa",
+    "phone": "082227223387",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769696367225-u1w8ximqm",
+        "serviceType": "one_day_service",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-01-29T14:19:27.225Z",
+        "_id": "697b6c6f94ff94dfec9828a3"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 2,
+    "estimatedPrice": 100000,
+    "subtotal": 100000,
+    "finalPrice": 100000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-29T14:19:33.186Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697b6c6f94ff94dfec9828a2_1769696404206?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/697b6c6f94ff94dfec9828a2_1769696404206",
+          "_id": "697b6c9873b87ecf9625142a"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-29T14:19:27.227Z",
+    "updatedAt": "2026-02-18T07:01:39.114Z",
+    "__v": 0,
+    "expireAt": "2026-03-04T09:56:25.008Z",
+    "finishedAt": "2026-02-02T16:56:25.008Z",
+    "rekapId": "698074c9725530f9c83c9b68"
+  },
+  {
+    "_id": "697b6cc273b87ecf9625142e",
+    "orderNumber": "ORD-MKZJKOF1-FHT",
+    "name": "adistra",
+    "phone": "081357583944",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769696450461-rlwpkwhzw",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-01-29T14:20:50.461Z",
+        "_id": "697b6cc273b87ecf9625142f"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-29T14:21:01.275Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697b6cc273b87ecf9625142e_1769696471832?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/697b6cc273b87ecf9625142e_1769696471832",
+          "_id": "697b6cda94ff94dfec9828c6"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-29T14:20:50.467Z",
+    "updatedAt": "2026-02-18T07:01:39.146Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:25:44.986Z",
+    "finishedAt": "2026-02-06T19:25:44.986Z",
+    "rekapId": "6985ddc90f5239e46bd5f6e7"
+  },
+  {
+    "_id": "697cbddcc1801c6160a72137",
+    "orderNumber": "ORD-ML0YYC64-8BZ",
+    "name": "Lingga",
+    "phone": "085157312263",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769782748187-bq3xaiz9z",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-01-30T14:19:08.187Z",
+        "_id": "697cbddcc1801c6160a72138"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-30T14:19:53.620Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/after/697cbddcc1801c6160a72137_1769782830432?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/after/697cbddcc1801c6160a72137_1769782830432",
+          "_id": "697cbe30c1801c6160a72152"
+        }
+      ]
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-30T14:19:08.191Z",
+    "updatedAt": "2026-02-18T07:01:39.177Z",
+    "__v": 0,
+    "expireAt": "2026-03-01T14:20:41.346Z",
+    "finishedAt": "2026-01-30T21:20:41.346Z",
+    "rekapId": "697cbe39a69de523b0c5a60d"
+  },
+  {
+    "_id": "697cbdfec1801c6160a7213b",
+    "orderNumber": "ORD-ML0YZ307-MXH",
+    "name": "eko saputro",
+    "phone": "085540464558",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1769782782967-pw8ktbs2a",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-01-30T14:19:42.967Z",
+        "_id": "697cbdfec1801c6160a7213c"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-01-30T14:19:52.917Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/697cbdfec1801c6160a7213b_1769782876201?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/697cbdfec1801c6160a7213b_1769782876201",
+          "_id": "697cbe5ea69de523b0c5a61b"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-01-30T14:19:42.969Z",
+    "updatedAt": "2026-02-18T07:01:39.209Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:25:20.767Z",
+    "finishedAt": "2026-02-06T19:25:20.767Z",
+    "rekapId": "6985ddb10f5239e46bd5f6d1"
+  },
+  {
+    "_id": "69806817dce99e37b3a6c7cc",
+    "orderNumber": "ORD-ML4XYDU0-JRO",
+    "name": "Rizano",
+    "phone": "085951501482",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770022935431-m120sgzdt",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-02T09:02:15.431Z",
+        "_id": "69806817dce99e37b3a6c7cd"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-02T09:02:36.819Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/69806817dce99e37b3a6c7cc_1770023101393?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/69806817dce99e37b3a6c7cc_1770023101393",
+          "_id": "698068ccf829a0d2ee2ac562"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-02T09:02:15.436Z",
+    "updatedAt": "2026-02-18T07:01:39.240Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:26:01.528Z",
+    "finishedAt": "2026-02-06T19:26:01.528Z",
+    "rekapId": "6985ddd90f5239e46bd5f6f9"
+  },
+  {
+    "_id": "6980a070a77ef03d366e1aae",
+    "orderNumber": "ORD-ML56JKMU-OAR",
+    "name": "Salman",
+    "phone": "088991449332",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770037360950-u2rkxfb88",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-02T13:02:40.950Z",
+        "_id": "6980a070a77ef03d366e1aaf"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-02T13:10:14.655Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6980a070a77ef03d366e1aae_1770037910298?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6980a070a77ef03d366e1aae_1770037910298",
+          "_id": "6980a29a69d23dd8a54067bd"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-02T13:02:40.957Z",
+    "updatedAt": "2026-02-18T07:01:39.271Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:25:05.952Z",
+    "finishedAt": "2026-02-06T19:25:05.952Z",
+    "rekapId": "6985dda20f5239e46bd5f6bb"
+  },
+  {
+    "_id": "6980a25e69d23dd8a54067ac",
+    "orderNumber": "ORD-ML56U5O4-KPZ",
+    "name": "Niam",
+    "phone": "083854212791",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770037854772-s52nsn6uy",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-02T13:10:54.772Z",
+        "_id": "6980a25e69d23dd8a54067ad"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-02T13:11:14.426Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [
+        {
+          "url": "https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto/v1/cleaning-app/orders/before/6980a25e69d23dd8a54067ac_1770037943455?_a=BAMAAAUs0",
+          "publicId": "cleaning-app/orders/before/6980a25e69d23dd8a54067ac_1770037943455",
+          "_id": "6980a2bc479d68ffdea88a8f"
+        }
+      ],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-02T13:10:54.775Z",
+    "updatedAt": "2026-02-18T07:01:39.302Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:24:42.239Z",
+    "finishedAt": "2026-02-06T19:24:42.239Z",
+    "rekapId": "6985dd8a0f5239e46bd5f6a9"
+  },
+  {
+    "_id": "6980a3cc479d68ffdea88a97",
+    "orderNumber": "ORD-ML571ZQU-QVV",
+    "name": "Irma",
+    "phone": "087769591188",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770038220342-ac9w135of",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-02T13:17:00.342Z",
+        "_id": "6980a3cc479d68ffdea88a98"
+      },
+      {
+        "id": "item-1770038220342-acibncbnj",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 3,
+        "unitPrice": 45000,
+        "subtotal": 125000,
+        "notes": "",
+        "createdAt": "2026-02-02T13:17:00.342Z",
+        "_id": "6980a3cc479d68ffdea88a99"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 4,
+    "estimatedPrice": 155000,
+    "subtotal": 160000,
+    "finalPrice": 125000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-02T13:17:13.607Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-02T13:17:00.346Z",
+    "updatedAt": "2026-02-18T07:14:32.773Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 35000
+    },
+    "expireAt": "2026-03-12T11:09:27.246Z",
+    "finishedAt": "2026-02-10T18:09:27.246Z",
+    "rekapId": "698b11e7c0064a872415f1fc"
+  },
+  {
+    "_id": "6981ef4759c23506f1cbfa43",
+    "orderNumber": "ORD-ML6LKT6O-EV8",
+    "name": "Akmal",
+    "phone": "0857-0015-0669",
+    "address": "Jl.kemanggisan",
+    "items": [
+      {
+        "id": "item-1770123079104-vnproglsc",
+        "serviceType": "Deepclean",
+        "quantity": 5,
+        "unitPrice": 35000,
+        "subtotal": 175000,
+        "notes": "",
+        "createdAt": "2026-02-03T12:51:19.104Z",
+        "_id": "6981ef4759c23506f1cbfa44"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 5,
+    "estimatedPrice": 175000,
+    "subtotal": 175000,
+    "finalPrice": 115000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-03T12:51:19.104Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-03T12:51:19.140Z",
+    "updatedAt": "2026-02-18T07:01:39.367Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 60000
+    },
+    "expireAt": "2026-03-05T12:53:30.507Z",
+    "finishedAt": "2026-02-03T19:53:30.507Z",
+    "rekapId": "6981efca41f94807d71133f3"
+  },
+  {
+    "_id": "6981f5e9178f1e678fd40699",
+    "orderNumber": "ORD-ML6ML7LE-00R",
+    "name": "Fikri",
+    "phone": "085198315013",
+    "address": "Jl.mawar",
+    "items": [
+      {
+        "id": "item-1770124777393-zhdp2nrsv",
+        "serviceType": "Deepclean",
+        "quantity": 4,
+        "unitPrice": 35000,
+        "subtotal": 140000,
+        "notes": "",
+        "createdAt": "2026-02-03T13:19:37.393Z",
+        "_id": "6981f5e9178f1e678fd4069a"
+      },
+      {
+        "id": "item-1770124777393-yj651ik7s",
+        "serviceType": "helm",
+        "quantity": 1,
+        "unitPrice": 30000,
+        "subtotal": 30000,
+        "notes": "",
+        "createdAt": "2026-02-03T13:19:37.393Z",
+        "_id": "6981f5e9178f1e678fd4069b"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 5,
+    "estimatedPrice": 170000,
+    "subtotal": 170000,
+    "finalPrice": 85000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-03T13:19:37.394Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": true,
+    "createdAt": "2026-02-03T13:19:37.411Z",
+    "updatedAt": "2026-02-18T07:55:09.447Z",
+    "__v": 0,
+    "discount": {
+      "type": "percentage",
+      "value": 50
+    },
+    "expireAt": "2026-03-05T13:21:54.028Z",
+    "finishedAt": "2026-02-03T20:21:54.028Z",
+    "rekapId": "6981f672cd54fd31bf88859f",
+    "archivedAt": "2026-02-18T07:55:09.442Z"
+  },
+  {
+    "_id": "6983207db6517cdc57145ed8",
+    "orderNumber": "ORD-ML7W3I0M-5N6",
+    "name": "Danni",
+    "phone": "082234438182",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770201213430-sixbfxo7j",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-04T10:33:33.430Z",
+        "_id": "6983207db6517cdc57145ed9"
+      },
+      {
+        "id": "item-1770201213430-zay50fa6e",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-02-04T10:33:33.430Z",
+        "_id": "6983207db6517cdc57145eda"
+      },
+      {
+        "id": "item-1770201213430-gp5vzrsh4",
+        "serviceType": "sewing",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-04T10:33:33.430Z",
+        "_id": "6983207db6517cdc57145edb"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 4,
+    "estimatedPrice": 145000,
+    "subtotal": 150000,
+    "finalPrice": 145000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-04T10:33:33.430Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-04T10:33:33.441Z",
+    "updatedAt": "2026-02-18T07:14:32.810Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 5000
+    },
+    "expireAt": "2026-03-08T12:23:23.475Z",
+    "finishedAt": "2026-02-06T19:23:23.475Z",
+    "rekapId": "6985dd3b9e0bd922aca6f754"
+  },
+  {
+    "_id": "69847b476dc82d9db918f89e",
+    "orderNumber": "ORD-ML9CYBN9-4KD",
+    "name": "Rifqi",
+    "phone": "085717407187",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770289991541-2afkiarea",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-05T11:13:11.541Z",
+        "_id": "69847b476dc82d9db918f89f"
+      },
+      {
+        "id": "item-1770289991541-57zn877vz",
+        "serviceType": "sewing",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-05T11:13:11.541Z",
+        "_id": "69847b476dc82d9db918f8a0"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 105000,
+    "subtotal": 105000,
+    "finalPrice": 105000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-05T11:13:11.541Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-05T11:13:11.554Z",
+    "updatedAt": "2026-02-18T07:01:39.462Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:23:02.059Z",
+    "finishedAt": "2026-02-06T19:23:02.059Z",
+    "rekapId": "6985dd260f5239e46bd5f665"
+  },
+  {
+    "_id": "69847c1510491411250d211d",
+    "orderNumber": "ORD-ML9D2QR3-W21",
+    "name": "Bianca",
+    "phone": "085235445544",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770290197743-66xp7pg7w",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-05T11:16:37.743Z",
+        "_id": "69847c1510491411250d211e"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-05T11:16:37.743Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-05T11:16:37.754Z",
+    "updatedAt": "2026-02-18T07:01:39.494Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:23:39.485Z",
+    "finishedAt": "2026-02-06T19:23:39.485Z",
+    "rekapId": "6985dd4b0f5239e46bd5f679"
+  },
+  {
+    "_id": "69847ca310491411250d2129",
+    "orderNumber": "ORD-ML9D5S6F-LO3",
+    "name": "Rafif",
+    "phone": "087771416660",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770290339559-vecg67urp",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-05T11:18:59.559Z",
+        "_id": "69847ca310491411250d212a"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-05T11:18:59.559Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-05T11:18:59.561Z",
+    "updatedAt": "2026-02-18T07:01:39.524Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:24:00.329Z",
+    "finishedAt": "2026-02-06T19:24:00.329Z",
+    "rekapId": "6985dd600f5239e46bd5f684"
+  },
+  {
+    "_id": "69847dc86dc82d9db918f8bd",
+    "orderNumber": "ORD-ML9DC1Y9-26L",
+    "name": "Liasyafitri",
+    "phone": "085258668427",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770290632161-z6r9dzr3p",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-05T11:23:52.161Z",
+        "_id": "69847dc86dc82d9db918f8be"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-05T11:23:52.161Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-05T11:23:52.164Z",
+    "updatedAt": "2026-02-18T07:01:39.556Z",
+    "__v": 0,
+    "expireAt": "2026-03-08T12:24:15.835Z",
+    "finishedAt": "2026-02-06T19:24:15.835Z",
+    "rekapId": "6985dd700f5239e46bd5f693"
+  },
+  {
+    "_id": "6985c5ab3defb7ea121dbdbe",
+    "orderNumber": "ORD-MLARB64H-9VO",
+    "name": "Zaky",
+    "phone": "082232581842",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770374571713-bykmfh45q",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-06T10:42:51.713Z",
+        "_id": "6985c5ab3defb7ea121dbdbf"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-06T10:42:51.713Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-06T10:42:51.736Z",
+    "updatedAt": "2026-02-18T07:01:39.587Z",
+    "__v": 0,
+    "expireAt": "2026-03-11T09:06:09.015Z",
+    "finishedAt": "2026-02-09T16:06:09.015Z",
+    "rekapId": "6989a3811a0982c8ca156310"
+  },
+  {
+    "_id": "6985c5e83defb7ea121dbdd7",
+    "orderNumber": "ORD-MLARCGWU-8TC",
+    "name": "Kazu",
+    "phone": "085795843214",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770374632349-uv7zjjxpu",
+        "serviceType": "Deepclean",
+        "quantity": 3,
+        "unitPrice": 35000,
+        "subtotal": 105000,
+        "notes": "",
+        "createdAt": "2026-02-06T10:43:52.349Z",
+        "_id": "6985c5e83defb7ea121dbdd8"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 105000,
+    "subtotal": 105000,
+    "finalPrice": 90000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-06T10:43:52.350Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-06T10:43:52.353Z",
+    "updatedAt": "2026-02-18T07:01:39.621Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 15000
+    },
+    "expireAt": "2026-03-12T11:00:16.241Z",
+    "finishedAt": "2026-02-10T18:00:16.241Z",
+    "rekapId": "698b0fc02d75d87b38929a3f"
+  },
+  {
+    "_id": "6985c6383defb7ea121dbde3",
+    "orderNumber": "ORD-MLARE70K-YMW",
+    "name": "Yoga",
+    "phone": "085155155720",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770374712836-95xu3qhyz",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-06T10:45:12.836Z",
+        "_id": "6985c6383defb7ea121dbde4"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-06T10:45:12.836Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-06T10:45:12.838Z",
+    "updatedAt": "2026-02-18T07:01:39.658Z",
+    "__v": 0,
+    "expireAt": "2026-03-11T09:47:41.810Z",
+    "finishedAt": "2026-02-09T16:47:41.810Z",
+    "rekapId": "6989ad3ea1bad83af5adc7ab"
+  },
+  {
+    "_id": "6985c6538d7f5c039101f6e6",
+    "orderNumber": "ORD-MLARERLR-1EC",
+    "name": "Doni",
+    "phone": "085159231337",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770374739519-jgq9xzn0q",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-06T10:45:39.519Z",
+        "_id": "6985c6538d7f5c039101f6e7"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-06T10:45:39.519Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-06T10:45:39.527Z",
+    "updatedAt": "2026-02-18T07:01:39.690Z",
+    "__v": 0,
+    "expireAt": "2026-03-12T11:00:00.456Z",
+    "finishedAt": "2026-02-10T18:00:00.456Z",
+    "rekapId": "698b0fb02d75d87b38929a2d"
+  },
+  {
+    "_id": "6989b913a8d42ea67de798ba",
+    "orderNumber": "ORD-MLF1GPOW-960",
+    "name": "Andika",
+    "phone": "081904188346",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770633491216-hq7r8k6m8",
+        "serviceType": "Deepclean",
+        "quantity": 3,
+        "unitPrice": 35000,
+        "subtotal": 105000,
+        "notes": "",
+        "createdAt": "2026-02-09T10:38:11.216Z",
+        "_id": "6989b913a8d42ea67de798bb"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 105000,
+    "subtotal": 105000,
+    "finalPrice": 90000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-09T10:38:11.216Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-09T10:38:11.231Z",
+    "updatedAt": "2026-02-18T07:01:39.723Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 15000
+    },
+    "expireAt": "2026-03-14T11:36:31.615Z",
+    "finishedAt": "2026-02-12T18:36:31.615Z",
+    "rekapId": "698dbb409d58183f542a8311"
+  },
+  {
+    "_id": "6989bacc9641fc1c9df95a6b",
+    "orderNumber": "ORD-MLF1Q5T4-MCW",
+    "name": "Gio",
+    "phone": "081340145559",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770633931994-0w4t0ghoz",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-09T10:45:31.994Z",
+        "_id": "6989bacc9641fc1c9df95a6c"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-09T10:45:32.008Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-09T10:45:32.024Z",
+    "updatedAt": "2026-02-18T07:01:39.760Z",
+    "__v": 0,
+    "expireAt": "2026-03-14T10:01:14.562Z",
+    "finishedAt": "2026-02-12T17:01:14.562Z",
+    "rekapId": "698da4eb986920cea94bdece"
+  },
+  {
+    "_id": "698b2300d279da389640cde0",
+    "orderNumber": "ORD-MLGKML5C-6XV",
+    "name": "Pinan",
+    "phone": "082183477922",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770726144144-0itr1axzq",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-10T12:22:24.144Z",
+        "_id": "698b2300d279da389640cde1"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-10T12:22:24.144Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-10T12:22:24.158Z",
+    "updatedAt": "2026-02-18T07:01:39.793Z",
+    "__v": 0,
+    "expireAt": "2026-03-13T09:17:49.229Z",
+    "finishedAt": "2026-02-11T16:17:49.229Z",
+    "rekapId": "698c493d905e49bfa3dbe1e2"
+  },
+  {
+    "_id": "698b2338b28938ea68ce82bf",
+    "orderNumber": "ORD-MLGKNSL3-BVQ",
+    "name": "Ella",
+    "phone": "085172425151",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770726200439-vvqjqjh6t",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-10T12:23:20.439Z",
+        "_id": "698b2338b28938ea68ce82c0"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-10T12:23:20.439Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-10T12:23:20.452Z",
+    "updatedAt": "2026-02-18T07:01:39.826Z",
+    "__v": 0,
+    "expireAt": "2026-03-15T12:46:59.865Z",
+    "finishedAt": "2026-02-13T19:46:59.865Z",
+    "rekapId": "698f1d445f96194562861e9b"
+  },
+  {
+    "_id": "698b2378b28938ea68ce82d5",
+    "orderNumber": "ORD-MLGKP5YR-NWP",
+    "name": "Hasnah",
+    "phone": "089674963885",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770726264434-ztoz3uuo1",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-10T12:24:24.435Z",
+        "_id": "698b2378b28938ea68ce82d6"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-10T12:24:24.435Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-10T12:24:24.438Z",
+    "updatedAt": "2026-02-18T07:01:39.865Z",
+    "__v": 0,
+    "expireAt": "2026-03-13T09:02:33.371Z",
+    "finishedAt": "2026-02-11T16:02:33.371Z",
+    "rekapId": "698c45a96ee78f7702ddebe9"
+  },
+  {
+    "_id": "698b39d0a1cb55dc66b10c8f",
+    "orderNumber": "ORD-MLGO3RGI-OEU",
+    "name": "Fathur",
+    "phone": "085262180921",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770731984322-n45cdso99",
+        "serviceType": "one_day_service",
+        "quantity": 2,
+        "unitPrice": 50000,
+        "subtotal": 100000,
+        "notes": "",
+        "createdAt": "2026-02-10T13:59:44.322Z",
+        "_id": "698b39d0a1cb55dc66b10c90"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 2,
+    "estimatedPrice": 100000,
+    "subtotal": 100000,
+    "finalPrice": 100000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-10T13:59:44.323Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-10T13:59:44.337Z",
+    "updatedAt": "2026-02-18T07:01:39.897Z",
+    "__v": 0,
+    "expireAt": "2026-03-14T08:49:23.781Z",
+    "finishedAt": "2026-02-12T15:49:23.781Z",
+    "rekapId": "698d9414b02c6786a925b603"
+  },
+  {
+    "_id": "698c4a57905e49bfa3dbe1ee",
+    "orderNumber": "ORD-MLHTN46O-L76",
+    "name": "Salva",
+    "phone": "081337616129",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770801751536-8pnrwt6mb",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-11T09:22:31.536Z",
+        "_id": "698c4a57905e49bfa3dbe1ef"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T09:22:31.536Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T09:22:31.544Z",
+    "updatedAt": "2026-02-18T07:01:39.929Z",
+    "__v": 0,
+    "expireAt": "2026-03-14T10:34:33.625Z",
+    "finishedAt": "2026-02-12T17:34:33.625Z",
+    "rekapId": "698dacbac3689b75ed159580"
+  },
+  {
+    "_id": "698c614d5eff37945d2b2cd8",
+    "orderNumber": "ORD-MLHX53UL-LD2",
+    "name": "Farhan",
+    "phone": "085155241155",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770807629757-doj3y8kg3",
+        "serviceType": "one_day_service",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-02-11T11:00:29.757Z",
+        "_id": "698c614d5eff37945d2b2cd9"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T11:00:29.757Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T11:00:29.771Z",
+    "updatedAt": "2026-02-18T07:01:39.966Z",
+    "__v": 0,
+    "expireAt": "2026-03-14T10:10:20.209Z",
+    "finishedAt": "2026-02-12T17:10:20.209Z",
+    "rekapId": "698da70c986920cea94bdef4"
+  },
+  {
+    "_id": "698c6e663bcaeea53df98d6f",
+    "orderNumber": "ORD-MLHZ4YZQ-PYF",
+    "name": "Rafi",
+    "phone": "085157386880",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770810982694-3thopvbcv",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-11T11:56:22.694Z",
+        "_id": "698c6e663bcaeea53df98d70"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T11:56:22.694Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T11:56:22.711Z",
+    "updatedAt": "2026-02-18T07:01:39.998Z",
+    "__v": 0,
+    "expireAt": "2026-03-18T09:40:36.660Z",
+    "finishedAt": "2026-02-16T16:40:36.660Z",
+    "rekapId": "6992e6157474802fa6377b6a"
+  },
+  {
+    "_id": "698c7d2080940ea7d3de317a",
+    "orderNumber": "ORD-MLI1DS0J-SOB",
+    "name": "Putri",
+    "phone": "08998396981",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770814752787-6mt54vyw9",
+        "serviceType": "Deepclean_Sandal",
+        "quantity": 1,
+        "unitPrice": 25000,
+        "subtotal": 25000,
+        "notes": "",
+        "createdAt": "2026-02-11T12:59:12.787Z",
+        "_id": "698c7d2080940ea7d3de317c"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 5,
+    "estimatedPrice": 165000,
+    "subtotal": 25000,
+    "finalPrice": 20000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T12:59:12.787Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T12:59:12.803Z",
+    "updatedAt": "2026-02-18T07:14:32.842Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 5000
+    },
+    "expireAt": "2026-03-18T09:30:02.115Z",
+    "finishedAt": "2026-02-16T16:30:02.115Z",
+    "rekapId": "6992e39aa173c969d40658b6"
+  },
+  {
+    "_id": "698c7d8580940ea7d3de319b",
+    "orderNumber": "ORD-MLI1FXJC-TNC",
+    "name": "Reva",
+    "phone": "083136805808",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770814853256-ps4mcz78e",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-11T13:00:53.256Z",
+        "_id": "698c7d8580940ea7d3de319c"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T13:00:53.256Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T13:00:53.259Z",
+    "updatedAt": "2026-02-18T07:01:40.070Z",
+    "__v": 0,
+    "expireAt": "2026-03-18T09:30:24.509Z",
+    "finishedAt": "2026-02-16T16:30:24.509Z",
+    "rekapId": "6992e3b00ae8528fa89366d2"
+  },
+  {
+    "_id": "698c7ddc1b362b9c780cae89",
+    "orderNumber": "ORD-MLI1HT6L-7P5",
+    "name": "Linda",
+    "phone": "081216987995",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770814940918-md3i2njje",
+        "serviceType": "Deepclean_Sandal",
+        "quantity": 1,
+        "unitPrice": 25000,
+        "subtotal": 25000,
+        "notes": "",
+        "createdAt": "2026-02-11T13:02:20.918Z",
+        "_id": "698c7ddc1b362b9c780cae8b"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 10,
+    "estimatedPrice": 370000,
+    "subtotal": 25000,
+    "finalPrice": 25000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-11T13:02:20.925Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-11T13:02:20.937Z",
+    "updatedAt": "2026-02-18T07:14:32.873Z",
+    "__v": 0,
+    "expireAt": "2026-03-18T09:30:43.696Z",
+    "finishedAt": "2026-02-16T16:30:43.696Z",
+    "rekapId": "6992e3c4a173c969d40658d3"
+  },
+  {
+    "_id": "698db01d954374adf0338d1c",
+    "orderNumber": "ORD-MLJC67LE-DRZ",
+    "name": "Yusuf",
+    "phone": "081324928436",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770893341681-qcogap70f",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-12T10:49:01.682Z",
+        "_id": "698db01d954374adf0338d1d"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-12T10:49:01.682Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-12T10:49:01.698Z",
+    "updatedAt": "2026-02-18T07:01:40.138Z",
+    "__v": 0
+  },
+  {
+    "_id": "698db040d90adc253438f648",
+    "orderNumber": "ORD-MLJC6YG1-LSG",
+    "name": "Naufal",
+    "phone": "082327207965",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770893376481-tyhi85co6",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-12T10:49:36.481Z",
+        "_id": "698db040d90adc253438f649"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-12T10:49:36.481Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-12T10:49:36.496Z",
+    "updatedAt": "2026-02-18T07:01:40.171Z",
+    "__v": 0
+  },
+  {
+    "_id": "698db722781da6ace567d28a",
+    "orderNumber": "ORD-MLJD8QCJ-6CB",
+    "name": "Aliya",
+    "phone": "085921950160",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770895138915-wyzp61sxa",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-12T11:18:58.915Z",
+        "_id": "698db722781da6ace567d28b"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-12T11:18:58.915Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-12T11:18:58.928Z",
+    "updatedAt": "2026-02-18T07:01:40.204Z",
+    "__v": 0,
+    "finishedAt": "2026-02-17T20:37:00.569Z",
+    "rekapId": "69946efda417dbbfb9b6d101"
+  },
+  {
+    "_id": "698dc343e89ada6729c2b950",
+    "orderNumber": "ORD-MLJF39T7-BKB",
+    "name": "Belinda",
+    "phone": "085157769494",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770898243435-m7plz7x0e",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-12T12:10:43.435Z",
+        "_id": "698dc343e89ada6729c2b951"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-12T12:10:43.435Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-12T12:10:43.449Z",
+    "updatedAt": "2026-02-18T07:01:40.237Z",
+    "__v": 0,
+    "expireAt": "2026-03-18T10:11:58.232Z",
+    "finishedAt": "2026-02-16T17:11:58.232Z",
+    "rekapId": "6992ed6e23e0f902a8e42e03"
+  },
+  {
+    "_id": "698dc377e89ada6729c2b970",
+    "orderNumber": "ORD-MLJF4DRY-E8I",
+    "name": "Ailsa",
+    "phone": "081359646564",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770898295230-r05ez0lwi",
+        "serviceType": "Deepclean",
+        "quantity": 3,
+        "unitPrice": 35000,
+        "subtotal": 105000,
+        "notes": "",
+        "createdAt": "2026-02-12T12:11:35.230Z",
+        "_id": "698dc377e89ada6729c2b971"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 3,
+    "estimatedPrice": 105000,
+    "subtotal": 105000,
+    "finalPrice": 105000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-12T12:11:35.230Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-12T12:11:35.233Z",
+    "updatedAt": "2026-02-18T07:01:40.271Z",
+    "__v": 0,
+    "finishedAt": "2026-02-17T19:27:17.661Z",
+    "rekapId": "69945ea6a65bf0fa1e5e7a18"
+  },
+  {
+    "_id": "698f1d7781fecd225354ebcd",
+    "orderNumber": "ORD-MLKVUVSO-HX4",
+    "name": "Ella",
+    "phone": "085172425151",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770986871672-41cglzvdu",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-13T12:47:51.672Z",
+        "_id": "698f1d7781fecd225354ebce"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-13T12:47:51.672Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-13T12:47:51.688Z",
+    "updatedAt": "2026-02-18T07:01:40.302Z",
+    "__v": 0
+  },
+  {
+    "_id": "698f1dc781fecd225354ebdf",
+    "orderNumber": "ORD-MLKVWLMS-ZK8",
+    "name": "Naura",
+    "phone": "082233423808",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1770986951812-ku8jmcmqm",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-13T12:49:11.812Z",
+        "_id": "698f1dc781fecd225354ebe0"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-13T12:49:11.812Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-13T12:49:11.814Z",
+    "updatedAt": "2026-02-18T07:01:40.334Z",
+    "__v": 0
+  },
+  {
+    "_id": "6992e507251cbc66861073ca",
+    "orderNumber": "ORD-MLOZBUZ0-LUP",
+    "name": "Ridlo",
+    "phone": "087858547375",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771234567308-v2hcbn1uh",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-16T09:36:07.308Z",
+        "_id": "6992e507251cbc66861073cb"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T09:36:07.308Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T09:36:07.314Z",
+    "updatedAt": "2026-02-18T07:01:40.367Z",
+    "__v": 0
+  },
+  {
+    "_id": "6992e6bd251cbc66861073e3",
+    "orderNumber": "ORD-MLOZL956-N7S",
+    "name": "Rino",
+    "phone": "081952559573",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771235005577-lj33jdx6g",
+        "serviceType": "one_day_service",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-02-16T09:43:25.577Z",
+        "_id": "6992e6bd251cbc66861073e4"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T09:43:25.578Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T09:43:25.580Z",
+    "updatedAt": "2026-02-18T07:01:40.399Z",
+    "__v": 0,
+    "expireAt": "2026-03-18T09:43:34.423Z",
+    "finishedAt": "2026-02-16T16:43:34.423Z",
+    "rekapId": "6992e6c67474802fa6377b7a"
+  },
+  {
+    "_id": "6992e711251cbc66861073f6",
+    "orderNumber": "ORD-MLOZN1MW-LPU",
+    "name": "Dwiky",
+    "phone": "082334540239",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771235089159-9morybl0g",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-16T09:44:49.159Z",
+        "_id": "6992e711251cbc66861073f7"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T09:44:49.160Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T09:44:49.162Z",
+    "updatedAt": "2026-02-18T07:01:40.431Z",
+    "__v": 0
+  },
+  {
+    "_id": "6992e7447474802fa6377b82",
+    "orderNumber": "ORD-MLOZO52X-HUO",
+    "name": "Dhini",
+    "phone": "081259519951",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771235140281-yms1opiz5",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-16T09:45:40.281Z",
+        "_id": "6992e7447474802fa6377b83"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T09:45:40.281Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T09:45:40.285Z",
+    "updatedAt": "2026-02-18T11:34:49.861Z",
+    "__v": 0,
+    "finishedAt": "2026-02-18T18:34:47.826Z",
+    "rekapId": "6995a3d9cab932c84e9a0502"
+  },
+  {
+    "_id": "6992eda333838c62479aa822",
+    "orderNumber": "ORD-MLP0N3PJ-4ZX",
+    "name": "Hilal",
+    "phone": "087703270951",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771236771463-hf77kr2o0",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-16T10:12:51.463Z",
+        "_id": "6992eda333838c62479aa823"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T10:12:51.463Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T10:12:51.470Z",
+    "updatedAt": "2026-02-18T07:01:40.496Z",
+    "__v": 0
+  },
+  {
+    "_id": "69931ba95bb4b4e616fac2bc",
+    "orderNumber": "ORD-MLP7NMRF-7CF",
+    "name": "Caca",
+    "phone": "087755915569",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771248553467-49hohbdb7",
+        "serviceType": "one_day_service",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-02-16T13:29:13.467Z",
+        "_id": "69931ba95bb4b4e616fac2bd"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 1,
+    "estimatedPrice": 50000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "finished",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-16T13:29:13.467Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-16T13:29:13.473Z",
+    "updatedAt": "2026-02-18T07:01:40.549Z",
+    "__v": 0,
+    "finishedAt": "2026-02-17T19:06:33.885Z",
+    "rekapId": "699459caa65bf0fa1e5e79e1"
+  },
+  {
+    "_id": "69945a18a65bf0fa1e5e79ee",
+    "orderNumber": "ORD-MLQK6V6Z-XHU",
+    "name": "Andhara",
+    "phone": "089656353691",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771330072427-hcr27bela",
+        "serviceType": "Deepclean_Sandal",
+        "quantity": 2,
+        "unitPrice": 25000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-02-17T12:07:52.427Z",
+        "_id": "69945a18a65bf0fa1e5e79ef"
+      }
+    ],
+    "itemType": "Deepclean_Sandal",
+    "quantity": 2,
+    "estimatedPrice": 25000,
+    "subtotal": 50000,
+    "finalPrice": 50000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-17T12:07:52.427Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-17T12:07:52.431Z",
+    "updatedAt": "2026-02-18T07:14:32.904Z",
+    "__v": 0
+  },
+  {
+    "_id": "69945a715f2e1bccefdb26c3",
+    "orderNumber": "ORD-MLQK8S5G-V8L",
+    "name": "Pak rockyy",
+    "phone": "081230020006",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771330161796-1rrp4be2t",
+        "serviceType": "Deepclean",
+        "quantity": 6,
+        "unitPrice": 35000,
+        "subtotal": 210000,
+        "notes": "",
+        "createdAt": "2026-02-17T12:09:21.796Z",
+        "_id": "69945a715f2e1bccefdb26c4"
+      },
+      {
+        "id": "item-1771330161796-c0bmcd6zj",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 4,
+        "unitPrice": 45000,
+        "subtotal": 165000,
+        "notes": "",
+        "createdAt": "2026-02-17T12:09:21.796Z",
+        "_id": "69945a715f2e1bccefdb26c5"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 10,
+    "estimatedPrice": 370000,
+    "subtotal": 375000,
+    "finalPrice": 375000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-17T12:09:21.796Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-17T12:09:21.834Z",
+    "updatedAt": "2026-02-18T07:14:32.936Z",
+    "__v": 0
+  },
+  {
+    "_id": "69945aa75f2e1bccefdb26d4",
+    "orderNumber": "ORD-MLQK9XPY-9F4",
+    "name": "Aida",
+    "phone": "089668066986",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771330215669-9xghow8ju",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-17T12:10:15.669Z",
+        "_id": "69945aa75f2e1bccefdb26d5"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-17T12:10:15.670Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-17T12:10:15.671Z",
+    "updatedAt": "2026-02-18T07:01:40.645Z",
+    "__v": 0
+  },
+  {
+    "_id": "69946c35d8435a1d7afb3ebb",
+    "orderNumber": "ORD-MLQMY9HF-W9S",
+    "name": "Altap",
+    "phone": "081356907713",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771334709891-xjmrastp5",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-17T13:25:09.891Z",
+        "_id": "69946c35d8435a1d7afb3ebc"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-17T13:25:09.891Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-17T13:25:09.901Z",
+    "updatedAt": "2026-02-18T07:01:40.679Z",
+    "__v": 0
+  },
+  {
+    "_id": "69946f59a417dbbfb9b6d112",
+    "orderNumber": "ORD-MLQNFHOS-HQB",
+    "name": "Diki",
+    "phone": "085605067800",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771335513676-ff62xvgq9",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-17T13:38:33.676Z",
+        "_id": "69946f59a417dbbfb9b6d113"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-17T13:38:33.676Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-17T13:38:33.680Z",
+    "updatedAt": "2026-02-18T07:01:40.712Z",
+    "__v": 0
+  },
+  {
+    "_id": "69958eafb0fca0efde838325",
+    "orderNumber": "ORD-MLRV83MT-D3L",
+    "name": "Dago",
+    "phone": "087762619365",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771409071973-dm1azap6m",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-18T10:04:31.973Z",
+        "_id": "69958eafb0fca0efde838326"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-18T10:04:31.973Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-18T10:04:31.988Z",
+    "updatedAt": "2026-02-18T10:04:31.988Z",
+    "__v": 0
+  },
+  {
+    "_id": "6995929f1ba9668085a07b3c",
+    "orderNumber": "ORD-MLRVTPAX-2AN",
+    "name": "Isna",
+    "phone": "081326987861",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771410079832-mg2le7s76",
+        "serviceType": "Deepclean",
+        "quantity": 2,
+        "unitPrice": 35000,
+        "subtotal": 70000,
+        "notes": "",
+        "createdAt": "2026-02-18T10:21:19.832Z",
+        "_id": "6995929f1ba9668085a07b3d"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 2,
+    "estimatedPrice": 70000,
+    "subtotal": 70000,
+    "finalPrice": 70000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-18T10:21:19.833Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-18T10:21:19.850Z",
+    "updatedAt": "2026-02-18T10:21:19.850Z",
+    "__v": 0
+  },
+  {
+    "_id": "69959a5172f68cea86a4b1e1",
+    "orderNumber": "ORD-MLRWZXEL-ENH",
+    "name": "Desi",
+    "phone": "085708826818",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771412049884-36bdak6pv",
+        "serviceType": "one_day_service",
+        "quantity": 1,
+        "unitPrice": 50000,
+        "subtotal": 50000,
+        "notes": "",
+        "createdAt": "2026-02-18T10:54:09.884Z",
+        "_id": "69959a5172f68cea86a4b1e2"
+      },
+      {
+        "id": "item-1771412049884-1upj699vl",
+        "serviceType": "Deepclean_Tas",
+        "quantity": 1,
+        "unitPrice": 45000,
+        "subtotal": 45000,
+        "notes": "",
+        "createdAt": "2026-02-18T10:54:09.884Z",
+        "_id": "69959a5172f68cea86a4b1e3"
+      }
+    ],
+    "itemType": "one_day_service",
+    "quantity": 2,
+    "estimatedPrice": 95000,
+    "subtotal": 95000,
+    "finalPrice": 95000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-18T10:54:09.885Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-18T10:54:09.903Z",
+    "updatedAt": "2026-02-18T10:54:09.903Z",
+    "__v": 0
+  },
+  {
+    "_id": "6995a46d657ef4c6dfdd7403",
+    "orderNumber": "ORD-MLRYJEAG-UYZ",
+    "name": "Safiera",
+    "phone": "081334321665",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771414637848-vfzaqqifs",
+        "serviceType": "Deepclean",
+        "quantity": 7,
+        "unitPrice": 35000,
+        "subtotal": 245000,
+        "notes": "",
+        "createdAt": "2026-02-18T11:37:17.848Z",
+        "_id": "6995a46d657ef4c6dfdd7404"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 7,
+    "estimatedPrice": 245000,
+    "subtotal": 245000,
+    "finalPrice": 210000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-18T11:37:17.848Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-18T11:37:17.875Z",
+    "updatedAt": "2026-02-18T11:38:05.885Z",
+    "__v": 0,
+    "discount": {
+      "type": "fixed",
+      "value": 35000
+    }
+  },
+  {
+    "_id": "6995b66393330d4d8c66f0c7",
+    "orderNumber": "ORD-MLS19Y0L-A6L",
+    "name": "Della",
+    "phone": "081328177045",
+    "address": "",
+    "items": [
+      {
+        "id": "item-1771419235701-3w6tnk9e4",
+        "serviceType": "Deepclean",
+        "quantity": 1,
+        "unitPrice": 35000,
+        "subtotal": 35000,
+        "notes": "",
+        "createdAt": "2026-02-18T12:53:55.701Z",
+        "_id": "6995b66393330d4d8c66f0c8"
+      }
+    ],
+    "itemType": "Deepclean",
+    "quantity": 1,
+    "estimatedPrice": 35000,
+    "subtotal": 35000,
+    "finalPrice": 35000,
+    "status": "pending",
+    "verification": {
+      "status": "approved",
+      "verifiedAt": "2026-02-18T12:53:55.701Z"
+    },
+    "proofOfWork": {
+      "beforePhotos": [],
+      "afterPhotos": []
+    },
+    "customerNotes": "",
+    "notes": "",
+    "deleted": false,
+    "createdAt": "2026-02-18T12:53:55.714Z",
+    "updatedAt": "2026-02-18T12:53:55.714Z",
+    "__v": 0
+  }
+]

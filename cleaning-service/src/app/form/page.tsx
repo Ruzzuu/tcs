@@ -12,7 +12,6 @@ const APP_VERSION = '2.0.2-debug-multi-submit';
 interface OrderItem {
   id: number;
   itemType: ServiceType | '';
-  customItemType?: string;
   quantity: number;
   notes?: string;
 }
@@ -48,7 +47,7 @@ export default function CustomerFormPage() {
   // Auto-calculate total price
   const estimatedPrice = useMemo(() => {
     return items.reduce((total, item) => {
-      if (!item.itemType || item.itemType === 'other') return total;
+      if (!item.itemType) return total;
       const service = SERVICES[item.itemType as ServiceType];
       return total + (service ? service.price * item.quantity : 0);
     }, 0);
@@ -57,9 +56,8 @@ export default function CustomerFormPage() {
   // Form validation
   const isFormValid = useMemo(() => {
     const hasValidCustomer = name.trim().length >= 2 && isValidPhoneNumber(phone);
-    const hasValidItems = items.every(item => 
-      item.itemType !== '' && 
-      (item.itemType !== 'other' || (item.customItemType?.trim().length || 0) > 0) &&
+    const hasValidItems = items.every(item =>
+      item.itemType !== '' &&
       item.quantity >= 1
     );
     return hasValidCustomer && hasValidItems && items.length > 0;
@@ -67,30 +65,29 @@ export default function CustomerFormPage() {
 
   const handleItemChange = (id: number, field: keyof OrderItem, value: string | number) => {
     setItems(prev => {
-      const updatedItems = prev.map(item => 
+      const updatedItems = prev.map(item =>
         item.id === id ? { ...item, [field]: value } : item
       );
-      
+
       // Auto-merge: If itemType changed, check for duplicates and merge
-      if (field === 'itemType' && value !== '' && value !== 'other') {
+      if (field === 'itemType' && value !== '') {
         const currentItem = updatedItems.find(i => i.id === id);
-        const duplicateItem = updatedItems.find(i => 
-          i.id !== id && 
-          i.itemType === value && 
-          i.itemType !== 'other'
+        const duplicateItem = updatedItems.find(i =>
+          i.id !== id &&
+          i.itemType === value
         );
-        
+
         if (duplicateItem && currentItem) {
           // Merge: add quantity to existing item, remove current
           return updatedItems
-            .map(i => i.id === duplicateItem.id 
+            .map(i => i.id === duplicateItem.id
               ? { ...i, quantity: i.quantity + currentItem.quantity }
               : i
             )
             .filter(i => i.id !== id);
         }
       }
-      
+
       return updatedItems;
     });
     setError(null);
@@ -186,7 +183,6 @@ export default function CustomerFormPage() {
         address: address?.trim() || '',
         items: validItems.map(item => ({
           itemType: item.itemType as string,
-          customItemType: item.customItemType?.trim() || '',
           quantity: Number(item.quantity) || 1,
           notes: item.notes?.trim() || ''
         }))
@@ -403,23 +399,6 @@ export default function CustomerFormPage() {
                 </div>
               </div>
 
-              {/* Custom Item Type Input */}
-              {item.itemType === 'other' && (
-                <div className="flex flex-col gap-2 mb-4">
-                  <label className="text-[#111318] dark:text-gray-200 text-sm font-medium">
-                    Nama Barang <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={item.customItemType || ''}
-                    onChange={(e) => handleItemChange(item.id, 'customItemType', e.target.value)}
-                    className="w-full h-12 px-4 rounded-xl border border-[#dbdfe6] dark:border-[#2a3441] bg-[#f6f6f8] dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-[#616f89] dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 focus:border-[#1152d4] transition-all"
-                    placeholder="Contoh: Boneka Besar, Stroller, dll."
-                    required
-                  />
-                </div>
-              )}
-
               {/* Quantity Input with +/- buttons */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="text-[#111318] dark:text-gray-200 text-sm font-medium">
@@ -459,7 +438,7 @@ export default function CustomerFormPage() {
               </div>
 
               {/* Item Subtotal */}
-              {item.itemType && item.itemType !== 'other' && (
+              {item.itemType && (
                 <div className="mt-4 pt-3 border-t border-[#dbdfe6] dark:border-[#2a3441] flex justify-between items-center">
                   <span className="text-sm text-[#616f89]">Subtotal</span>
                   <span className="font-semibold text-[#1152d4]">

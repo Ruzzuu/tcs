@@ -36,10 +36,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       errors.push('Jenis barang tidak valid');
     }
 
-    if (itemType === 'other' && (!customItemType || customItemType.trim().length === 0)) {
-      errors.push('Nama barang wajib diisi untuk kategori Lainnya');
-    }
-
     if (!quantity || quantity < 1) {
       errors.push('Jumlah minimal 1');
     }
@@ -78,7 +74,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const newItem = createOrderItem(
       itemType as ServiceType,
       quantity,
-      itemType === 'other' ? customItemType?.trim() : undefined,
+      undefined,
       notes?.trim()
     );
 

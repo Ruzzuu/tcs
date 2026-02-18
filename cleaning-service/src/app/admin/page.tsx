@@ -279,7 +279,6 @@ export default function AdminDashboard() {
     phone: '',
     address: '',
     itemType: '' as ServiceType | '',
-    customItemType: '',
     quantity: 1,
     customerNotes: ''
   });
@@ -293,15 +292,13 @@ export default function AdminDashboard() {
   // Form validation
   const isFormValid = useMemo(() => {
     const hasValidCustomer = formData.name.trim().length >= 2 && isValidPhoneNumber(formData.phone);
-    const hasValidItem = formData.itemType !== '' && 
-      (formData.itemType !== 'other' || formData.customItemType.trim().length > 0) &&
-      formData.quantity >= 1;
+    const hasValidItem = formData.itemType !== '' && formData.quantity >= 1;
     return hasValidCustomer && hasValidItem;
   }, [formData]);
 
   // Calculate estimated price
   const estimatedPrice = useMemo(() => {
-    if (!formData.itemType || formData.itemType === 'other') return 0;
+    if (!formData.itemType) return 0;
     const service = SERVICES[formData.itemType as ServiceType];
     return service ? service.price * formData.quantity : 0;
   }, [formData.itemType, formData.quantity]);
@@ -564,7 +561,6 @@ export default function AdminDashboard() {
           phone: formData.phone,
           address: formData.address,
           itemType: formData.itemType,
-          customItemType: formData.customItemType,
           quantity: formData.quantity,
           customerNotes: formData.customerNotes,
           estimatedPrice: estimatedPrice,
@@ -594,7 +590,6 @@ export default function AdminDashboard() {
       phone: '',
       address: '',
       itemType: '',
-      customItemType: '',
       quantity: 1,
       customerNotes: ''
     });
@@ -949,26 +944,9 @@ export default function AdminDashboard() {
                       </optgroup>
                     ))}
                   </select>
-                </div>
+              </div>
 
-                {/* Custom Item Type (if other selected) */}
-                {formData.itemType === 'other' && (
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
-                      Nama Barang <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.customItemType}
-                      onChange={(e) => setFormData(prev => ({ ...prev, customItemType: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101622] text-[#111318] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 transition-all"
-                      placeholder="Contoh: Boneka Besar, Stroller, dll."
-                      required
-                    />
-                  </div>
-                )}
-
-                {/* Quantity */}
+              {/* Quantity */}
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
                     Jumlah

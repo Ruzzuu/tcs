@@ -222,12 +222,6 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        // Check custom item type for "other"
-        if (item.itemType === 'other' && (!item.customItemType || item.customItemType.trim().length === 0)) {
-          errors.push(`Item ${index + 1}: Nama barang wajib diisi untuk kategori Lainnya`);
-          return;
-        }
-
         // Check quantity
         if (!item.quantity || typeof item.quantity !== 'number' || item.quantity < 1) {
           errors.push(`Item ${index + 1}: Jumlah minimal 1`);
@@ -253,11 +247,11 @@ export async function POST(request: NextRequest) {
     console.log('📦 Creating new order with', submittedItems.length, 'items');
 
     // Create order items array
-    const orderItems = submittedItems.map((item: any) => 
+    const orderItems = submittedItems.map((item: any) =>
       createOrderItem(
         item.itemType as ServiceType,
         item.quantity,
-        item.itemType === 'other' ? item.customItemType?.trim() : undefined,
+        undefined,
         item.notes?.trim()
       )
     );

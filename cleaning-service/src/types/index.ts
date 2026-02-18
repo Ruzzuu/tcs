@@ -71,17 +71,9 @@ export type ServiceType =
   | 'Deepclean_Tas'
   | 'deepclean_bag_small'
   | 'deepclean_bag_large'
-  | 'tas_gunung'
-  | 'topi'
-  | 'helm'
   | 'one_day_service'
   | 'unyellowing'
-  | 'whitening'
-  | 'sewing'
-  | 'repaint_canvas'
-  | 'repaint_leather'
-  | 'repaint_suede'
-  | 'other';
+  | 'sewing';
 
 export type OrderStatus = 'pending' | 'in_progress' | 'finished' | 'delivered' | 'picked_up' | 'rejected';
 

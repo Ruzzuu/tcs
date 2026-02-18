@@ -36,24 +36,6 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     price: 55000,
     icon: 'shopping_bag'
   },
-  tas_gunung: {
-    name: 'Tas Gunung',
-    nameEn: 'Mountain Bag',
-    price: 50000,
-    icon: 'hiking'
-  },
-  topi: {
-    name: 'Topi',
-    nameEn: 'Hat',
-    price: 25000,
-    icon: 'school'
-  },
-  helm: {
-    name: 'Helm',
-    nameEn: 'Helmet',
-    price: 30000,
-    icon: 'sports_motorsports'
-  },
   one_day_service: {
     name: 'One Day Service',
     nameEn: 'One Day Service',
@@ -66,41 +48,11 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     price: 50000,
     icon: 'wb_sunny'
   },
-  whitening: {
-    name: 'Whitening',
-    nameEn: 'Whitening',
-    price: 50000,
-    icon: 'auto_fix_high'
-  },
   sewing: {
     name: 'Sewing (Jahit)',
     nameEn: 'Sewing',
     price: 35000,
     icon: 'content_cut'
-  },
-  repaint_canvas: {
-    name: 'Repaint Canvas',
-    nameEn: 'Canvas Repaint',
-    price: 75000,
-    icon: 'brush'
-  },
-  repaint_leather: {
-    name: 'Repaint Leather',
-    nameEn: 'Repaint Leather',
-    price: 75000,
-    icon: 'format_paint'
-  },
-  repaint_suede: {
-    name: 'Repaint Suede',
-    nameEn: 'Repaint Suede',
-    price: 75000,
-    icon: 'palette'
-  },
-  other: {
-    name: 'Lainnya',
-    nameEn: 'Other',
-    price: 0,
-    icon: 'more_horiz'
   }
 };
 
@@ -114,9 +66,6 @@ export const SERVICE_CATEGORIES = [
       { value: 'Deepclean_Tas', label: 'Deepclean Tas', price: 45000 },
       { value: 'deepclean_bag_small', label: 'Deepclean Tas (Small)', price: 35000 },
       { value: 'deepclean_bag_large', label: 'Deepclean Tas (Large)', price: 55000 },
-      { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
-      { value: 'topi', label: 'Topi', price: 25000 },
-      { value: 'helm', label: 'Helm', price: 30000 },
       { value: 'one_day_service', label: 'One Day Service', price: 50000 }
     ]
   },
@@ -124,22 +73,7 @@ export const SERVICE_CATEGORIES = [
     name: 'Treatment',
     services: [
       { value: 'unyellowing', label: 'Unyellowing', price: 50000 },
-      { value: 'whitening', label: 'Whitening', price: 50000 },
       { value: 'sewing', label: 'Sewing (Jahit)', price: 35000 }
-    ]
-  },
-  {
-    name: 'Repaint',
-    services: [
-      { value: 'repaint_canvas', label: 'Repaint Canvas', price: 75000 },
-      { value: 'repaint_leather', label: 'Repaint Leather', price: 75000 },
-      { value: 'repaint_suede', label: 'Repaint Suede', price: 75000 }
-    ]
-  },
-  {
-    name: 'Other',
-    services: [
-      { value: 'other', label: 'Lainnya', price: 0 }
     ]
   }
 ];
@@ -158,15 +92,7 @@ export const SERVICE_COLORS: Record<ServiceType, string> = {
   Deepclean_Tas: '#60A5FA',
   deepclean_bag_small: '#93C5FD',
   deepclean_bag_large: '#3B82F6',
-  tas_gunung: '#059669',
-  topi: '#D97706',
-  helm: '#D97706',
   one_day_service: '#EF4444',
   unyellowing: '#8B5CF6',
-  whitening: '#A855F7',
-  sewing: '#EC4899',
-  repaint_canvas: '#14B8A6',
-  repaint_leather: '#06B6D4',
-  repaint_suede: '#0EA5E9',
-  other: '#6B7280',
+  sewing: '#EC4899'
 };

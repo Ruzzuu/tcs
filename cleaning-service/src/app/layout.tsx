@@ -10,8 +10,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Teman Cuci Sepatu - Layanan Cuci Profesional",
-  description: "Layanan cuci sepatu, tas, helm, sofa, karpet dengan kualitas premium. Penjemputan gratis ke lokasi Anda.",
-  keywords: ["cuci sepatu", "cuci tas", "cuci helm", "cuci sofa", "cuci karpet", "laundry"],
+  description: "Layanan cuci sepatu dan tas dengan kualitas premium. Penjemputan gratis ke lokasi Anda.",
+  keywords: ["cuci sepatu", "cuci tas", "laundry"],
   authors: [{ name: "Teman Cuci Sepatu" }],
   manifest: "/manifest.json",
 };
