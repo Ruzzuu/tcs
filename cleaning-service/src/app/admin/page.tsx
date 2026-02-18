@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
-import { formatCurrency, formatDate, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import PhoneAutocomplete from '@/components/PhoneAutocomplete';
@@ -1145,6 +1145,10 @@ export default function AdminDashboard() {
               className="h-full px-3 py-2 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer"
             />
             {dateFilter && (
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111318] dark:text-white text-sm pointer-events-none bg-white/95 dark:bg-[#1a202c]/95 backdrop-blur-sm px-3 py-2 rounded-lg font-medium">
+                {formatDateShort(dateFilter)}
+              </span>
+            )} {dateFilter && (
               <button
                 onClick={() => setDateFilter('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"

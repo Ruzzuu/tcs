@@ -172,6 +172,17 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Format date to dd/mm/yyyy format (e.g., 18/02/2026)
+ */
+export function formatDateShort(date: Date | string): string {
+  return new Date(date).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+/**
  * Get current date/time in WIB timezone (GMT+7)
  * Use this instead of new Date() for Indonesian time
  */
