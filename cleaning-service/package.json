@@ -12,7 +12,9 @@
     "migrate:sepatu": "npx tsx scripts/migrate-sepatu-to-deepclean.ts",
     "migrate:tas-ransel": "npx tsx scripts/migrate-tas-ransel-to-deepclean-tas.ts",
     "migrate:sandal": "npx tsx scripts/migrate-sandal-to-deepclean-sandal.ts",
-    "migrate:to-deepclean-tas": "npx tsx scripts/migrate-to-deepclean-tas.ts"
+    "migrate:to-deepclean-tas": "npx tsx scripts/migrate-to-deepclean-tas.ts",
+    "debug:pricing": "npx tsx scripts/debug-order-pricing.ts",
+    "fix:pricing": "npx tsx scripts/fix-order-pricing.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
