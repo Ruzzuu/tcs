@@ -1141,6 +1141,11 @@ export default function AdminDashboard() {
             <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
               <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">calendar_today</span>
             </div>
+            {!dateFilter && (
+              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm pointer-events-none">
+                DD/MM/YYYY
+              </span>
+            )}
             <input
               type="date"
               value={dateFilter}
