@@ -19,6 +19,12 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     price: 25000,
     icon: 'backpack'
   },
+  Deepclean_Tas: {
+    name: 'Deepclean Tas',
+    nameEn: 'Deepclean Backpack',
+    price: 45000,
+    icon: 'backpack'
+  },
   tas_gunung: {
     name: 'Tas Gunung',
     nameEn: 'Mountain Bag',
@@ -97,6 +103,7 @@ export const SERVICE_CATEGORIES = [
     services: [
       { value: 'Deepclean', label: 'Deepclean', price: 35000 },
       { value: 'Deepclean_Sandal', label: 'Deepclean Sandal', price: 25000 },
+      { value: 'Deepclean_Tas', label: 'Deepclean Tas', price: 45000 },
       { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
       { value: 'topi', label: 'Topi', price: 25000 },
       { value: 'helm', label: 'Helm', price: 30000 },
@@ -138,6 +145,7 @@ export const SERVICE_OPTIONS = Object.entries(SERVICES).map(([key, value]) => ({
 export const SERVICE_COLORS: Record<ServiceType, string> = {
   Deepclean: '#1152d4',
   Deepclean_Sandal: '#3B82F6',
+  Deepclean_Tas: '#60A5FA',
   tas_gunung: '#059669',
   topi: '#F59E0B',
   helm: '#D97706',

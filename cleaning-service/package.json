@@ -11,7 +11,8 @@
     "migrate:phones": "node --loader ts-node/esm scripts/migrate-phones.ts",
     "migrate:sepatu": "npx tsx scripts/migrate-sepatu-to-deepclean.ts",
     "migrate:tas-ransel": "npx tsx scripts/migrate-tas-ransel-to-deepclean-tas.ts",
-    "migrate:sandal": "npx tsx scripts/migrate-sandal-to-deepclean-sandal.ts"
+    "migrate:sandal": "npx tsx scripts/migrate-sandal-to-deepclean-sandal.ts",
+    "migrate:to-deepclean-tas": "npx tsx scripts/migrate-to-deepclean-tas.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",

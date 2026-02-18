@@ -17,7 +17,7 @@ const OrderItemSchema = new Schema({
   serviceType: {
     type: String,
     required: true,
-    enum: ['Deepclean', 'Deepclean_Sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[]
+    enum: ['Deepclean', 'Deepclean_Sandal', 'Deepclean_Tas', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[]
   },
   quantity: {
     type: Number,
@@ -88,7 +88,7 @@ const OrderSchema = new Schema<OrderDocument>(
     itemType: {
       type: String,
       enum: {
-        values: ['Deepclean', 'Deepclean_Sandal', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[],
+        values: ['Deepclean', 'Deepclean_Sandal', 'Deepclean_Tas', 'tas_ransel', 'tas_gunung', 'topi', 'helm', 'one_day_service', 'unyellowing', 'whitening', 'sewing', 'repaint_canvas', 'repaint_leather', 'repaint_suede', 'other'] as ServiceType[],
         message: 'Jenis barang tidak valid'
       }
     },
