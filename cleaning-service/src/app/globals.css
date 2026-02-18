@@ -172,62 +172,14 @@ textarea {
   }
 }
 
-/* Mobile Safari iOS - prevent zoom on focus */
-@media screen and (max-width: 768px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  textarea {
-    font-size: 16px !important;
-  }
-}
-
-/* Button active state */
-button:active {
-  transform: scale(0.98);
-}
-
-/* Card shadow */
-.card-shadow {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-/* Status badge base */
-.status-badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-}
-
-/* Loading spinner */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Skeleton loading */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.dark input:-webkit-autofill {
+  background-color: #1a2230 !important;
 }
 
 /* Mobile WebKit Date Input Fixes */
 @media screen and (max-width: 768px) {
   input[type="date"] {
     -webkit-appearance: none;
-    -webkit-transform: translateZ(0);
   }
 
   .date-display {
@@ -235,34 +187,6 @@ button:active {
     -webkit-backface-visibility: visible !important;
     -webkit-font-smoothing: antialiased !important;
   }
-
-  .date-display-overlay {
-    opacity: 1 !important;
-    -webkit-opacity: 1 !important;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-text-fill-color: #111318 !important;
-    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  }
-}
-
-.dark input:-webkit-autofill,
-.dark input:-webkit-autofill:hover,
-.dark input:-webkit-autofill:focus,
-.dark input:-webkit-autofill:active {
-  -webkit-text-fill-color: #ffffff !important;
-  -webkit-box-shadow: 0 0 0 1000px #1a2230 inset !important;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-.dark input:-webkit-autofill {
-  background-color: #1a2230 !important;
 }
 
 .dark input:-webkit-autofill::selection {
