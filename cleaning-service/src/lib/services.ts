@@ -9,19 +9,19 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
   // Cleaning - Normal
   Deepclean: {
     name: 'Deepclean',
-    nameEn: 'Deepclean Backpack',
+    nameEn: 'Deepclean Shoes',
     price: 35000,
     icon: 'steps'
   },
   Deepclean_Sandal: {
     name: 'Deepclean Sandal',
-    nameEn: 'Deepclean Backpack',
+    nameEn: 'Deepclean Sandal',
     price: 25000,
     icon: 'backpack'
   },
   Deepclean_Tas: {
     name: 'Deepclean Tas',
-    nameEn: 'Deepclean Backpack',
+    nameEn: 'Deepclean Bag',
     price: 45000,
     icon: 'backpack'
   },
