@@ -1125,7 +1125,7 @@ export default function AdminDashboard() {
 
         {/* Search with Date Picker */}
         <div className="flex gap-2 mb-4">
-          <div className="relative group flex-1">
+          <div className="relative group flex-1 min-w-0">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
               <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">search</span>
             </div>
@@ -1137,7 +1137,7 @@ export default function AdminDashboard() {
               placeholder="Cari nama, telepon, atau nomor order..."
             />
           </div>
-          <div className="relative group">
+          <div className="relative group w-48 sm:w-52 shrink-0">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
               <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">calendar_today</span>
             </div>
