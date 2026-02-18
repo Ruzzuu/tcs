@@ -1138,6 +1138,12 @@ export default function AdminDashboard() {
             />
           </div>
           <div className="relative">
+            <label className="sr-only">Filter by Date</label>
+            {!dateFilter && (
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111318] dark:text-white/60 text-sm font-medium pointer-events-none">
+                DD/MM/YYYY
+              </span>
+            )}
             <input
               type="date"
               value={dateFilter}
