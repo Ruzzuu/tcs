@@ -1137,29 +1137,22 @@ export default function AdminDashboard() {
               placeholder="Cari nama, telepon, atau nomor order..."
             />
           </div>
-          <div className="relative">
-            <label className="sr-only">Filter by Date</label>
-            {!dateFilter && (
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111318] dark:text-white/60 text-sm font-medium pointer-events-none">
-                DD/MM/YYYY
-              </span>
-            )}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+              <span className="material-symbols-outlined text-gray-400 group-focus-within:text-[#1152d4] transition-colors text-[20px]">calendar_today</span>
+            </div>
             <input
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="h-full pl-12 pr-8 py-2 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer"
+              className="w-full pl-10 pr-10 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
             />
             {dateFilter && (
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 z-[100] text-[#111318] dark:text-white text-sm bg-white dark:bg-[#1a202c] px-3 py-1.5 rounded-lg font-medium shadow-md border border-gray-200 dark:border-gray-700 date-display pointer-events-none">
-                {formatDateShort(dateFilter)}
-              </span>
-            )} {dateFilter && (
               <button
                 onClick={() => setDateFilter('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors z-10"
               >
-                <span className="material-symbols-outlined text-[16px]">close</span>
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
