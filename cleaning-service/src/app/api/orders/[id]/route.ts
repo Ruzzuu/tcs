@@ -7,12 +7,12 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import Rekap from '@/lib/models/Rekap';
 import { v2 as cloudinary } from 'cloudinary';
-import { calculateTotal } from '@/lib/services';
-import type { ServiceSelection, Discount } from '@/lib/services';
-import { isFeatureEnabled } from '@/lib/featureFlags';
 import { calculateOrderTotal } from '@/lib/orderUtils';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { runTransactionSafe } from '@/lib/db/transactions';
 import mongoose from 'mongoose';
+
+type Discount = { type: 'percentage' | 'fixed'; value: number };
 
 // Configure Cloudinary
 cloudinary.config({
@@ -133,14 +133,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             );
           }
           
-          const items: ServiceSelection[] = [{
-            serviceKey: order.itemType,
-            quantity: order.quantity,
-            price: order.estimatedPrice / order.quantity
-          }];
+          const items = order.items || [];
+          const pricing = calculateOrderTotal(items, discount);
 
-          const pricing = calculateTotal(items, discount);
-          
           updateData.discount = discount;
           updateData.subtotal = pricing.subtotal;
           updateData.finalPrice = pricing.total;

@@ -51,31 +51,17 @@ async function migrateSandalToDeepcleanSandal() {
     // STEP 4: UPDATE MULTI-ITEM ORDERS (serviceType + price)
     let itemsUpdated = 0;
     if (multiItemCount > 0) {
-      // For each order with sandal items, update those specific items only
-      const ordersToUpdate = await Order.find({ 'items.serviceType': OLD_VALUE });
-      
-      for (const order of ordersToUpdate) {
-        // Find the specific items with itemType = 'sandal'
-        const sandalItems = order.items?.filter(item => item.serviceType === 'sandal') || [];
-        
-        if (sandalItems.length > 0) {
-          // Update only the sandal items (not other items)
-          const updatedItems = sandalItems.map(item => {
-            if (item.serviceType === 'sandal') {
-              return { ...item, serviceType: 'Deepclean_Sandal' };
-            }
-            return item;
-          });
-
-          await Order.updateOne(
-            { _id: order._id },
-            { $set: { items: updatedItems } }
-          );
-
-          itemsUpdated++;
+      // Use arrayFilters to update only matching array elements
+      const result = await Order.updateMany(
+        { 'items.serviceType': OLD_VALUE },
+        { $set: { 'items.$[elem].serviceType': NEW_VALUE } },
+        {
+          arrayFilters: [{ 'elem.serviceType': OLD_VALUE }]
         }
-      }
-      
+      );
+
+      itemsUpdated = result.modifiedCount;
+
       console.log(`✅ Updated ${itemsUpdated} orders with sandal items → Deepclean_Sandal`);
     }
 
@@ -109,8 +95,8 @@ async function migrateSandalToDeepcleanSandal() {
       console.log('\n⚠️  Migration completed with warnings:');
       console.log(`   ${remainingLegacy} orders still have itemType = 'sandal'`);
       console.log(`   ${remainingItems} items still have serviceType = 'sandal'`);
-      console.log(`   Expected: ${legacyCount} legacy + multiItemCount} orders`);
-      console.log(`   Got: ${newCount} + itemsNewCount} total`);
+      console.log(`   Expected: ${legacyCount + multiItemCount} orders`);
+      console.log(`   Got: ${newCount + itemsNewCount} total`);
       process.exit(1);
     }
 

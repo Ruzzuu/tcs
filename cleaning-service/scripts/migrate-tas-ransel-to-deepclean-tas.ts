@@ -58,30 +58,18 @@ async function migrateTasRanselToDeepcleanTas() {
     let itemsUpdated = 0;
     if (multiItemCount > 0) {
       // First, update all items with new serviceType
-      await Order.updateMany(
+      const result = await Order.updateMany(
         { 'items.serviceType': OLD_VALUE },
         {
           $set: {
             'items.$[elem].serviceType': NEW_VALUE
           }
+        },
+        {
+          arrayFilters: [{ 'elem.serviceType': OLD_VALUE }]
         }
       );
       itemsUpdated = result.modifiedCount;
-      console.log(`✅ Updated ${itemsUpdated} orders with items array: tas_ransel → deepclean_tas`);
-      console.log(`✅ Updated subtotals for ${itemsUpdated} orders with new price: Rp ${NEW_PRICE}`);
-    }
-            return item;
-          });
-
-          await Order.updateOne(
-            { _id: order._id },
-            { $set: { items: updatedItems } }
-          );
-
-          itemsUpdated++;
-        }
-      }
-
       console.log(`✅ Updated ${itemsUpdated} orders with items array: tas_ransel → deepclean_tas`);
       console.log(`✅ Updated subtotals for ${itemsUpdated} orders with new price: Rp ${NEW_PRICE}`);
     }

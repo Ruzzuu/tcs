@@ -3,7 +3,6 @@
 // ============================================
 
 import { Order } from '@/types';
-import { BUSINESS_INFO } from './services';
 
 /**
  * Format number to Indonesian Rupiah
@@ -53,7 +52,7 @@ export function generateWhatsAppLink(phone: string, message?: string): string {
  */
 export const WA_TEMPLATES = {
   newOrderVerification: (order: Order) =>
-    `Halo ${order.name}, terima kasih telah menghubungi ${BUSINESS_INFO.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
+    `Halo ${order.name}, terima kasih telah menghubungi Teman Cuci Sepatu.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
 
   orderInProgress: (order: Order) =>
     `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan Deepclean ke *Teman Cuci Sepatu*.\n\nSaat ini Deepclean Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,

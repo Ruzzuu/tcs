@@ -25,7 +25,7 @@ async function updateDeepcleanTasPrice() {
     console.log('🔍 Finding orders with deepclean_tas items...');
 
     const ordersToUpdate = await Order.find({
-      'items.serviceType': 'deepclean_tas'
+      'items.serviceType': 'deepclean_tas' as any
     });
 
     console.log(`📊 Found ${ordersToUpdate.length} orders with deepclean_tas items`);
@@ -39,7 +39,7 @@ async function updateDeepcleanTasPrice() {
     let itemsUpdated = 0;
     for (const order of ordersToUpdate) {
       // Update each item's unitPrice and recalculate subtotal
-      const updatedItems = order.items!.map(item => {
+      const updatedItems = order.items!.map((item: any) => {
         if (item.serviceType === 'deepclean_tas') {
           return {
             ...item,
@@ -56,17 +56,17 @@ async function updateDeepcleanTasPrice() {
       );
 
       itemsUpdated++;
-      console.log(`✅ Updated order ${order.orderNumber}: ${order.items!.filter(i => i.serviceType === 'deepclean_tas').length} items`);
+      console.log(`✅ Updated order ${order.orderNumber}: ${order.items!.filter((i: any) => i.serviceType === 'deepclean_tas').length} items`);
     }
 
     // STEP 3: VERIFY PRICES
     const itemsWithPrice = await Order.find({
-      'items.serviceType': 'deepclean_tas',
+      'items.serviceType': 'deepclean_tas' as any,
       'items.unitPrice': NEW_PRICE
     });
 
     const itemCount = itemsWithPrice.reduce((sum, order) => {
-      return sum + (order.items?.filter(i => i.serviceType === 'deepclean_tas').length || 0);
+      return sum + (order.items?.filter((i: any) => i.serviceType === 'deepclean_tas').length || 0);
     }, 0);
 
     const endTime = Date.now();
