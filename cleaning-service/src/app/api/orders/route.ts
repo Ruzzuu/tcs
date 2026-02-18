@@ -10,7 +10,7 @@ import { SERVICES } from '@/lib/services';
 import { generateOrderNumber, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { createOrderItem, shouldAppendToOrder } from '@/lib/orderUtils';
+import { createOrderItem } from '@/lib/orderUtils';
 
 // Phone numbers to exclude from auto-saving
 const EXCLUDED_PHONES = [

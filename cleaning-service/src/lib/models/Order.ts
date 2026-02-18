@@ -134,7 +134,7 @@ const OrderSchema = new Schema<OrderDocument>(
     // Status Flow
     status: {
       type: String,
-      enum: ['pending', 'in_progress', 'finished', 'delivered', 'picked_up'] as OrderStatus[],
+      enum: ['pending', 'in_progress', 'finished', 'delivered', 'picked_up', 'rejected'] as OrderStatus[],
       default: 'pending',
       index: true
     },

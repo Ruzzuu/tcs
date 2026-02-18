@@ -16,7 +16,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     name: 'Deepclean Sandal',
     nameEn: 'Deepclean Sandal',
     price: 25000,
-    icon: 'backpack'
+    icon: 'steps'
   },
   Deepclean_Tas: {
     name: 'Deepclean Tas',
@@ -52,7 +52,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     name: 'Sewing (Jahit)',
     nameEn: 'Sewing',
     price: 35000,
-    icon: 'content_cut'
+    icon: 'sewing'
   },
   sewing_dan_cuci: {
     name: 'Sewing (Jahit) dan Cuci',
@@ -70,7 +70,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     name: 'Deepclean Topi',
     nameEn: 'Deepclean Hat',
     price: 25000,
-    icon: 'school'
+    icon: 'cap'
   },
   deepclean_fantofel: {
     name: 'Deepclean Fantofel',
@@ -117,34 +117,24 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
 };
 
 // Service categories for grouped dropdown
+// Prices are derived from SERVICES to keep a single source of truth
 export const SERVICE_CATEGORIES = [
   {
     name: 'Cleaning',
-    services: [
-      { value: 'Deepclean', label: 'Deepclean', price: 35000 },
-      { value: 'Deepclean_Sandal', label: 'Deepclean Sandal', price: 25000 },
-      { value: 'Deepclean_Tas', label: 'Deepclean Tas', price: 45000 },
-      { value: 'deepclean_bag_small', label: 'Deepclean Tas (Small)', price: 35000 },
-      { value: 'deepclean_bag_large', label: 'Deepclean Tas (Large)', price: 55000 },
-      { value: 'one_day_service', label: 'One Day Service', price: 50000 },
-      { value: 'sewing_dan_cuci', label: 'Sewing (Jahit) dan Cuci', price: 60000 },
-      { value: 'deepclean_kids', label: 'Deepclean Kids', price: 30000 },
-      { value: 'deepclean_topi', label: 'Deepclean Topi', price: 25000 },
-      { value: 'deepclean_fantofel', label: 'Deepclean Fantofel', price: 30000 },
-      { value: 'deepclean_member', label: 'Deepclean Member', price: 30000 },
-      { value: 'deepclean_helm', label: 'Deepclean Helm', price: 35000 }
-    ]
+    services: (
+      [
+        'Deepclean', 'Deepclean_Sandal', 'Deepclean_Tas',
+        'deepclean_bag_small', 'deepclean_bag_large',
+        'one_day_service', 'sewing_dan_cuci', 'deepclean_kids',
+        'deepclean_topi', 'deepclean_fantofel', 'deepclean_member', 'deepclean_helm'
+      ] as ServiceType[]
+    ).map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
   },
   {
     name: 'Treatment',
-    services: [
-      { value: 'unyellowing', label: 'Unyellowing', price: 50000 },
-      { value: 'sewing', label: 'Sewing (Jahit)', price: 35000 },
-      { value: 'whitening', label: 'Whitening Treatment', price: 50000 },
-      { value: 'repaint_leather', label: 'Repaint Leather', price: 100000 },
-      { value: 'repaint_canvas', label: 'Repaint Canvas', price: 100000 },
-      { value: 'repaint_suede', label: 'Repaint Suede', price: 100000 }
-    ]
+    services: (
+      ['unyellowing', 'sewing', 'whitening', 'repaint_leather', 'repaint_canvas', 'repaint_suede'] as ServiceType[]
+    ).map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
   }
 ];
 
