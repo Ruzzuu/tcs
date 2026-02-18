@@ -6,10 +6,9 @@
 import { ServiceConfig, ServiceType } from '@/types';
 
 export const SERVICES: Record<ServiceType, ServiceConfig> = {
-  // Cleaning - Normal
   Deepclean: {
     name: 'Deepclean',
-    nameEn: 'Deepclean Shoes',
+    nameEn: 'Deepclean',
     price: 35000,
     icon: 'steps'
   },
@@ -24,6 +23,48 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     nameEn: 'Deepclean Bag',
     price: 45000,
     icon: 'backpack'
+  },
+  deepclean_bag_small: {
+    name: 'Deepclean Tas Kecil',
+    nameEn: 'Deepclean Bag (Small)',
+    price: 35000,
+    icon: 'work'
+  },
+  deepclean_bag_large: {
+    name: 'Deepclean Tas Besar',
+    nameEn: 'Deepclean Bag (Large)',
+    price: 55000,
+    icon: 'shopping_bag'
+  },
+  tas_gunung: {
+    name: 'Tas Gunung',
+    nameEn: 'Mountain Bag',
+    price: 50000,
+    icon: 'hiking'
+  },
+  Deepclean_Sandal: {
+    name: 'Deepclean Sandal',
+    nameEn: 'Deepclean Sandal',
+    price: 25000,
+    icon: 'backpack'
+  },
+  Deepclean_Tas: {
+    name: 'Deepclean Tas',
+    nameEn: 'Deepclean Bag',
+    price: 45000,
+    icon: 'backpack'
+  },
+  deepclean_bag_small: {
+    name: 'Deepclean Tas Kecil',
+    nameEn: 'Deepclean Bag (Small)',
+    price: 35000,
+    icon: 'work'
+  },
+  deepclean_bag_large: {
+    name: 'Deepclean Tas Besar',
+    nameEn: 'Deepclean Bag (Large)',
+    price: 55000,
+    icon: 'shopping_bag'
   },
   tas_gunung: {
     name: 'Tas Gunung',
@@ -104,34 +145,12 @@ export const SERVICE_CATEGORIES = [
       { value: 'Deepclean', label: 'Deepclean', price: 35000 },
       { value: 'Deepclean_Sandal', label: 'Deepclean Sandal', price: 25000 },
       { value: 'Deepclean_Tas', label: 'Deepclean Tas', price: 45000 },
-      { value: 'tas_gunung', label: 'Tas Gunung', price: 50000 },
-      { value: 'topi', label: 'Topi', price: 25000 },
-      { value: 'helm', label: 'Helm', price: 30000 },
-      { value: 'one_day_service', label: 'One Day Service', price: 50000 }
+      { value: 'deepclean_bag_small', label: 'Deepclean Tas Kecil', price: 35000 },
+      { value: 'deepclean_bag_large', label: 'Deepclean Tas Besar', price: 55000 },
+      // ... existing services
     ]
   },
-  {
-    name: 'Treatment',
-    services: [
-      { value: 'unyellowing', label: 'Unyellowing', price: 50000 },
-      { value: 'whitening', label: 'Whitening', price: 50000 },
-      { value: 'sewing', label: 'Sewing (Jahit)', price: 35000 }
-    ]
-  },
-  {
-    name: 'Repaint',
-    services: [
-      { value: 'repaint_canvas', label: 'Repaint Canvas', price: 75000 },
-      { value: 'repaint_leather', label: 'Repaint Leather', price: 75000 },
-      { value: 'repaint_suede', label: 'Repaint Suede', price: 75000 }
-    ]
-  },
-  {
-    name: 'Lainnya',
-    services: [
-      { value: 'other', label: 'Lainnya', price: 0 }
-    ]
-  }
+  // ... other categories
 ];
 
 // Service type options for dropdown (flat list)
@@ -146,8 +165,10 @@ export const SERVICE_COLORS: Record<ServiceType, string> = {
   Deepclean: '#1152d4',
   Deepclean_Sandal: '#3B82F6',
   Deepclean_Tas: '#60A5FA',
+  deepclean_bag_small: '#93C5FD',
+  deepclean_bag_large: '#3B82F6',
   tas_gunung: '#059669',
-  topi: '#F59E0B',
+  topi: '#D97706',
   helm: '#D97706',
   one_day_service: '#EF4444',
   unyellowing: '#8B5CF6',
@@ -156,5 +177,5 @@ export const SERVICE_COLORS: Record<ServiceType, string> = {
   repaint_canvas: '#14B8A6',
   repaint_leather: '#06B6D4',
   repaint_suede: '#0EA5E9',
-  other: '#6B7280'
+  other: '#6B7280',
 };

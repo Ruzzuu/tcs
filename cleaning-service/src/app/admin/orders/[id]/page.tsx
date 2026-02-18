@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Order, OrderStatus, CloudinaryImage } from '@/types';
+import type { Order, OrderStatus, CloudinaryImage } from '@/types';
 import { 
   formatCurrency, 
   formatDate, 
