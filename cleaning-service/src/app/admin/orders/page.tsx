@@ -327,7 +327,7 @@ export default function AdminForm() {
             <div className="relative">
               <PhoneAutocomplete
                 value={formData.whatsapp}
-                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, whatsapp: e.target.value })}
                 placeholder="0812xxxx..."
                 required
               />

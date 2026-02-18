@@ -11,13 +11,14 @@ export interface CloudinaryImage {
 // Order Item - represents a single item in an order
 export interface OrderItem {
   _id?: string;
-  id: string; // Unique ID for the item
+  id: string;
   serviceType: ServiceType;
   quantity: number;
-  unitPrice: number; // Price per unit at time of order
-  subtotal: number; // unitPrice * quantity
-  notes?: string; // Item-specific notes
-  customItemType?: string; // For 'other' service type
+  unitPrice: number;
+  subtotal: number;
+  notes?: string;
+  customItemType?: string;
+  createdAt?: Date;
 }
 
 // Order - main order interface
@@ -27,9 +28,10 @@ export interface Order {
   name: string;
   phone: string;
   address: string;
-  itemType?: ServiceType; // Legacy single-item orders
+  itemType?: ServiceType;
   quantity?: number;
-  items?: OrderItem[]; // Multi-item orders (new feature)
+  items?: OrderItem[];
+  customItemType?: string;
   estimatedPrice?: number;
   subtotal: number;
   finalPrice: number;
@@ -40,7 +42,6 @@ export interface Order {
   status: OrderStatus;
   createdAt: Date;
   updatedAt: Date;
-  // Verification
   verification?: {
     status: VerificationStatus;
     verifiedAt?: Date;
@@ -51,26 +52,20 @@ export interface Order {
     };
     notes?: string;
   };
-  // Proof of Work
   proofOfWork?: {
     beforePhotos: CloudinaryImage[];
     afterPhotos: CloudinaryImage[];
   };
-  customerNotes?: string; // Notes from customer when ordering
-  notes: string; // Admin internal notes
-  // Timestamps
-  createdAt: Date;
-  updatedAt: Date;
+  customerNotes?: string;
+  notes: string;
   finishedAt?: Date;
-  // Rekap reference
   rekapId?: string;
-  // Soft delete
   deleted?: boolean;
   archivedAt?: Date;
+  notaImage?: CloudinaryImage;
 }
 
 export type ServiceType =
-  // Cleaning - Normal
   | 'Deepclean'
   | 'Deepclean_Sandal'
   | 'Deepclean_Tas'
@@ -80,75 +75,13 @@ export type ServiceType =
   | 'topi'
   | 'helm'
   | 'one_day_service'
-  // Treatment
   | 'unyellowing'
   | 'whitening'
   | 'sewing'
   | 'repaint_canvas'
   | 'repaint_leather'
   | 'repaint_suede'
-  // Other;
-
-// Order Item - represents a single item in an order
-export interface OrderItem {
-  _id?: string;
-  id: string; // Unique ID for the item
-  serviceType: ServiceType;
-  quantity: number;
-  unitPrice: number; // Price per unit at time of order
-  subtotal: number; // unitPrice * quantity
-  notes?: string; // Item-specific notes
-  customItemType?: string; // For 'other' service type
-}
-
-// Order - main order interface
-export interface Order {
-  _id: string;
-  orderNumber: string;
-  name: string;
-  phone: string;
-  address: string;
-  itemType?: ServiceType; // Legacy single-item orders
-  quantity?: number;
-  items?: OrderItem[]; // Multi-item orders (new feature)
-  estimatedPrice?: number;
-  subtotal: number;
-  finalPrice: number;
-  discount?: {
-    type: 'percentage' | 'fixed';
-    value: number;
-  };
-  status: OrderStatus;
-  createdAt: Date;
-  updatedAt: Date;
-  // Verification
-  verification?: {
-    status: VerificationStatus;
-    verifiedAt?: Date;
-    verifiedBy?: string;
-    proofOfWork?: {
-      beforePhotos: CloudinaryImage[];
-      afterPhotos: CloudinaryImage[];
-    };
-    notes?: string;
-  };
-  // Proof of Work
-  proofOfWork?: {
-    beforePhotos: CloudinaryImage[];
-    afterPhotos: CloudinaryImage[];
-    };
-  customerNotes?: string; // Notes from customer when ordering
-  notes: string; // Admin internal notes
-  // Timestamps
-  createdAt: Date;
-  updatedAt: Date;
-  finishedAt?: Date;
-  // Rekap reference
-  rekapId?: string;
-  // Soft delete
-  deleted?: boolean;
-  archivedAt?: Date;
-}
+  | 'other';
 
 export type OrderStatus = 'pending' | 'in_progress' | 'finished' | 'delivered' | 'picked_up' | 'rejected';
 
@@ -159,4 +92,29 @@ export interface ServiceConfig {
   nameEn: string;
   price: number;
   icon: string;
+}
+
+export interface PhoneAutocompleteProps {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+  className?: string;
+}
+
+export interface PhoneCacheData {
+  phones: string[];
+  timestamp: number;
+}
+
+export interface DashboardData {
+  total: number;
+  pending: number;
+  inProgress: number;
+  delivered: number;
+  pickedUp: number;
+  finished: number;
+  serviceDistribution: Array<{ name: string; value: number; color: string }>;
+  incomeTrend: Array<{ day: string; date: string; amount: number }>;
+  recentOrders: Order[];
 }
