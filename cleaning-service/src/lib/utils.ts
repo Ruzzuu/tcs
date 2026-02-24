@@ -223,14 +223,17 @@ export function formatTime(date: Date | string): string {
  */
 export function formatDateTimeFull(date: Date | string): string {
   const d = new Date(date);
+  // finishedAt/pickedUpAt are stored as WIB time (server adds +7h before saving),
+  // so use UTC methods to read back the stored value without double-applying timezone.
   const datePart = d.toLocaleDateString('id-ID', {
+    timeZone: 'UTC',
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  const seconds = String(d.getSeconds()).padStart(2, '0');
+  const hours = String(d.getUTCHours()).padStart(2, '0');
+  const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(d.getUTCSeconds()).padStart(2, '0');
   return `${datePart} | ${hours}:${minutes}:${seconds}`;
 }
 
