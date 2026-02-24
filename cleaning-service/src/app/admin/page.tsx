@@ -684,6 +684,15 @@ export default function AdminDashboard() {
     return matchesSearch && matchesStatus && matchesDate;
   }) || [];
 
+  // When viewing Selesai tab, sort by finishedAt newest first
+  if (statusFilter === 'finished') {
+    filteredOrders.sort((a, b) => {
+      const aTime = a.finishedAt ? new Date(a.finishedAt).getTime() : 0;
+      const bTime = b.finishedAt ? new Date(b.finishedAt).getTime() : 0;
+      return bTime - aTime;
+    });
+  }
+
   if (loading && !data) {
     return <DashboardSkeleton />;
   }
