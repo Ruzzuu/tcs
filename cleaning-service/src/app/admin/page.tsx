@@ -198,6 +198,11 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}>
             {getStatusLabel(order.status)}
           </span>
+          {order.status === 'finished' && order.finishedAt && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              · {formatDateTimeFull(order.finishedAt)}
+            </span>
+          )}
           {order.status === 'picked_up' && order.pickedUpAt && (
             <span className="text-xs text-gray-500 dark:text-gray-400">
               · {formatDateTimeFull(order.pickedUpAt)}

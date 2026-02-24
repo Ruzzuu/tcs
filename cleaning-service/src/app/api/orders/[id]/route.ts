@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import Rekap from '@/lib/models/Rekap';
-import { v2 as cloudinary } from 'cloudinary';
+import { deleteImages } from '@/lib/cloudinary';
 import { calculateOrderTotal } from '@/lib/orderUtils';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { runTransactionSafe } from '@/lib/db/transactions';
@@ -14,13 +14,7 @@ import mongoose from 'mongoose';
 
 type Discount = { type: 'percentage' | 'fixed'; value: number };
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
+// Cloudinary is configured via @/lib/cloudinary
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -312,6 +306,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
       }
 
+      // Delete Cloudinary images before archiving
+      const softDeletePublicIds: string[] = [];
+      order.proofOfWork?.beforePhotos?.forEach((img: any) => { if (img.publicId) softDeletePublicIds.push(img.publicId); });
+      order.proofOfWork?.afterPhotos?.forEach((img: any) => { if (img.publicId) softDeletePublicIds.push(img.publicId); });
+      if (order.notaImage?.publicId) softDeletePublicIds.push(order.notaImage.publicId);
+      if (softDeletePublicIds.length > 0) {
+        try {
+          await deleteImages(softDeletePublicIds);
+          console.log(`🗑️ Deleted ${softDeletePublicIds.length} Cloudinary image(s) for archived order ${order.orderNumber}`);
+        } catch (imgError) {
+          console.error('⚠️ Failed to delete some Cloudinary images:', imgError);
+          // Continue with soft delete even if image deletion fails
+        }
+      }
+
       // Soft delete
       order.deleted = true;
       order.archivedAt = new Date();
@@ -359,18 +368,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     console.log('Public IDs to delete from Cloudinary:', publicIdsToDelete);
 
-    const deletePromises = publicIdsToDelete.map(async (publicId) => {
+    if (publicIdsToDelete.length > 0) {
       try {
-        const result = await cloudinary.uploader.destroy(publicId);
-        console.log(`Cloudinary delete result for ${publicId}:`, result);
-        return result;
+        await deleteImages(publicIdsToDelete);
+        console.log(`🗑️ Deleted ${publicIdsToDelete.length} Cloudinary image(s) for order ${order.orderNumber}`);
       } catch (error) {
-        console.error(`Failed to delete image from Cloudinary: ${publicId}`, error);
-        return null;
+        console.error('Failed to delete images from Cloudinary:', error);
       }
-    });
-
-    await Promise.allSettled(deletePromises);
+    }
 
     await Order.findByIdAndDelete(id);
 
