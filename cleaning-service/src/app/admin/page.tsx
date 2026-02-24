@@ -315,10 +315,27 @@ export default function AdminDashboard() {
     return service ? service.price * formData.quantity : 0;
   }, [formData.itemType, formData.quantity]);
 
+  const fetchAnalytics = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard?type=analytics');
+      const result = await response.json();
+      if (result.success) {
+        // Merge analytics fields into data, preserving existing recentOrders
+        setData(prev => prev
+          ? { ...prev, ...result.data }
+          : { ...result.data, recentOrders: [] }
+        );
+      }
+    } catch {
+      // Analytics fetch failure is non-critical
+    }
+  }, []);
+
   const fetchData = useCallback(async (page = 1, status: OrderStatus | 'all' = 'all') => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
+        type: 'orders',
         page: page.toString(),
         limit: PAGE_SIZE.toString(),
         sort: status === 'finished' ? 'finishedAt:desc' : 'createdAt:desc'
@@ -331,7 +348,11 @@ export default function AdminDashboard() {
       const result = await response.json();
       
       if (result.success) {
-        setData(result.data);
+        // Merge orders into data, preserving analytics fields already loaded
+        setData(prev => prev
+          ? { ...prev, recentOrders: result.data.recentOrders }
+          : result.data
+        );
         setTotalPages(result.meta.totalPages);
         setTotalOrders(result.meta.total);
         setCurrentPage(result.meta.page);
@@ -344,6 +365,10 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [PAGE_SIZE]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   useEffect(() => {
     fetchData(currentPage, statusFilter);
@@ -585,7 +610,8 @@ export default function AdminDashboard() {
 
       if (result.success) {
         resetForm();
-        fetchData(currentPage, statusFilter); // Refresh current page
+        fetchAnalytics(); // update KPI counts + charts
+        fetchData(currentPage, statusFilter); // refresh order list
       } else {
         setFormError(result.error || 'Gagal menambahkan pesanan');
       }
@@ -628,7 +654,8 @@ export default function AdminDashboard() {
       const result = await response.json();
       
       if (result.success) {
-        // Refetch current page to update list
+        // Refetch both: analytics (counts change) and order list
+        fetchAnalytics();
         await fetchData(currentPage, statusFilter);
       } else {
         alert(result.error || 'Gagal menghapus pesanan');

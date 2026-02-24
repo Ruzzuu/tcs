@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const statusFilter = searchParams.get('status') || 'all';
     const sortBy = searchParams.get('sort') || 'createdAt:desc';
+    const requestType = searchParams.get('type') || 'all'; // 'all' | 'analytics' | 'orders'
 
     // Parse sort
     const [sortField, sortOrder] = sortBy.split(':');
@@ -35,108 +36,45 @@ export async function GET(request: NextRequest) {
       ordersFilter.status = statusFilter;
     }
 
-    // Run all aggregations in parallel
-    const [
-      kpiResult,
-      serviceDistribution,
-      incomeTrend,
-      totalOrders,
-      recentOrders
-    ] = await Promise.all([
-      // KPI counts (only verified orders, exclude deleted)
-      Order.aggregate([
-        { $match: { 'verification.status': 'approved', deleted: { $ne: true } } },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: 1 },
-            pending: {
-              $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
-            },
-            inProgress: {
-              $sum: { $cond: [{ $eq: ['$status', 'in_progress'] }, 1, 0] }
-            },
-            delivered: {
-              $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] }
-            },
-            pickedUp: {
-              $sum: { $cond: [{ $eq: ['$status', 'picked_up'] }, 1, 0] }
-            },
-            finished: {
-              $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] }
-            }
-          }
-        }
-      ]),
+    const analyticsMatch = { 'verification.status': 'approved', deleted: { $ne: true } };
 
-      // Service distribution pie chart - count all individual items (exclude deleted)
-      Order.aggregate([
-        { $match: { 'verification.status': 'approved', deleted: { $ne: true } } },
-        {
-          $project: {
-            // Expand items array if exists, otherwise create single item from legacy fields
-            itemsToCount: {
-              $cond: {
-                if: { $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }] },
-                then: '$items',
-                else: [{
-                  serviceType: '$itemType',
-                  quantity: { $ifNull: ['$quantity', 1] }
-                }]
-              }
-            }
-          }
-        },
-        { $unwind: '$itemsToCount' },
-        {
-          $group: {
-            _id: '$itemsToCount.serviceType',
-            count: { $sum: { $ifNull: ['$itemsToCount.quantity', 1] } }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            name: '$_id',
-            value: '$count'
-          }
-        },
-        { $sort: { value: -1 } }
-      ]),
+    // Run analytics queries only when needed
+    let kpiResult: any[] = [];
+    let serviceDistribution: any[] = [];
+    let incomeTrend: any[] = [];
 
-      // Income trend (last 7 days, only finished orders, exclude deleted)
-      Order.aggregate([
-        {
-          $match: {
-            'verification.status': 'approved',
-            status: 'finished',
-            finishedAt: { $gte: sevenDaysAgo },
-            deleted: { $ne: true }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              $dateToString: { format: '%Y-%m-%d', date: '$finishedAt' }
-            },
-            amount: {
-              $sum: { $ifNull: ['$finalPrice', '$estimatedPrice'] }
-            }
-          }
-        },
-        { $sort: { _id: 1 } }
-      ]),
+    if (requestType !== 'orders') {
+      [kpiResult, serviceDistribution, incomeTrend] = await Promise.all([
+        Order.aggregate([
+          { $match: analyticsMatch },
+          { $group: { _id: null, total: { $sum: 1 }, pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } }, inProgress: { $sum: { $cond: [{ $eq: ['$status', 'in_progress'] }, 1, 0] } }, delivered: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] } }, pickedUp: { $sum: { $cond: [{ $eq: ['$status', 'picked_up'] }, 1, 0] } }, finished: { $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] } } } }
+        ]),
+        Order.aggregate([
+          { $match: analyticsMatch },
+          { $project: { itemsToCount: { $cond: { if: { $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }] }, then: '$items', else: [{ serviceType: '$itemType', quantity: { $ifNull: ['$quantity', 1] } }] } } } },
+          { $unwind: '$itemsToCount' },
+          { $group: { _id: '$itemsToCount.serviceType', count: { $sum: { $ifNull: ['$itemsToCount.quantity', 1] } } } },
+          { $project: { _id: 0, name: '$_id', value: '$count' } },
+          { $sort: { value: -1 } }
+        ]),
+        Order.aggregate([
+          { $match: { 'verification.status': 'approved', status: 'finished', finishedAt: { $gte: sevenDaysAgo }, deleted: { $ne: true } } },
+          { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$finishedAt' } }, amount: { $sum: { $ifNull: ['$finalPrice', '$estimatedPrice'] } } } },
+          { $sort: { _id: 1 } }
+        ])
+      ]);
+    }
 
-      // Total orders count for pagination
-      Order.countDocuments(ordersFilter),
+    // Run orders queries only when needed
+    let totalOrders = 0;
+    let recentOrders: any[] = [];
 
-      // Recent orders with pagination (verified, exclude deleted)
-      Order.find(ordersFilter)
-        .sort({ [sortField]: sortDirection })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean()
-    ]);
+    if (requestType !== 'analytics') {
+      [totalOrders, recentOrders] = await Promise.all([
+        Order.countDocuments(ordersFilter),
+        Order.find(ordersFilter).sort({ [sortField]: sortDirection }).skip((page - 1) * limit).limit(limit).lean()
+      ]);
+    }
 
     // Process KPI data
     const kpiData = kpiResult[0] || {
