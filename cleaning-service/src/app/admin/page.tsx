@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
-import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import PhoneAutocomplete from '@/components/PhoneAutocomplete';
@@ -194,9 +194,16 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
         </div>
       </div>
       <div className="flex justify-between items-center mt-1 pt-3 border-t border-gray-50 dark:border-gray-800">
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}>
-          {getStatusLabel(order.status)}
-        </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}>
+            {getStatusLabel(order.status)}
+          </span>
+          {order.status === 'picked_up' && order.pickedUpAt && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              · {formatDateTimeFull(order.pickedUpAt)}
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/orders/${order._id}`}
