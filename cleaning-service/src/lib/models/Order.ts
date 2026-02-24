@@ -186,6 +186,11 @@ const OrderSchema = new Schema<OrderDocument>(
     finishedAt: {
       type: Date
     },
+
+    // Pickup timestamp (set when status changes to picked_up)
+    pickedUpAt: {
+      type: Date
+    },
     
     // Rekap reference
     rekapId: {

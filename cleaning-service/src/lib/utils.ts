@@ -218,6 +218,23 @@ export function formatTime(date: Date | string): string {
 }
 
 /**
+ * Format date + time in full Indonesian format
+ * Output: "23 Februari 2026 | 14:14:06"
+ */
+export function formatDateTimeFull(date: Date | string): string {
+  const d = new Date(date);
+  const datePart = d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
+  return `${datePart} | ${hours}:${minutes}:${seconds}`;
+}
+
+/**
  * Get status color classes
  */
 export function getStatusColor(status: string): { bg: string; text: string; border: string } {

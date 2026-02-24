@@ -6,6 +6,7 @@ import type { Order, OrderStatus, CloudinaryImage } from '@/types';
 import { 
   formatCurrency, 
   formatDate, 
+  formatDateTimeFull,
   formatPhoneNumber, 
   getStatusColor, 
   getStatusLabel,
@@ -718,11 +719,16 @@ export default function OrderDetailPage() {
         </label>
 
         {/* Current Status Badge */}
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
           <span className="text-xs text-gray-500">Status saat ini:</span>
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}>
             {getStatusLabel(order.status)}
           </span>
+          {order.status === 'picked_up' && order.pickedUpAt && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              · Diambil {formatDateTimeFull(order.pickedUpAt)}
+            </span>
+          )}
         </div>
       </div>
 

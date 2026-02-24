@@ -152,6 +152,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updateData.finishedAt = new Date(wibTime);
     }
 
+    // Set pickedUpAt when status changes to picked_up
+    if (updateData.status === 'picked_up') {
+      const now = new Date();
+      const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const wibTime = utcTime + (7 * 3600 * 1000);
+      updateData.pickedUpAt = new Date(wibTime);
+    }
+
     const order = await Order.findByIdAndUpdate(
       id,
       { $set: updateData },

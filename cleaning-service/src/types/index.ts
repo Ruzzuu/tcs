@@ -59,6 +59,7 @@ export interface Order {
   customerNotes?: string;
   notes: string;
   finishedAt?: Date;
+  pickedUpAt?: Date;
   rekapId?: string;
   deleted?: boolean;
   archivedAt?: Date;
