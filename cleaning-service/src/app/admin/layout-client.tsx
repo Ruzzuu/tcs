@@ -23,6 +23,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: 'dashboard' },
     { href: '/admin/orders', label: 'Form', icon: 'edit_note' },
+    { href: '/admin/report', label: 'Report', icon: 'assessment' },
   ];
 
   // Check if current route is a public auth route
