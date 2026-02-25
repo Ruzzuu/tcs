@@ -55,7 +55,15 @@ export default function ReportPage() {
   return (
     <div className="relative min-h-screen">
       <div className={isLocked ? "filter blur-[6px] opacity-30 dark:opacity-20 select-none pointer-events-none" : ""}>
-        <section className="px-4 pt-6 flex items-start gap-4">
+        <section className="px-4 pt-6 flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className="text-[#111318] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]">
+              Report
+            </h1>
+            <p className="text-[#616f89] dark:text-gray-400 text-sm mt-1">
+              Laporan dan analisis data
+            </p>
+          </div>
           {!isLocked && (
             <button
               onClick={handleLeave}
@@ -65,14 +73,6 @@ export default function ReportPage() {
               <span>Leave</span>
             </button>
           )}
-          <div className="flex-1">
-            <h1 className="text-[#111318] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]">
-              Report
-            </h1>
-            <p className="text-[#616f89] dark:text-gray-400 text-sm mt-1">
-              Laporan dan analisis data
-            </p>
-          </div>
         </section>
 
         <section className="px-4 mt-6">
