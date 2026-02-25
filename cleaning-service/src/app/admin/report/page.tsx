@@ -95,7 +95,7 @@ export default function ReportPage() {
       {isLocked && (
         <>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-md z-10"></div>
-          <div className="relative z-20 flex items-center justify-center min-h-screen px-4">
+          <div className="fixed inset-0 z-20 flex items-center justify-center px-4">
             <div className="w-full max-w-[340px]">
               <div className="w-full bg-white dark:bg-[#1a202c] rounded-[32px] shadow-2xl p-8 border border-white/10 overflow-hidden">
                 <div className="flex flex-col items-center mb-8">
