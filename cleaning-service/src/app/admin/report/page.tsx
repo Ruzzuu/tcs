@@ -159,9 +159,6 @@ export default function ReportPage() {
                   </p>
                 </div>
               </div>
-              <div className="mt-8">
-                <div className="w-32 h-1.5 bg-white/30 dark:bg-white/10 rounded-full"></div>
-              </div>
             </div>
           </div>
         </>
