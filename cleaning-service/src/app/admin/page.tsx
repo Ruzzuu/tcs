@@ -315,10 +315,12 @@ export default function AdminDashboard() {
       const response = await fetch('/api/dashboard?type=analytics');
       const result = await response.json();
       if (result.success) {
-        // Merge analytics fields into data, preserving existing recentOrders
+        // Destructure out recentOrders so it can never overwrite the orders list
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { recentOrders: _omit, ...analyticsFields } = result.data as any;
         setData(prev => prev
-          ? { ...prev, ...result.data }
-          : { ...result.data, recentOrders: [] }
+          ? { ...prev, ...analyticsFields }
+          : { ...analyticsFields, recentOrders: [] }
         );
       }
     } catch {
@@ -346,7 +348,11 @@ export default function AdminDashboard() {
         // Merge orders into data, preserving analytics fields already loaded
         setData(prev => prev
           ? { ...prev, recentOrders: result.data.recentOrders }
-          : result.data
+          : {
+              total: 0, pending: 0, inProgress: 0, delivered: 0,
+              pickedUp: 0, finished: 0, serviceDistribution: [], incomeTrend: [],
+              recentOrders: result.data.recentOrders
+            }
         );
         setTotalPages(result.meta.totalPages);
         setTotalOrders(result.meta.total);

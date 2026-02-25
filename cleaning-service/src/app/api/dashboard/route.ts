@@ -107,22 +107,26 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(totalOrders / limit);
 
+    // Build response — analytics fields and orders fields are separate
+    const analyticsPayload = requestType !== 'orders' ? {
+      total: kpiData.total,
+      pending: kpiData.pending,
+      inProgress: kpiData.inProgress,
+      delivered: kpiData.delivered || 0,
+      pickedUp: kpiData.pickedUp || 0,
+      finished: kpiData.finished,
+      serviceDistribution: serviceDistributionWithColors,
+      incomeTrend: incomeTrendFormatted,
+    } : {};
+
+    const ordersPayload = requestType !== 'analytics' ? { recentOrders } : {};
+
     return NextResponse.json({
       success: true,
-      data: {
-        total: kpiData.total,
-        pending: kpiData.pending,
-        finished: kpiData.finished,
-        serviceDistribution: serviceDistributionWithColors,
-        incomeTrend: incomeTrendFormatted,
-        recentOrders
-      },
-      meta: {
-        total: totalOrders,
-        page,
-        limit,
-        totalPages
-      }
+      data: { ...analyticsPayload, ...ordersPayload },
+      ...(requestType !== 'analytics' ? {
+        meta: { total: totalOrders, page, limit, totalPages }
+      } : {})
     });
   } catch (error) {
     console.error('GET /api/dashboard error:', error);
