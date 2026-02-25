@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       [kpiResult, serviceDistribution, incomeTrend] = await Promise.all([
         Order.aggregate([
           { $match: analyticsMatch },
-          { $group: { _id: null, total: { $sum: 1 }, pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } }, inProgress: { $sum: { $cond: [{ $eq: ['$status', 'in_progress'] }, 1, 0] } }, delivered: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] } }, pickedUp: { $sum: { $cond: [{ $eq: ['$status', 'picked_up'] }, 1, 0] } }, finished: { $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] } } } }
+          { $group: { _id: null, total: { $sum: 1 }, pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } }, finished: { $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] } } } }
         ]),
         Order.aggregate([
           { $match: analyticsMatch },
@@ -80,9 +80,6 @@ export async function GET(request: NextRequest) {
     const kpiData = kpiResult[0] || {
       total: 0,
       pending: 0,
-      inProgress: 0,
-      delivered: 0,
-      pickedUp: 0,
       finished: 0
     };
 
@@ -115,9 +112,6 @@ export async function GET(request: NextRequest) {
       data: {
         total: kpiData.total,
         pending: kpiData.pending,
-        inProgress: kpiData.inProgress,
-        delivered: kpiData.delivered || 0,
-        pickedUp: kpiData.pickedUp || 0,
         finished: kpiData.finished,
         serviceDistribution: serviceDistributionWithColors,
         incomeTrend: incomeTrendFormatted,

@@ -707,10 +707,7 @@ export default function OrderDetailPage() {
               className="w-full appearance-none rounded-xl bg-white dark:bg-[#1a2230] border border-gray-200 dark:border-gray-700 text-[#111318] dark:text-white py-4 px-4 pr-10 text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 shadow-sm"
             >
               <option value="pending">Menunggu</option>
-              <option value="in_progress">Diproses</option>
               <option value="finished">Selesai</option>
-              <option value="delivered">Diantar</option>
-              <option value="picked_up">Diambil</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
               <span className="material-symbols-outlined">expand_more</span>
@@ -727,11 +724,6 @@ export default function OrderDetailPage() {
           {order.status === 'finished' && order.finishedAt && (
             <span className="text-xs text-gray-500 dark:text-gray-400">
               · Selesai {formatDateTimeFull(order.finishedAt)}
-            </span>
-          )}
-          {order.status === 'picked_up' && order.pickedUpAt && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              · Diambil {formatDateTimeFull(order.pickedUpAt)}
             </span>
           )}
         </div>

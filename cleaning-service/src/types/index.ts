@@ -59,7 +59,6 @@ export interface Order {
   customerNotes?: string;
   notes: string;
   finishedAt?: Date;
-  pickedUpAt?: Date;
   rekapId?: string;
   deleted?: boolean;
   archivedAt?: Date;
@@ -86,7 +85,7 @@ export type ServiceType =
   | 'repaint_canvas'
   | 'repaint_suede';
 
-export type OrderStatus = 'pending' | 'in_progress' | 'finished' | 'delivered' | 'picked_up' | 'rejected';
+export type OrderStatus = 'pending' | 'finished' | 'rejected';
 
 export type VerificationStatus = 'unverified' | 'approved' | 'rejected';
 
@@ -113,9 +112,6 @@ export interface PhoneCacheData {
 export interface DashboardData {
   total: number;
   pending: number;
-  inProgress: number;
-  delivered: number;
-  pickedUp: number;
   finished: number;
   serviceDistribution: Array<{ name: string; value: number; color: string }>;
   incomeTrend: Array<{ day: string; date: string; amount: number }>;

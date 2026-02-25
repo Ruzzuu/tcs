@@ -203,11 +203,6 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
               · {formatDateTimeFull(order.finishedAt)}
             </span>
           )}
-          {order.status === 'picked_up' && order.pickedUpAt && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              · {formatDateTimeFull(order.pickedUpAt)}
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -670,9 +665,6 @@ export default function AdminDashboard() {
   const statusOptions: Array<{ value: OrderStatus | 'all'; label: string; icon: string }> = [
     { value: 'all', label: 'Semua', icon: 'list_alt' },
     { value: 'pending', label: 'Menunggu', icon: 'pending_actions' },
-    { value: 'in_progress', label: 'Proses', icon: 'autorenew' },
-    { value: 'delivered', label: 'Diantar', icon: 'local_shipping' },
-    { value: 'picked_up', label: 'Diambil', icon: 'inventory' },
     { value: 'finished', label: 'Selesai', icon: 'check_circle' }
   ];
 
@@ -680,9 +672,6 @@ export default function AdminDashboard() {
     if (status === 'all') return data?.total || 0;
     switch (status) {
       case 'pending': return data?.pending || 0;
-      case 'in_progress': return data?.inProgress || 0;
-      case 'delivered': return data?.delivered || 0;
-      case 'picked_up': return data?.pickedUp || 0;
       case 'finished': return data?.finished || 0;
       default: return 0;
     }
@@ -747,38 +736,6 @@ export default function AdminDashboard() {
               </div>
               <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
                 {data?.total.toLocaleString() || 0}
-              </p>
-            </div>
-          </div>
-
-          {/* In Progress */}
-          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-blue-50/50 to-blue-100/50 dark:from-blue-900/10 dark:to-blue-800/10 p-5 shadow-md ring-1 ring-blue-200/50 dark:ring-blue-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-blue-400/20 to-blue-600/20 blur-xl" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
-                  <span className="material-symbols-outlined text-white text-[20px]">autorenew</span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Proses</p>
-              </div>
-              <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
-                {data?.inProgress || 0}
-              </p>
-            </div>
-          </div>
-
-          {/* Out (Delivered) */}
-          <div className="group relative overflow-hidden rounded-2xl min-h-[140px] bg-gradient-to-br from-purple-50/50 to-purple-100/50 dark:from-purple-900/10 dark:to-purple-800/10 p-5 shadow-md ring-1 ring-purple-200/50 dark:ring-purple-700/30 transition-all hover:shadow-lg hover:scale-[1.02]">
-            <div className="absolute top-0 right-0 h-20 w-20 translate-x-4 -translate-y-4 rounded-full bg-gradient-to-br from-purple-400/20 to-purple-600/20 blur-xl" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30">
-                  <span className="material-symbols-outlined text-white text-[20px]">local_shipping</span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Diantar</p>
-              </div>
-              <p className="text-[#111318] dark:text-white text-3xl font-extrabold tracking-tight">
-                {data?.delivered || 0}
               </p>
             </div>
           </div>

@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter by order status
-    if (status && ['pending', 'in_progress', 'finished', 'delivered', 'picked_up'].includes(status)) {
+    if (status && ['pending', 'finished'].includes(status)) {
       query.status = status;
     }
 

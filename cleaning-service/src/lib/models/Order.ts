@@ -134,7 +134,7 @@ const OrderSchema = new Schema<OrderDocument>(
     // Status Flow
     status: {
       type: String,
-      enum: ['pending', 'in_progress', 'finished', 'delivered', 'picked_up', 'rejected'] as OrderStatus[],
+      enum: ['pending', 'finished', 'rejected'] as OrderStatus[],
       default: 'pending',
       index: true
     },
@@ -187,11 +187,6 @@ const OrderSchema = new Schema<OrderDocument>(
       type: Date
     },
 
-    // Pickup timestamp (set when status changes to picked_up)
-    pickedUpAt: {
-      type: Date
-    },
-    
     // Rekap reference
     rekapId: {
       type: Schema.Types.ObjectId,

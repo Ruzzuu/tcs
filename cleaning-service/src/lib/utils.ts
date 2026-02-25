@@ -66,8 +66,6 @@ export const WA_TEMPLATES = {
  */
 export function getWhatsAppMessageByStatus(order: Order): string {
   switch (order.status) {
-    case 'in_progress':
-      return WA_TEMPLATES.orderInProgress(order);
     case 'finished':
       return WA_TEMPLATES.orderCompleted(order);
     default:
@@ -248,29 +246,11 @@ export function getStatusColor(status: string): { bg: string; text: string; bord
         text: 'text-amber-800 dark:text-amber-300',
         border: 'border-amber-400'
       };
-    case 'in_progress':
-      return {
-        bg: 'bg-blue-100 dark:bg-blue-900/30',
-        text: 'text-blue-800 dark:text-blue-300',
-        border: 'border-blue-400'
-      };
     case 'finished':
       return {
         bg: 'bg-emerald-100 dark:bg-emerald-900/30',
         text: 'text-emerald-800 dark:text-emerald-300',
         border: 'border-emerald-500'
-      };
-    case 'delivered':
-      return {
-        bg: 'bg-purple-100 dark:bg-purple-900/30',
-        text: 'text-purple-800 dark:text-purple-300',
-        border: 'border-purple-500'
-      };
-    case 'picked_up':
-      return {
-        bg: 'bg-gray-200 dark:bg-gray-700',
-        text: 'text-gray-800 dark:text-gray-300',
-        border: 'border-gray-500'
       };
     case 'unverified':
       return {
@@ -294,14 +274,8 @@ export function getStatusLabel(status: string): string {
   switch (status) {
     case 'pending':
       return 'Menunggu';
-    case 'in_progress':
-      return 'Diproses';
     case 'finished':
       return 'Selesai';
-    case 'delivered':
-      return 'Diantar';
-    case 'picked_up':
-      return 'Diambil';
     case 'unverified':
       return 'Belum Verifikasi';
     case 'approved':
