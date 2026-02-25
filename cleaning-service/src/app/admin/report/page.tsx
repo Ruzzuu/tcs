@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ReportPage() {
-  const { admin } = useAuth();
+  const { } = useAuth();
   const [isLocked, setIsLocked] = useState(true);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +38,7 @@ export default function ReportPage() {
       } else {
         setError(data.error || 'Invalid password');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to verify password. Please try again.');
     } finally {
       setIsVerifying(false);
