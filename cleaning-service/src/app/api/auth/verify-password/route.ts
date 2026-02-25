@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     await mongoose.connect(process.env.MONGODB_URI || '');
 
-    const admin = await Admin.findById(payload.adminId).select('password');
+    const admin = await Admin.findById(payload.adminId).select('passwordHash');
 
     if (!admin) {
       return NextResponse.json(
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isPasswordValid = await verifyPassword(password, admin.password);
+    const isPasswordValid = await verifyPassword(password, admin.passwordHash);
 
     if (!isPasswordValid) {
       return NextResponse.json(
