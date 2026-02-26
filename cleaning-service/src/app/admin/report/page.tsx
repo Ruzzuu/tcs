@@ -21,7 +21,6 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
     <div className="space-y-3">
       {data.map((item, index) => {
         const percentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
-        const opacity = 0.4 + (index / data.length) * 0.6;
         
         return (
           <div key={item.day} className="flex items-center gap-3">
@@ -31,7 +30,7 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
                 className="h-full rounded-md transition-all duration-300"
                 style={{
                   width: `${Math.max(percentage, 3)}%`,
-                  backgroundColor: `rgba(17, 82, 212, ${opacity})`
+                  backgroundColor: `rgba(17, 82, 212, 0.7)`
                 }}
               ></div>
             </div>
