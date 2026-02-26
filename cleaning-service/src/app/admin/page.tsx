@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
-import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber, formatDateGMT7 } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import PhoneAutocomplete from '@/components/PhoneAutocomplete';
@@ -51,38 +51,6 @@ function PieChart({ data }: { data: Array<{ name: string; value: number; color: 
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-// Bar Chart Component (CSS-based, matching original design)
-function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
-  const maxAmount = Math.max(...data.map(d => d.amount), 1);
-
-  return (
-    <div className="space-y-3">
-      {data.map((item, index) => {
-        const percentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
-        const opacity = 0.4 + (index / data.length) * 0.6;
-        
-        return (
-          <div key={item.day} className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-gray-400 w-8 text-right">{item.day}</span>
-            <div className="flex-1 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
-              <div
-                className="h-full rounded-md transition-all duration-300"
-                style={{
-                  width: `${Math.max(percentage, 3)}%`,
-                  backgroundColor: `rgba(17, 82, 212, ${opacity})`
-                }}
-              ></div>
-            </div>
-            <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-20 text-right">
-              {formatCurrency(item.amount)}
-            </span>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -269,14 +237,7 @@ export default function AdminDashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const PAGE_SIZE = 10;
-  
-  // Week selector state
-  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [availableWeeks, setAvailableWeeks] = useState<number[]>([]);
-  const [weeklyData, setWeeklyData] = useState<any>(null);
-  const [weeklyLoading, setWeeklyLoading] = useState(false);
-  
+
   // Add Order Form State
   const [showAddForm, setShowAddForm] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
@@ -374,108 +335,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchData(currentPage, statusFilter);
   }, [currentPage, statusFilter, fetchData]);
-
-  // Fetch available weeks
-  const fetchAvailableWeeks = useCallback(async (year?: number) => {
-    try {
-      const params = new URLSearchParams({ action: 'available' });
-      if (year !== undefined) params.append('year', year.toString());
-      
-      const response = await fetch(`/api/income/weekly?${params}`);
-      const result = await response.json();
-      
-      if (result.success && result.data.availableWeeks.length > 0) {
-        setAvailableWeeks(result.data.availableWeeks);
-        // Return latest week for initialization
-        const latestWeek = result.data.availableWeeks[result.data.availableWeeks.length - 1];
-        return latestWeek;
-      } else {
-        setAvailableWeeks([]);
-        return null;
-      }
-    } catch (error) {
-      console.error('Failed to fetch available weeks:', error);
-      return null;
-    }
-  }, []);
-
-  // Fetch weekly income data
-  const fetchWeeklyData = useCallback(async (week: number, year?: number) => {
-    setWeeklyLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.append('week', week.toString());
-      if (year !== undefined) params.append('year', year.toString());
-      
-      const response = await fetch(`/api/income/weekly?${params}`);
-      const result = await response.json();
-      
-      if (result.success) {
-        setWeeklyData(result.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch weekly data:', error);
-    } finally {
-      setWeeklyLoading(false);
-    }
-  }, []);
-
-  // Initialize weekly data on mount
-  useEffect(() => {
-    let isMounted = true;
-    
-    const initWeeklyData = async () => {
-      const latestWeek = await fetchAvailableWeeks(selectedYear);
-      if (latestWeek !== null && isMounted) {
-        setSelectedWeek(latestWeek);
-        await fetchWeeklyData(latestWeek, selectedYear);
-      }
-    };
-    
-    initWeeklyData();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedYear]);
-
-  // Fetch data when selected week changes (user interaction)
-  useEffect(() => {
-    let isMounted = true;
-    
-    if (selectedWeek !== null && availableWeeks.includes(selectedWeek)) {
-      fetchWeeklyData(selectedWeek, selectedYear).then(() => {
-        if (!isMounted) return;
-      });
-    }
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedWeek]);
-
-  const handleWeekChange = (week: number) => {
-    setSelectedWeek(week);
-    fetchWeeklyData(week, selectedYear);
-  };
-
-  const handlePrevWeek = () => {
-    if (selectedWeek !== null && availableWeeks.length > 0) {
-      const currentIndex = availableWeeks.indexOf(selectedWeek);
-      if (currentIndex > 0) {
-        handleWeekChange(availableWeeks[currentIndex - 1]);
-      }
-    }
-  };
-
-  const handleNextWeek = () => {
-    if (selectedWeek !== null && availableWeeks.length > 0) {
-      const currentIndex = availableWeeks.indexOf(selectedWeek);
-      if (currentIndex < availableWeeks.length - 1) {
-        handleWeekChange(availableWeeks[currentIndex + 1]);
-      }
-    }
-  };
 
   // Handle multiple image upload for form
   const handleFormImageUpload = async (files: FileList | File[]) => {
@@ -767,7 +626,7 @@ export default function AdminDashboard() {
       {/* Analytics Section */}
       <section className="px-4">
         <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Analitik</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {/* Service Distribution Pie Chart */}
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="flex justify-between items-start mb-6">
@@ -778,67 +637,6 @@ export default function AdminDashboard() {
               <span className="material-symbols-outlined text-gray-400">pie_chart</span>
             </div>
             <PieChart data={data?.serviceDistribution || []} />
-          </div>
-
-          {/* Income Trend Bar Chart with Week Selector */}
-          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
-            {availableWeeks.length > 0 ? (
-              <>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
-                      Minggu ke-{selectedWeek || '...'} — {weeklyData && formatDateGMT7(new Date(weeklyData.startDate))} s/d {weeklyData && formatDateGMT7(new Date(weeklyData.endDate))}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handlePrevWeek}
-                      disabled={weeklyLoading || selectedWeek === availableWeeks[0]}
-                      className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      ←
-                    </button>
-                    <select
-                      value={selectedWeek || ''}
-                      onChange={(e) => handleWeekChange(parseInt(e.target.value))}
-                      disabled={weeklyLoading}
-                      className="text-xs rounded bg-white dark:bg-[#0f1724] border border-gray-200 dark:border-gray-700 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
-                    >
-                      {availableWeeks.map((week) => (
-                        <option key={week} value={week}>
-                          Minggu {week}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={handleNextWeek}
-                      disabled={weeklyLoading || selectedWeek === availableWeeks[availableWeeks.length - 1]}
-                      className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      →
-                    </button>
-                  </div>
-                </div>
-                {weeklyLoading ? (
-                  <div className="flex items-center justify-center h-48">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
-                  </div>
-                ) : (
-                  <BarChart data={weeklyData?.weekData || []} />
-                )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center">
-                <span className="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3">
-                  monitoring
-                </span>
-                <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Pendapatan</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
-                  Data akan muncul setelah ada pesanan yang diselesaikan
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </section>

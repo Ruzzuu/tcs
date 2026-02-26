@@ -2,6 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { formatCurrency, formatDateGMT7 } from '@/lib/utils';
+
+// Bar Chart Component (CSS-based, matching original design)
+function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
+  const maxAmount = Math.max(...data.map(d => d.amount), 1);
+
+  return (
+    <div className="space-y-3">
+      {data.map((item, index) => {
+        const percentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
+        const opacity = 0.4 + (index / data.length) * 0.6;
+        
+        return (
+          <div key={item.day} className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-gray-400 w-8 text-right">{item.day}</span>
+            <div className="flex-1 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
+              <div
+                className="h-full rounded-md transition-all duration-300"
+                style={{
+                  width: `${Math.max(percentage, 3)}%`,
+                  backgroundColor: `rgba(17, 82, 212, ${opacity})`
+                }}
+              ></div>
+            </div>
+            <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-20 text-right">
+              {formatCurrency(item.amount)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function ReportPage() {
   const { } = useAuth();
@@ -11,10 +44,146 @@ export default function ReportPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
 
+  // Weekly income state
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [availableWeeks, setAvailableWeeks] = useState<number[]>([]);
+  const [weeklyData, setWeeklyData] = useState<any>(null);
+  const [weeklyLoading, setWeeklyLoading] = useState(false);
+
+  // 7-day trend state
+  const [trendData, setTrendData] = useState<Array<{ day: string; amount: number; date: string }>>([]);
+  const [trendLoading, setTrendLoading] = useState(true);
+
   useEffect(() => {
     const unlocked = sessionStorage.getItem('reportUnlocked') === 'true';
     setIsLocked(!unlocked);
   }, []);
+
+  // Fetch 7-day income trend
+  const fetchTrendData = async () => {
+    setTrendLoading(true);
+    try {
+      const response = await fetch('/api/dashboard?type=analytics');
+      const result = await response.json();
+      
+      if (result.success && result.data?.incomeTrend) {
+        setTrendData(result.data.incomeTrend);
+      }
+    } catch (error) {
+      console.error('Failed to fetch trend data:', error);
+    } finally {
+      setTrendLoading(false);
+    }
+  };
+
+  // Fetch available weeks
+  const fetchAvailableWeeks = async (year?: number) => {
+    try {
+      const params = new URLSearchParams({ action: 'available' });
+      if (year !== undefined) params.append('year', year.toString());
+      
+      const response = await fetch(`/api/income/weekly?${params}`);
+      const result = await response.json();
+      
+      if (result.success && result.data.availableWeeks.length > 0) {
+        setAvailableWeeks(result.data.availableWeeks);
+        const latestWeek = result.data.availableWeeks[result.data.availableWeeks.length - 1];
+        return latestWeek;
+      } else {
+        setAvailableWeeks([]);
+        return null;
+      }
+    } catch (error) {
+      console.error('Failed to fetch available weeks:', error);
+      return null;
+    }
+  };
+
+  // Fetch weekly income data
+  const fetchWeeklyData = async (week: number, year?: number) => {
+    setWeeklyLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('week', week.toString());
+      if (year !== undefined) params.append('year', year.toString());
+      
+      const response = await fetch(`/api/income/weekly?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setWeeklyData(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch weekly data:', error);
+    } finally {
+      setWeeklyLoading(false);
+    }
+  };
+
+  // Initialize weekly data on mount
+  useEffect(() => {
+    let isMounted = true;
+    
+    const initWeeklyData = async () => {
+      const latestWeek = await fetchAvailableWeeks(selectedYear);
+      if (latestWeek !== null && isMounted) {
+        setSelectedWeek(latestWeek);
+        await fetchWeeklyData(latestWeek, selectedYear);
+      }
+    };
+    
+    initWeeklyData();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedYear]);
+
+  // Fetch trend data when unlocked
+  useEffect(() => {
+    if (!isLocked) {
+      fetchTrendData();
+    }
+  }, [isLocked]);
+
+  // Fetch data when selected week changes
+  useEffect(() => {
+    let isMounted = true;
+    
+    if (selectedWeek !== null && availableWeeks.includes(selectedWeek)) {
+      fetchWeeklyData(selectedWeek, selectedYear).then(() => {
+        if (!isMounted) return;
+      });
+    }
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedWeek]);
+
+  const handleWeekChange = (week: number) => {
+    setSelectedWeek(week);
+    fetchWeeklyData(week, selectedYear);
+  };
+
+  const handlePrevWeek = () => {
+    if (selectedWeek !== null && availableWeeks.length > 0) {
+      const currentIndex = availableWeeks.indexOf(selectedWeek);
+      if (currentIndex > 0) {
+        handleWeekChange(availableWeeks[currentIndex - 1]);
+      }
+    }
+  };
+
+  const handleNextWeek = () => {
+    if (selectedWeek !== null && availableWeeks.length > 0) {
+      const currentIndex = availableWeeks.indexOf(selectedWeek);
+      if (currentIndex < availableWeeks.length - 1) {
+        handleWeekChange(availableWeeks[currentIndex + 1]);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,19 +244,84 @@ export default function ReportPage() {
           )}
         </section>
 
-        <section className="px-4 mt-6">
-          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-8 shadow-sm border border-gray-100 dark:border-gray-800 text-center">
-            <div className="flex flex-col items-center justify-center gap-4 py-12">
-              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600">
-                assessment
-              </span>
-              <h2 className="text-[#111318] dark:text-white text-lg font-semibold">
-                Halaman Report
-              </h2>
-              <p className="text-[#616f89] dark:text-gray-400 text-sm max-w-sm">
-                Halaman ini masih dalam pengembangan. Fitur laporan akan segera tersedia.
-              </p>
+        <section className="px-4 mt-6 flex flex-col gap-4">
+          {/* 7-Day Income Trend */}
+          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <p className="text-[#111318] dark:text-white text-base font-bold">Trend 7 Hari</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">Pendapatan 7 hari terakhir</p>
+              </div>
+              <span className="material-symbols-outlined text-gray-400">show_chart</span>
             </div>
+            {trendLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+              </div>
+            ) : (
+              <BarChart data={trendData} />
+            )}
+          </div>
+
+          {/* Weekly Income Chart with Week Selector */}
+          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            {availableWeeks.length > 0 ? (
+              <>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan Mingguan</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                      Minggu ke-{selectedWeek || '...'} — {weeklyData && formatDateGMT7(new Date(weeklyData.startDate))} s/d {weeklyData && formatDateGMT7(new Date(weeklyData.endDate))}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handlePrevWeek}
+                      disabled={weeklyLoading || selectedWeek === availableWeeks[0]}
+                      className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      ←
+                    </button>
+                    <select
+                      value={selectedWeek || ''}
+                      onChange={(e) => handleWeekChange(parseInt(e.target.value))}
+                      disabled={weeklyLoading}
+                      className="text-xs rounded bg-white dark:bg-[#0f1724] border border-gray-200 dark:border-gray-700 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
+                    >
+                      {availableWeeks.map((week) => (
+                        <option key={week} value={week}>
+                          Minggu {week}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleNextWeek}
+                      disabled={weeklyLoading || selectedWeek === availableWeeks[availableWeeks.length - 1]}
+                      className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      →
+                    </button>
+                  </div>
+                </div>
+                {weeklyLoading ? (
+                  <div className="flex items-center justify-center h-48">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+                  </div>
+                ) : (
+                  <BarChart data={weeklyData?.weekData || []} />
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-center">
+                <span className="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3">
+                  monitoring
+                </span>
+                <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Pendapatan</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                  Data akan muncul setelah ada pesanan yang diselesaikan
+                </p>
+              </div>
+            )}
           </div>
         </section>
       </div>
