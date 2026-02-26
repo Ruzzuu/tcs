@@ -61,11 +61,10 @@ export default function ReportPage() {
   const [trendData, setTrendData] = useState<Array<{ day: string; amount: number; date: string }>>([]);
   const [trendLoading, setTrendLoading] = useState(true);
 
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const [selectedYearForMonth, setSelectedYearForMonth] = useState(new Date().getFullYear());
-  const [availableMonths, setAvailableMonths] = useState<number[]>([]);
-  const [monthlyData, setMonthlyData] = useState<any>(null);
-  const [monthlyLoading, setMonthlyLoading] = useState(false);
+  const [selectedYearForYearly, setSelectedYearForYearly] = useState<number | null>(null);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [yearlyData, setYearlyData] = useState<any>(null);
+  const [yearlyLoading, setYearlyLoading] = useState(false);
 
   useEffect(() => {
     const unlocked = sessionStorage.getItem('reportUnlocked') === 'true';
@@ -130,49 +129,46 @@ export default function ReportPage() {
     }
   };
 
-  const fetchAvailableMonths = async (year?: number) => {
-    setMonthlyLoading(true);
+  const fetchAvailableYears = async (year?: number) => {
+    setYearlyLoading(true);
     try {
-      const params = new URLSearchParams({ year: (year || selectedYearForMonth).toString() });
+      const params = new URLSearchParams({ year: (year || selectedYearForYearly || new Date().getFullYear()).toString() });
       
       const response = await fetch(`/api/income/monthly?${params}`);
       const result = await response.json();
       
-      if (result.success && result.data.availableMonths.length > 0) {
-        setAvailableMonths(result.data.availableMonths);
-        const latestMonth = result.data.availableMonths[result.data.availableMonths.length - 1];
-        setSelectedMonth(latestMonth);
-        setMonthlyData(null);
+      if (result.success && result.data?.availableYears && result.data.availableYears.length > 0) {
+        setAvailableYears(result.data.availableYears);
+        const latestYear = result.data.availableYears[result.data.availableYears.length - 1];
+        setSelectedYearForYearly(latestYear);
+        setYearlyData(null);
       } else {
-        setAvailableMonths([]);
-        setSelectedMonth(null);
-        setMonthlyData(null);
+        setAvailableYears([]);
+        setSelectedYearForYearly(null);
+        setYearlyData(null);
       }
     } catch (error) {
-      console.error('Failed to fetch available months:', error);
+      console.error('Failed to fetch available years:', error);
     } finally {
-      setMonthlyLoading(false);
+      setYearlyLoading(false);
     }
   };
 
-  const fetchMonthlyData = async (month: number, year?: number) => {
-    setMonthlyLoading(true);
+  const fetchYearlyData = async (year: number) => {
+    setYearlyLoading(true);
     try {
-      const params = new URLSearchParams({
-        year: (year || selectedYearForMonth).toString(),
-        month: month.toString()
-      });
+      const params = new URLSearchParams({ year: year.toString() });
       
       const response = await fetch(`/api/income/monthly?${params}`);
       const result = await response.json();
       
-      if (result.success && result.data.selectedMonthData) {
-        setMonthlyData(result.data.selectedMonthData);
+      if (result.success && result.data.selectedYearData) {
+        setYearlyData(result.data.selectedYearData);
       }
     } catch (error) {
-      console.error('Failed to fetch monthly data:', error);
+      console.error('Failed to fetch yearly data:', error);
     } finally {
-      setMonthlyLoading(false);
+      setYearlyLoading(false);
     }
   };
 
@@ -197,16 +193,16 @@ export default function ReportPage() {
   useEffect(() => {
     let isMounted = true;
     
-    const initMonthlyData = async () => {
-      await fetchAvailableMonths(selectedYearForMonth);
+    const initYearlyData = async () => {
+      await fetchAvailableYears(selectedYearForYearly || undefined);
     };
     
-    initMonthlyData();
+    initYearlyData();
     
     return () => {
       isMounted = false;
     };
-  }, [selectedYearForMonth]);
+  }, [selectedYearForYearly]);
 
   useEffect(() => {
     if (!isLocked) {
@@ -231,8 +227,8 @@ export default function ReportPage() {
   useEffect(() => {
     let isMounted = true;
     
-    if (selectedMonth !== null && availableMonths.includes(selectedMonth)) {
-      fetchMonthlyData(selectedMonth, selectedYearForMonth).then(() => {
+    if (selectedYearForYearly !== null && availableYears.includes(selectedYearForYearly)) {
+      fetchYearlyData(selectedYearForYearly).then(() => {
         if (!isMounted) return;
       });
     }
@@ -240,7 +236,7 @@ export default function ReportPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedMonth]);
+  }, [selectedYearForYearly]);
 
   const handleWeekChange = (week: number) => {
     setSelectedWeek(week);
@@ -265,25 +261,25 @@ export default function ReportPage() {
     }
   };
 
-  const handleMonthChange = (month: number) => {
-    setSelectedMonth(month);
-    fetchMonthlyData(month, selectedYearForMonth);
+  const handleYearChange = (year: number) => {
+    setSelectedYearForYearly(year);
+    fetchYearlyData(year);
   };
 
-  const handlePrevMonth = () => {
-    if (selectedMonth !== null && availableMonths.length > 0) {
-      const currentIndex = availableMonths.indexOf(selectedMonth);
+  const handlePrevYear = () => {
+    if (selectedYearForYearly !== null && availableYears.length > 0) {
+      const currentIndex = availableYears.indexOf(selectedYearForYearly);
       if (currentIndex > 0) {
-        handleMonthChange(availableMonths[currentIndex - 1]);
+        handleYearChange(availableYears[currentIndex - 1]);
       }
     }
   };
 
-  const handleNextMonth = () => {
-    if (selectedMonth !== null && availableMonths.length > 0) {
-      const currentIndex = availableMonths.indexOf(selectedMonth);
-      if (currentIndex < availableMonths.length - 1) {
-        handleMonthChange(availableMonths[currentIndex + 1]);
+  const handleNextYear = () => {
+    if (selectedYearForYearly !== null && availableYears.length > 0) {
+      const currentIndex = availableYears.indexOf(selectedYearForYearly);
+      if (currentIndex < availableYears.length - 1) {
+        handleYearChange(availableYears[currentIndex + 1]);
       }
     }
   };
@@ -426,54 +422,54 @@ export default function ReportPage() {
           </div>
 
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
-            {availableMonths.length > 0 ? (
+            {availableYears.length > 0 ? (
               <>
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan Bulanan</p>
+                    <p className="text-[#111318] dark:text-white text-base font-bold">Pendapatan Tahunan</p>
                     <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
-                      {selectedMonth ? getMonthName(selectedMonth) : '...'} {selectedYearForMonth}
+                      {selectedYearForYearly || '...'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={handlePrevMonth}
-                      disabled={monthlyLoading || selectedMonth === availableMonths[0]}
+                      onClick={handlePrevYear}
+                      disabled={yearlyLoading || selectedYearForYearly === availableYears[0]}
                       className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       ←
                     </button>
                     <select
-                      value={selectedMonth || ''}
-                      onChange={(e) => handleMonthChange(parseInt(e.target.value))}
-                      disabled={monthlyLoading}
+                      value={selectedYearForYearly || ''}
+                      onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                      disabled={yearlyLoading}
                       className="text-xs rounded bg-white dark:bg-[#0f1724] border border-gray-200 dark:border-gray-700 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
                     >
-                      {availableMonths.map((month) => (
-                        <option key={month} value={month}>
-                          {getMonthName(month)}
+                      {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
                         </option>
                       ))}
                     </select>
                     <button
-                      onClick={handleNextMonth}
-                      disabled={monthlyLoading || selectedMonth === availableMonths[availableMonths.length - 1]}
+                      onClick={handleNextYear}
+                      disabled={yearlyLoading || selectedYearForYearly === availableYears[availableYears.length - 1]}
                       className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       →
                     </button>
                   </div>
                 </div>
-                {monthlyLoading ? (
+                {yearlyLoading ? (
                   <div className="flex items-center justify-center h-48">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
                   </div>
                 ) : (
-                  monthlyData && monthlyData.weeklyIncome && monthlyData.weeklyIncome.length > 0 ? (
-                    <BarChart data={monthlyData.weeklyIncome.map((w: { week: number; amount: number }) => ({ day: `Week ${w.week}`, amount: w.amount }))} />
+                  yearlyData && yearlyData.monthlyIncome && yearlyData.monthlyIncome.length > 0 ? (
+                    <BarChart data={yearlyData.monthlyIncome.map((monthItem: { month: number; monthName: string; amount: number }) => ({ day: monthItem.monthName, amount: monthItem.amount }))} />
                   ) : (
                     <div className="flex flex-col items-center justify-center h-48 text-center">
-                      <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Bulanan</p>
+                      <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Tahunan</p>
                       <p className="text-gray-500 dark:text-gray-400 text-xs">
                         Data akan muncul setelah ada pesanan yang diselesaikan
                       </p>
@@ -486,7 +482,7 @@ export default function ReportPage() {
                 <span className="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3">
                   calendar_month
                 </span>
-                <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Bulanan</p>
+                <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Tahunan</p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs">
                   Data akan muncul setelah ada pesanan yang diselesaikan
                 </p>
