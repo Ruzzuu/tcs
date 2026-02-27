@@ -24,3 +24,5 @@ nama, jenis barang, total barang, total harga
 - alamat opsional
 - jumlah sepatu
 - total harga
+
+note sementara
