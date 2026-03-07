@@ -17,6 +17,9 @@
     "fix:pricing": "npx tsx scripts/fix-order-pricing.ts",
     "check-deleted-services": "npx tsx scripts/check-deleted-services.ts",
     "backup-database": "npx tsx scripts/backup-database.ts",
+    "fix-ttl-index": "npx tsx scripts/fix-ttl-index.ts",
+    "fix-ttl-index:apply": "npx tsx scripts/fix-ttl-index.ts --fix",
+    "audit-january-data": "npx tsx scripts/audit-january-data.ts",
     "migrate-delete-deleted-services": "npx tsx scripts/migrate-delete-deleted-services.ts",
     "verify-service-removal": "npx tsx scripts/verify-service-removal.ts"
   },
