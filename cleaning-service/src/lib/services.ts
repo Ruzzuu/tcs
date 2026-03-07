@@ -52,7 +52,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     name: 'Sewing (Jahit)',
     nameEn: 'Sewing',
     price: 35000,
-    icon: 'sewing'
+    icon: 'content_cut'
   },
   sewing_dan_cuci: {
     name: 'Sewing (Jahit) dan Cuci',
