@@ -6,49 +6,66 @@
 import { ServiceConfig, ServiceType } from '@/types';
 import { ACTIVE_TENANT } from '@/config/tenant';
 
+function applyTenantServiceName(serviceType: ServiceType, config: ServiceConfig): ServiceConfig {
+  const override = ACTIVE_TENANT.serviceNames?.[serviceType];
+  if (!override) return config;
+
+  return {
+    ...config,
+    name: override.name,
+    nameEn: override.nameEn || override.name,
+  };
+}
+
+const visibleServiceTypes = ACTIVE_TENANT.visibleServiceTypes;
+
+function isVisibleService(serviceType: ServiceType): boolean {
+  return !visibleServiceTypes || visibleServiceTypes.includes(serviceType);
+}
+
 export const SERVICES: Record<ServiceType, ServiceConfig> = {
-  Deepclean: {
+  Deepclean: applyTenantServiceName('Deepclean', {
     name: 'Deepclean',
     nameEn: 'Deepclean',
     price: ACTIVE_TENANT.servicePrices.Deepclean,
     icon: 'steps'
-  },
-  Deepclean_Sandal: {
+  }),
+  Deepclean_Sandal: applyTenantServiceName('Deepclean_Sandal', {
     name: 'Deepclean Sandal',
     nameEn: 'Deepclean Sandal',
     price: ACTIVE_TENANT.servicePrices.Deepclean_Sandal,
     icon: 'steps'
-  },
-  Deepclean_Tas: {
+  }),
+  Deepclean_Tas: applyTenantServiceName('Deepclean_Tas', {
     name: 'Deepclean Tas',
     nameEn: 'Deepclean Bag',
     price: ACTIVE_TENANT.servicePrices.Deepclean_Tas,
     icon: 'backpack'
-  },
-  deepclean_bag_small: {
+  }),
+  deepclean_bag_small: applyTenantServiceName('deepclean_bag_small', {
     name: 'Deepclean Tas (Small)',
     nameEn: 'Deepclean Bag (Small)',
     price: ACTIVE_TENANT.servicePrices.deepclean_bag_small,
     icon: 'work'
-  },
-  deepclean_bag_large: {
+  }),
+  deepclean_bag_large: applyTenantServiceName('deepclean_bag_large', {
     name: 'Deepclean Tas (Large)',
     nameEn: 'Deepclean Bag (Large)',
     price: ACTIVE_TENANT.servicePrices.deepclean_bag_large,
     icon: 'shopping_bag'
-  },
-  one_day_service: {
+  }),
+  one_day_service: applyTenantServiceName('one_day_service', {
     name: 'One Day Service',
     nameEn: 'One Day Service',
     price: ACTIVE_TENANT.servicePrices.one_day_service,
     icon: 'bolt'
-  },
-  unyellowing: {
+  }),
+  unyellowing: applyTenantServiceName('unyellowing', {
     name: 'Unyellowing',
     nameEn: 'Unyellowing',
     price: ACTIVE_TENANT.servicePrices.unyellowing,
     icon: 'wb_sunny'
-  },
+  }),
   sewing: {
     name: 'Sewing (Jahit)',
     nameEn: 'Sewing',
@@ -67,36 +84,36 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     price: ACTIVE_TENANT.servicePrices.deepclean_kids,
     icon: 'child_care'
   },
-  deepclean_topi: {
+  deepclean_topi: applyTenantServiceName('deepclean_topi', {
     name: 'Deepclean Topi',
     nameEn: 'Deepclean Hat',
     price: ACTIVE_TENANT.servicePrices.deepclean_topi,
     icon: 'cap'
-  },
-  deepclean_fantofel: {
+  }),
+  deepclean_fantofel: applyTenantServiceName('deepclean_fantofel', {
     name: 'Deepclean Fantofel',
     nameEn: 'Deepclean Fantofel',
     price: ACTIVE_TENANT.servicePrices.deepclean_fantofel,
     icon: 'checkroom'
-  },
-  deepclean_member: {
+  }),
+  deepclean_member: applyTenantServiceName('deepclean_member', {
     name: 'Deepclean Member',
     nameEn: 'Deepclean Member',
     price: ACTIVE_TENANT.servicePrices.deepclean_member,
     icon: 'card_membership'
-  },
-  deepclean_helm: {
+  }),
+  deepclean_helm: applyTenantServiceName('deepclean_helm', {
     name: 'Deepclean Helm',
     nameEn: 'Deepclean Helmet',
     price: ACTIVE_TENANT.servicePrices.deepclean_helm,
     icon: 'sports_motorsports'
-  },
-  whitening: {
+  }),
+  whitening: applyTenantServiceName('whitening', {
     name: 'Whitening Treatment',
     nameEn: 'Whitening Treatment',
     price: ACTIVE_TENANT.servicePrices.whitening,
     icon: 'auto_fix_high'
-  },
+  }),
   repaint_leather: {
     name: 'Repaint Leather',
     nameEn: 'Repaint Leather',
@@ -129,22 +146,28 @@ export const SERVICE_CATEGORIES = [
         'one_day_service', 'sewing_dan_cuci', 'deepclean_kids',
         'deepclean_topi', 'deepclean_fantofel', 'deepclean_member', 'deepclean_helm'
       ] as ServiceType[]
-    ).map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
+    )
+      .filter(isVisibleService)
+      .map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
   },
   {
     name: 'Treatment',
     services: (
       ['unyellowing', 'sewing', 'whitening', 'repaint_leather', 'repaint_canvas', 'repaint_suede'] as ServiceType[]
-    ).map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
+    )
+      .filter(isVisibleService)
+      .map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
   }
 ];
 
 // Service type options for dropdown (flat list)
-export const SERVICE_OPTIONS = Object.entries(SERVICES).map(([key, value]) => ({
-  value: key as ServiceType,
-  label: value.name,
-  price: value.price
-}));
+export const SERVICE_OPTIONS = Object.entries(SERVICES)
+  .filter(([key]) => isVisibleService(key as ServiceType))
+  .map(([key, value]) => ({
+    value: key as ServiceType,
+    label: value.name,
+    price: value.price
+  }));
 
 // Color mapping for charts
 export const SERVICE_COLORS: Record<ServiceType, string> = {
