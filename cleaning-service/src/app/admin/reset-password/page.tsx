@@ -8,6 +8,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -91,8 +92,8 @@ function ResetPasswordForm() {
         <div className="flex justify-center mb-10 pt-4">
           <div className="w-20 h-20 bg-[#1152d4]/10 rounded-2xl flex items-center justify-center">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
-              alt="Teman Cuci Sepatu" 
+              src={ACTIVE_TENANT.logoUrl}
+              alt={ACTIVE_TENANT.name}
               className="w-12 h-12 object-contain"
             />
           </div>

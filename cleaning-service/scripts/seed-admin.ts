@@ -7,13 +7,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// Admin credentials
-const ADMIN_USERNAME = 'everyoneherelikelisa';
-const ADMIN_PASSWORD = 'temancs251810';
-const ADMIN_EMAIL = 'admin@cucipremium.com'; // Default email, can be changed later
-
-// MongoDB connection string - update this with your actual connection string
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://your-connection-string';
+// Required runtime configuration. Never hardcode admin or database credentials.
+const ADMIN_USERNAME = process.env.ADMIN_SEED_USERNAME?.trim().toLowerCase();
+const ADMIN_PASSWORD = process.env.ADMIN_SEED_PASSWORD;
+const ADMIN_EMAIL = process.env.ADMIN_SEED_EMAIL?.trim().toLowerCase();
+const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME?.trim();
 
 // Admin Schema (same as in src/lib/models/Admin.ts)
 const AdminSchema = new mongoose.Schema({
@@ -62,8 +61,18 @@ const Admin = mongoose.models.Admin || mongoose.model('Admin', AdminSchema);
 
 async function seedAdmin() {
   try {
+    if (!ADMIN_USERNAME || !ADMIN_PASSWORD || !ADMIN_EMAIL || !MONGODB_URI || !MONGODB_DB_NAME) {
+      throw new Error(
+        'ADMIN_SEED_USERNAME, ADMIN_SEED_PASSWORD, ADMIN_SEED_EMAIL, MONGODB_URI, and MONGODB_DB_NAME are required'
+      );
+    }
+
+    if (ADMIN_PASSWORD.length < 8) {
+      throw new Error('ADMIN_SEED_PASSWORD must contain at least 8 characters');
+    }
+
     console.log('🔌 Connecting to MongoDB...');
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB_NAME });
     console.log('✅ Connected to MongoDB');
 
     // Check if admin already exists
@@ -101,7 +110,6 @@ async function seedAdmin() {
     console.log('✅ Admin created successfully!');
     console.log('================================');
     console.log(`   Username: ${ADMIN_USERNAME}`);
-    console.log(`   Password: ${ADMIN_PASSWORD}`);
     console.log(`   Email: ${ADMIN_EMAIL}`);
     console.log('================================');
     console.log('');

@@ -9,6 +9,7 @@ import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { createOrderItem, calculateOrderSubtotal, calculateOrderTotal } from '@/lib/orderUtils';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -17,6 +18,10 @@ interface RouteParams {
 // POST /api/orders/[id]/items - Add item to existing order
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     if (!isFeatureEnabled('MULTI_ITEM_ORDERS')) {
       return NextResponse.json(
         { success: false, error: 'Multi-item orders feature is not enabled' },

@@ -7,6 +7,7 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { calculateOrderSubtotal, calculateOrderTotal } from '@/lib/orderUtils';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 interface RouteParams {
   params: Promise<{ id: string; itemId: string }>;
@@ -15,6 +16,10 @@ interface RouteParams {
 // DELETE /api/orders/[id]/items/[itemId] - Remove item from order
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     if (!isFeatureEnabled('MULTI_ITEM_ORDERS')) {
       return NextResponse.json(
         { success: false, error: 'Multi-item orders feature is not enabled' },

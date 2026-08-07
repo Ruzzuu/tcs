@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 export default function AdminLoginPage() {
   const [identifier, setIdentifier] = useState(''); // email or username
@@ -52,8 +53,8 @@ export default function AdminLoginPage() {
         <div className="mb-10 flex flex-col items-center">
           <div className="mb-4">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
-              alt="Teman Cuci Sepatu" 
+              src={ACTIVE_TENANT.logoUrl}
+              alt={ACTIVE_TENANT.name}
               className="w-24 h-24 object-contain"
             />
           </div>
@@ -61,7 +62,7 @@ export default function AdminLoginPage() {
             Admin Portal
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Teman Cuci Sepatu
+            {ACTIVE_TENANT.name}
           </p>
         </div>
 

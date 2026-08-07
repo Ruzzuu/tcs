@@ -4,15 +4,15 @@
 // ADMIN SEED PAGE (One-time use)
 // ============================================
 // This page allows initial admin creation
-// DELETE THIS FILE after creating the admin!
+// Keep ADMIN_SEED_ENABLED=false except during one-time tenant initialization.
 
 import { useState } from 'react';
 
 export default function SeedAdminPage() {
   const [seedKey, setSeedKey] = useState('');
-  const [username, setUsername] = useState('everyoneherelikelisa');
-  const [password, setPassword] = useState('temancs251810');
-  const [email, setEmail] = useState('admin@cucipremium.com');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -45,8 +45,7 @@ export default function SeedAdminPage() {
           ⚠️ Admin Seed Page
         </h1>
         <p className="text-sm text-gray-600 mb-6 text-center">
-          DELETE THIS FILE after creating admin!<br/>
-          File: src/app/admin/seed/page.tsx
+          Aktifkan ADMIN_SEED_ENABLED hanya saat membuat admin pertama, lalu nonaktifkan kembali.
         </p>
 
         {result && (

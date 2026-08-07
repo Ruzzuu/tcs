@@ -7,23 +7,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
-import { v2 as cloudinary } from 'cloudinary';
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
+import { isAdminAuthenticated } from '@/lib/adminAuth';
+import {
+  CLOUDINARY_FOLDERS,
+  deleteImage,
+  isCloudinaryPublicIdInFolder,
+} from '@/lib/cloudinary';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+type PhotoType = 'before' | 'after' | 'nota';
+
+function getPhotoFolder(type: PhotoType): string {
+  if (type === 'before') return CLOUDINARY_FOLDERS.BEFORE;
+  if (type === 'after') return CLOUDINARY_FOLDERS.AFTER;
+  return CLOUDINARY_FOLDERS.NOTA;
+}
+
 // POST - Add photo to existing order
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -41,6 +50,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (!type || !['before', 'after', 'nota'].includes(type)) {
       return NextResponse.json(
         { success: false, error: 'type must be: before, after, or nota' },
+        { status: 400 }
+      );
+    }
+
+    const photoType = type as PhotoType;
+    if (!isCloudinaryPublicIdInFolder(publicId, getPhotoFolder(photoType))) {
+      return NextResponse.json(
+        { success: false, error: 'Photo does not belong to this tenant or photo type' },
         { status: 400 }
       );
     }
@@ -111,6 +128,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // DELETE - Remove individual photo from order
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const { searchParams } = new URL(request.url);
@@ -133,6 +154,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    const photoType = type as PhotoType;
+    if (!isCloudinaryPublicIdInFolder(publicId, getPhotoFolder(photoType))) {
+      return NextResponse.json(
+        { success: false, error: 'Photo does not belong to this tenant or photo type' },
+        { status: 400 }
+      );
+    }
+
     // Get the order
     const order = await Order.findById(id);
 
@@ -143,17 +172,25 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Delete from Cloudinary first
+    const photoExistsOnOrder = photoType === 'before'
+      ? order.proofOfWork?.beforePhotos?.some((photo: { publicId?: string }) => photo.publicId === publicId)
+      : photoType === 'after'
+        ? order.proofOfWork?.afterPhotos?.some((photo: { publicId?: string }) => photo.publicId === publicId)
+        : order.notaImage?.publicId === publicId;
+
+    if (!photoExistsOnOrder) {
+      return NextResponse.json(
+        { success: false, error: 'Photo is not attached to this order' },
+        { status: 404 }
+      );
+    }
+
+    // Delete from Cloudinary first. Database cleanup still continues if the
+    // provider is temporarily unavailable, matching the previous behavior.
     try {
-      const result = await cloudinary.uploader.destroy(publicId);
-      console.log(`Cloudinary delete result for ${publicId}:`, result);
-      
-      if (result.result !== 'ok' && result.result !== 'not found') {
-        console.warn(`Cloudinary deletion warning: ${result.result}`);
-      }
+      await deleteImage(publicId);
     } catch (error) {
       console.error(`Failed to delete from Cloudinary: ${publicId}`, error);
-      // Continue to remove from MongoDB even if Cloudinary fails
     }
 
     // Remove from MongoDB array based on type

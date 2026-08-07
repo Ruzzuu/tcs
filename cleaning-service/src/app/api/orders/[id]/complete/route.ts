@@ -4,6 +4,7 @@ import Order from '@/lib/models/Order';
 import Rekap from '@/lib/models/Rekap';
 import { runTransactionSafe } from '@/lib/db/transactions';
 import mongoose from 'mongoose';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -11,6 +12,10 @@ interface RouteParams {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
 

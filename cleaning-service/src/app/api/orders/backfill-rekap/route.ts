@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import Rekap from '@/lib/models/Rekap';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     
     // Find all finished orders without Rekap

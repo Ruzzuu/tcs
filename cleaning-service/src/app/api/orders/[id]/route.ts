@@ -11,6 +11,7 @@ import { calculateOrderTotal } from '@/lib/orderUtils';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { runTransactionSafe } from '@/lib/db/transactions';
 import mongoose from 'mongoose';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 type Discount = { type: 'percentage' | 'fixed'; value: number };
 
@@ -23,6 +24,10 @@ interface RouteParams {
 // GET /api/orders/[id] - Get single order
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -51,6 +56,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/orders/[id] - Update order
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -258,6 +267,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/orders/[id] - Delete order and all associated images
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
 

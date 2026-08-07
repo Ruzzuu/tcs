@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { formatCurrency, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 // Version check for deployment verification
 const APP_VERSION = '2.0.2-debug-multi-submit';
@@ -250,13 +251,13 @@ export default function CustomerFormPage() {
       <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#1a2230]/95 backdrop-blur-md border-b border-[#dbdfe6] dark:border-[#2a3441] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img 
-            src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
-            alt="Teman Cuci Sepatu" 
+            src={ACTIVE_TENANT.logoUrl}
+            alt={ACTIVE_TENANT.name}
             className="w-10 h-10 object-contain"
           />
         </div>
         <h1 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
-          Form Teman Cuci Sepatu
+          Form {ACTIVE_TENANT.name}
         </h1>
         <div className="w-2"></div>
       </div>
@@ -266,10 +267,10 @@ export default function CustomerFormPage() {
         {/* Header Text */}
         <div className="mb-8 text-center">
           <h2 className="text-[#111318] dark:text-white text-2xl font-bold mb-2">
-            Teman Cuci Sepatu
+            {ACTIVE_TENANT.name}
           </h2>
           <p className="text-[#616f89] dark:text-gray-400 text-sm">
-            Isi data di bawah ini untuk layanan penjemputan gratis ke lokasi Anda.
+            {ACTIVE_TENANT.formDescription}
           </p>
         </div>
 

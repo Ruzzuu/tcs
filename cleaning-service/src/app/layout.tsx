@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ACTIVE_TENANT } from "@/config/tenant";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,11 +10,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Teman Cuci Sepatu - Layanan Cuci Profesional",
-  description: "Layanan cuci sepatu dan tas dengan kualitas premium. Penjemputan gratis ke lokasi Anda.",
+  title: `${ACTIVE_TENANT.name} - Layanan Cuci Profesional`,
+  description: ACTIVE_TENANT.formDescription,
   keywords: ["cuci sepatu", "cuci tas", "laundry"],
-  authors: [{ name: "Teman Cuci Sepatu" }],
-  manifest: "/manifest.json",
+  authors: [{ name: ACTIVE_TENANT.name }],
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -63,11 +64,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
         {/* PWA & Favicon */}
-        <link rel="icon" type="image/png" href="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/w_32,h_32,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
-        <link rel="apple-touch-icon" href="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/w_180,h_180,c_fit,f_png/v1768543427/logo_tcs_keooto.png" />
+        <link rel="icon" type="image/png" href={ACTIVE_TENANT.logoUrl} />
+        <link rel="apple-touch-icon" href={ACTIVE_TENANT.logoUrl} />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Teman Cuci Sepatu" />
+        <meta name="apple-mobile-web-app-title" content={ACTIVE_TENANT.name} />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-[#f6f6f8] dark:bg-[#101622] min-h-screen`}

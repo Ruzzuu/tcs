@@ -2,10 +2,11 @@
 // MIGRATE PHONES API - Trigger Migration
 // ============================================
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import PhoneNumber from '@/lib/models/PhoneNumber';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 // Phone numbers to exclude from migration
 const EXCLUDED_PHONES = [
@@ -15,8 +16,12 @@ const EXCLUDED_PHONES = [
 ];
 
 // POST /api/admin/migrate-phones - Run phone migration
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     console.log('🔄 Starting phone numbers migration...');
     
     await connectDB();

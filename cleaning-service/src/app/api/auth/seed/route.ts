@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Admin from '@/lib/models/Admin';
-import { hashPassword } from '@/lib/auth';
+import { checkRateLimit, hashPassword } from '@/lib/auth';
 
 interface SeedRequest {
   username: string;
@@ -23,14 +23,30 @@ interface SeedResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<SeedResponse>> {
   try {
+    if (process.env.ADMIN_SEED_ENABLED !== 'true') {
+      return NextResponse.json(
+        { success: false, message: 'Admin seed is disabled' },
+        { status: 403 }
+      );
+    }
+
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor?.split(',')[0]?.trim() || 'unknown';
+    if (!checkRateLimit(`admin-seed:${clientIp}`, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        { success: false, message: 'Terlalu banyak percobaan. Coba lagi nanti.' },
+        { status: 429 }
+      );
+    }
+
     const body: SeedRequest = await request.json();
     const { username, password, email, seedKey } = body;
 
     // Verify seed key
     const expectedSeedKey = process.env.ADMIN_SEED_KEY;
-    if (!expectedSeedKey) {
+    if (!expectedSeedKey || expectedSeedKey.length < 32) {
       return NextResponse.json(
-        { success: false, message: 'Seed key not configured' },
+        { success: false, message: 'Seed key is missing or too weak' },
         { status: 500 }
       );
     }

@@ -4,114 +4,115 @@
 // ============================================
 
 import { ServiceConfig, ServiceType } from '@/types';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 export const SERVICES: Record<ServiceType, ServiceConfig> = {
   Deepclean: {
     name: 'Deepclean',
     nameEn: 'Deepclean',
-    price: 35000,
+    price: ACTIVE_TENANT.servicePrices.Deepclean,
     icon: 'steps'
   },
   Deepclean_Sandal: {
     name: 'Deepclean Sandal',
     nameEn: 'Deepclean Sandal',
-    price: 25000,
+    price: ACTIVE_TENANT.servicePrices.Deepclean_Sandal,
     icon: 'steps'
   },
   Deepclean_Tas: {
     name: 'Deepclean Tas',
     nameEn: 'Deepclean Bag',
-    price: 45000,
+    price: ACTIVE_TENANT.servicePrices.Deepclean_Tas,
     icon: 'backpack'
   },
   deepclean_bag_small: {
     name: 'Deepclean Tas (Small)',
     nameEn: 'Deepclean Bag (Small)',
-    price: 35000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_bag_small,
     icon: 'work'
   },
   deepclean_bag_large: {
     name: 'Deepclean Tas (Large)',
     nameEn: 'Deepclean Bag (Large)',
-    price: 55000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_bag_large,
     icon: 'shopping_bag'
   },
   one_day_service: {
     name: 'One Day Service',
     nameEn: 'One Day Service',
-    price: 50000,
+    price: ACTIVE_TENANT.servicePrices.one_day_service,
     icon: 'bolt'
   },
   unyellowing: {
     name: 'Unyellowing',
     nameEn: 'Unyellowing',
-    price: 50000,
+    price: ACTIVE_TENANT.servicePrices.unyellowing,
     icon: 'wb_sunny'
   },
   sewing: {
     name: 'Sewing (Jahit)',
     nameEn: 'Sewing',
-    price: 35000,
+    price: ACTIVE_TENANT.servicePrices.sewing,
     icon: 'content_cut'
   },
   sewing_dan_cuci: {
     name: 'Sewing (Jahit) dan Cuci',
     nameEn: 'Sewing and Washing',
-    price: 60000,
+    price: ACTIVE_TENANT.servicePrices.sewing_dan_cuci,
     icon: 'local_laundry_service'
   },
   deepclean_kids: {
     name: 'Deepclean Kids',
     nameEn: 'Deepclean Kids',
-    price: 30000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_kids,
     icon: 'child_care'
   },
   deepclean_topi: {
     name: 'Deepclean Topi',
     nameEn: 'Deepclean Hat',
-    price: 25000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_topi,
     icon: 'cap'
   },
   deepclean_fantofel: {
     name: 'Deepclean Fantofel',
     nameEn: 'Deepclean Fantofel',
-    price: 30000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_fantofel,
     icon: 'checkroom'
   },
   deepclean_member: {
     name: 'Deepclean Member',
     nameEn: 'Deepclean Member',
-    price: 30000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_member,
     icon: 'card_membership'
   },
   deepclean_helm: {
     name: 'Deepclean Helm',
     nameEn: 'Deepclean Helmet',
-    price: 35000,
+    price: ACTIVE_TENANT.servicePrices.deepclean_helm,
     icon: 'sports_motorsports'
   },
   whitening: {
     name: 'Whitening Treatment',
     nameEn: 'Whitening Treatment',
-    price: 50000,
+    price: ACTIVE_TENANT.servicePrices.whitening,
     icon: 'auto_fix_high'
   },
   repaint_leather: {
     name: 'Repaint Leather',
     nameEn: 'Repaint Leather',
-    price: 100000,
+    price: ACTIVE_TENANT.servicePrices.repaint_leather,
     icon: 'format_paint'
   },
   repaint_canvas: {
     name: 'Repaint Canvas',
     nameEn: 'Repaint Canvas',
-    price: 100000,
+    price: ACTIVE_TENANT.servicePrices.repaint_canvas,
     icon: 'brush'
   },
   repaint_suede: {
     name: 'Repaint Suede',
     nameEn: 'Repaint Suede',
-    price: 100000,
+    price: ACTIVE_TENANT.servicePrices.repaint_suede,
     icon: 'palette'
   }
 };

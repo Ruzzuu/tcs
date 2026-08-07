@@ -7,7 +7,9 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production'
+  ? (() => { throw new Error('JWT_SECRET is required in production'); })()
+  : 'development-only-secret-change-before-production');
 const RECOVERY_KEY = process.env.ADMIN_RECOVERY_KEY || '';
 
 // ============================================

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Rekap from '@/lib/models/Rekap';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 export async function GET(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
     
     const { searchParams } = new URL(request.url);

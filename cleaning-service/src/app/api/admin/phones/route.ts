@@ -5,10 +5,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import PhoneNumber from '@/lib/models/PhoneNumber';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 // GET /api/admin/phones - Get all phone numbers
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
 
     // Get all phone numbers from PhoneNumber collection
@@ -32,6 +37,10 @@ export async function GET() {
 // POST /api/admin/phones - Add a new phone number
 export async function POST(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
 
     const { phone } = await request.json();
@@ -71,6 +80,10 @@ export async function POST(request: NextRequest) {
 // DELETE /api/admin/phones - Delete a phone number
 export async function DELETE(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(request.url);

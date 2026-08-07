@@ -7,10 +7,15 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { SERVICE_COLORS } from '@/lib/services';
 import { ServiceType } from '@/types';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 // GET /api/dashboard - Get dashboard data with pagination
 export async function GET(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(request.url);

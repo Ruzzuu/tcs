@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -71,12 +72,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </button>
           <Link href="/admin" className="flex items-center gap-2">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
-              alt="Teman Cuci Sepatu" 
+              src={ACTIVE_TENANT.logoUrl}
+              alt={ACTIVE_TENANT.name}
               className="w-8 h-8 object-contain"
             />
             <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] hidden sm:block">
-              Teman Cuci Sepatu
+              {ACTIVE_TENANT.name}
             </h2>
           </Link>
         </div>
@@ -167,12 +168,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="p-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <img 
-              src="https://res.cloudinary.com/dncpyspjq/image/upload/e_background_removal/f_auto,q_auto,w_200/v1768543427/logo_tcs_keooto.png" 
-              alt="Teman Cuci Sepatu" 
+              src={ACTIVE_TENANT.logoUrl}
+              alt={ACTIVE_TENANT.name}
               className="w-10 h-10 object-contain"
             />
             <div>
-              <h2 className="text-[#111318] dark:text-white font-bold">Teman Cuci Sepatu</h2>
+              <h2 className="text-[#111318] dark:text-white font-bold">{ACTIVE_TENANT.name}</h2>
               <p className="text-xs text-[#616f89]">Admin Panel</p>
             </div>
           </div>

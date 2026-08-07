@@ -5,6 +5,7 @@
 // Never import this in client components
 
 import { v2 as cloudinary } from 'cloudinary';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 // Configure Cloudinary with environment variables
 cloudinary.config({
@@ -14,13 +15,43 @@ cloudinary.config({
   secure: true, // Always use HTTPS
 });
 
-// Folder structure for organized storage
+const configuredBaseFolder = process.env.CLOUDINARY_BASE_FOLDER?.trim();
+
+if (configuredBaseFolder && !/^[a-zA-Z0-9/_-]+$/.test(configuredBaseFolder)) {
+  throw new Error('CLOUDINARY_BASE_FOLDER contains unsupported characters');
+}
+
+if (configuredBaseFolder && configuredBaseFolder !== ACTIVE_TENANT.cloudinaryBaseFolder) {
+  throw new Error(
+    `CLOUDINARY_BASE_FOLDER does not match tenant ${ACTIVE_TENANT.id}; expected ${ACTIVE_TENANT.cloudinaryBaseFolder}`
+  );
+}
+
+export const CLOUDINARY_BASE_FOLDER = ACTIVE_TENANT.cloudinaryBaseFolder;
+
+// Folder structure for organized, deployment-scoped storage
 export const CLOUDINARY_FOLDERS = {
-  BEFORE: 'cleaning-app/orders/before',
-  AFTER: 'cleaning-app/orders/after',
-  INVOICES: 'cleaning-app/invoices',
-  NOTA: 'cleaning-app/nota',
+  BEFORE: `${CLOUDINARY_BASE_FOLDER}/orders/before`,
+  AFTER: `${CLOUDINARY_BASE_FOLDER}/orders/after`,
+  INVOICES: `${CLOUDINARY_BASE_FOLDER}/invoices`,
+  NOTA: `${CLOUDINARY_BASE_FOLDER}/nota`,
 } as const;
+
+const MANAGED_FOLDERS = Object.values(CLOUDINARY_FOLDERS);
+
+export function isCloudinaryPublicIdInFolder(publicId: string, folder: string): boolean {
+  return publicId.startsWith(`${folder}/`);
+}
+
+export function isManagedCloudinaryPublicId(publicId: string): boolean {
+  return MANAGED_FOLDERS.some((folder) => isCloudinaryPublicIdInFolder(publicId, folder));
+}
+
+function assertManagedCloudinaryPublicId(publicId: string): void {
+  if (!isManagedCloudinaryPublicId(publicId)) {
+    throw new Error(`Cloudinary asset is outside tenant ${ACTIVE_TENANT.id} folders`);
+  }
+}
 
 // Allowed file types
 export const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -95,6 +126,8 @@ export async function uploadImage(
  * @param publicId - The public_id of the image to delete
  */
 export async function deleteImage(publicId: string): Promise<void> {
+  assertManagedCloudinaryPublicId(publicId);
+
   try {
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
@@ -109,6 +142,8 @@ export async function deleteImage(publicId: string): Promise<void> {
  */
 export async function deleteImages(publicIds: string[]): Promise<void> {
   if (publicIds.length === 0) return;
+
+  publicIds.forEach(assertManagedCloudinaryPublicId);
   
   try {
     await cloudinary.api.delete_resources(publicIds);

@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/logo_rekancucisepatu.png
 
 # debug
 npm-debug.log*
@@ -30,8 +31,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (can opt-in for committing examples only)
 .env*
+!.env.example
+!deploy/*.env.example
 
 # vercel
 .vercel
@@ -51,6 +54,22 @@ next-env.d.ts
 .vercel
 
 .vercel
+
+# local virtual environments
+venv/
+.venv/
+
+# local storage / uploads / databases
+storage/
+uploads/
+backups/*.json
+database.sqlite
+*.sqlite
+*.sqlite3
+
+# service credentials
+credentials.json
+service-account.json
 
 # VS Code workspace settings
 .vscode/

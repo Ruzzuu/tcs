@@ -5,6 +5,7 @@
 // Server-side only, returns Cloudinary URL
 
 import { NextRequest, NextResponse } from 'next/server';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 import { 
   uploadImage, 
   CLOUDINARY_FOLDERS, 
@@ -23,6 +24,13 @@ interface UploadResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<UploadResponse>> {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json(
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
     const formData = await request.formData();
     
     // Get file and metadata

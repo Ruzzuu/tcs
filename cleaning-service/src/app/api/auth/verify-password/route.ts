@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuthToken, getAuthCookie, verifyPassword } from '@/lib/auth';
 import Admin from '@/lib/models/Admin';
-import mongoose from 'mongoose';
+import connectDB from '@/lib/mongodb';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await mongoose.connect(process.env.MONGODB_URI || '');
+    await connectDB();
 
     const admin = await Admin.findById(payload.adminId).select('passwordHash');
 

@@ -4606,7 +4606,7 @@ await prisma.user.updateMany({
 
 ```bash
 # .env.local
-MONGODB_URI=mongodb+srv://...
+MONGODB_URI=<MONGODB_CONNECTION_STRING>
 DATABASE_URL=postgresql://...
 MIGRATION_DRY_RUN=false
 MIGRATION_STEP_BY_STEP=false

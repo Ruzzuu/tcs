@@ -1,0 +1,25 @@
+# Environment / secrets at repository root
+.env
+.env.*
+!.env.example
+
+# Dependencies / virtual environments
+node_modules/
+venv/
+.venv/
+
+# Local storage and uploads
+storage/
+uploads/
+database.sqlite
+*.sqlite
+*.sqlite3
+
+# Service credentials
+credentials.json
+service-account.json
+*.pem
+
+# OS/editor noise
+.DS_Store
+.vscode/

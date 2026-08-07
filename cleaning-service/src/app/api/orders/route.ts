@@ -11,6 +11,7 @@ import { generateOrderNumber, isValidPhoneNumber } from '@/lib/utils';
 import { ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { createOrderItem } from '@/lib/orderUtils';
+import { isAdminAuthenticated } from '@/lib/adminAuth';
 
 // Phone numbers to exclude from auto-saving
 const EXCLUDED_PHONES = [
@@ -51,6 +52,10 @@ async function autoSavePhoneNumber(phone: string) {
 // GET /api/orders - List orders (for admin)
 export async function GET(request: NextRequest) {
   try {
+    if (!(await isAdminAuthenticated(request))) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(request.url);

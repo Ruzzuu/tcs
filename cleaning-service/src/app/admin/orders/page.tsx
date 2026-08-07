@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import PhoneAutocomplete from '@/components/PhoneAutocomplete';
 import { CloudinaryImage } from '@/types';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 // Global submission lock
 if (typeof window !== 'undefined') {
@@ -294,10 +295,10 @@ export default function AdminForm() {
       <main className="flex-1 w-full max-w-md mx-auto px-4 py-6 pb-24">
         <div className="mb-8 text-center">
           <h2 className="text-[#111318] dark:text-white text-2xl font-bold mb-2">
-            Teman Cuci Sepatu
+            {ACTIVE_TENANT.name}
           </h2>
           <p className="text-[#616f89] dark:text-gray-400 text-sm">
-            Isi data di bawah ini untuk layanan penjemputan gratis ke lokasi Anda.
+            {ACTIVE_TENANT.formDescription}
           </p>
         </div>
 

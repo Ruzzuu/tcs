@@ -3,6 +3,7 @@
 // ============================================
 
 import { Order } from '@/types';
+import { ACTIVE_TENANT } from '@/config/tenant';
 
 /**
  * Format number to Indonesian Rupiah
@@ -52,13 +53,13 @@ export function generateWhatsAppLink(phone: string, message?: string): string {
  */
 export const WA_TEMPLATES = {
   newOrderVerification: (order: Order) =>
-    `Halo ${order.name}, terima kasih telah menghubungi Teman Cuci Sepatu.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
+    `Halo ${order.name}, terima kasih telah menghubungi ${ACTIVE_TENANT.name}.\n\nPesanan Anda:\n- Jenis: ${order.itemType}\n- Qty: ${order.quantity || 1}\n- Estimasi: ${formatCurrency(order.estimatedPrice || 0)}\n\nApakah data sudah benar?`,
 
   orderInProgress: (order: Order) =>
-    `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan Deepclean ke *Teman Cuci Sepatu*.\n\nSaat ini Deepclean Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,
+    `Halo Kak ${order.name},\nTerima kasih sudah mempercayakan perawatan Deepclean ke *${ACTIVE_TENANT.name}*.\n\nSaat ini Deepclean Kakak sudah kami terima dan sedang *dalam antrean proses* ya.\nEstimasi pengerjaan sekitar *2-3 hari kerja*, agar hasilnya bisa maksimal dan rapi.\n\nKami akan mengabari Kakak kembali segera setelah proses selesai.\nTerima kasih atas kesabarannya.`,
 
   orderCompleted: (order: Order) =>
-    `Halo Kak ${order.name},\nKabar baik dari *Teman Cuci Sepatu*!\n\nDeepclean Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice || 0)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan Deepclean Kakak ke *Teman Cuci Sepatu*.`
+    `Halo Kak ${order.name},\nKabar baik dari *${ACTIVE_TENANT.name}*!\n\nDeepclean Kakak sudah *selesai kami kerjakan* dan siap untuk diambil / dikirim.\n\nTotal Biaya: *Rp ${formatNumber(order.finalPrice || order.estimatedPrice || 0)}*\n\nSilakan info ke kami ya Kak untuk jadwal pengambilan atau pengantaran.\nTerima kasih sudah mempercayakan Deepclean Kakak ke *${ACTIVE_TENANT.name}*.`
 };
 
 /**
