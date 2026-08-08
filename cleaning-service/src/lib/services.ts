@@ -88,7 +88,7 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     name: 'Deepclean Topi',
     nameEn: 'Deepclean Hat',
     price: ACTIVE_TENANT.servicePrices.deepclean_topi,
-    icon: 'cap'
+    icon: 'apparel'
   }),
   deepclean_fantofel: applyTenantServiceName('deepclean_fantofel', {
     name: 'Deepclean Fantofel',
