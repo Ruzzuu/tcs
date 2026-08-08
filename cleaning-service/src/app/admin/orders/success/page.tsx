@@ -23,7 +23,7 @@ export default function OrderSuccessPage() {
           Terima kasih telah menggunakan layanan kami.
         </p>
         <p className="text-[#616f89] dark:text-gray-400 text-sm mb-8 max-w-xs">
-          Tim kami akan menghubungi Anda melalui WhatsApp untuk konfirmasi lebih lanjut.
+          Tim kami akan menghubungi Anda melalui kontak yang diberikan untuk konfirmasi lebih lanjut.
         </p>
 
         {/* Next Steps Card */}
@@ -45,7 +45,7 @@ export default function OrderSuccessPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5">2.</span>
-                  Kami akan menghubungi via WhatsApp
+                  Kami akan menghubungi melalui kontak yang diberikan
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 mt-0.5">3.</span>

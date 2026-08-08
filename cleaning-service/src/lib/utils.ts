@@ -24,6 +24,10 @@ export function formatNumber(amount: number): string {
   return new Intl.NumberFormat('id-ID').format(amount);
 }
 
+export function isWhatsAppCompatibleContact(contact: string): boolean {
+  return isValidPhoneNumber(contact);
+}
+
 /**
  * Generate WhatsApp link with pre-filled message
  */
@@ -83,6 +87,15 @@ export function generateStatusBasedWhatsAppLink(order: Order): string {
 }
 
 /**
+ * Validate customer contact value. Accepts phone numbers, social usernames,
+ * profile URLs, email-like IDs, and other short contact handles.
+ */
+export function isValidContactValue(contact: string): boolean {
+  const value = contact.trim();
+  return value.length >= 3 && value.length <= 120;
+}
+
+/**
  * Validate Indonesian phone number
  */
 export function isValidPhoneNumber(phone: string): boolean {
@@ -96,6 +109,10 @@ export function isValidPhoneNumber(phone: string): boolean {
  * Format phone number for display
  */
 export function formatPhoneNumber(phone: string): string {
+  if (!isValidPhoneNumber(phone)) {
+    return phone;
+  }
+
   const cleanPhone = phone.replace(/[\s\-()]/g, '');
   
   // Convert to local format

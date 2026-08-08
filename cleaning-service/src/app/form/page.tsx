@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
-import { formatCurrency, isValidPhoneNumber } from '@/lib/utils';
+import { formatCurrency, isValidContactValue } from '@/lib/utils';
 import { ServiceType } from '@/types';
 import { ACTIVE_TENANT } from '@/config/tenant';
 
@@ -56,7 +56,7 @@ export default function CustomerFormPage() {
 
   // Form validation
   const isFormValid = useMemo(() => {
-    const hasValidCustomer = name.trim().length >= 2 && isValidPhoneNumber(phone);
+    const hasValidCustomer = name.trim().length >= 2 && isValidContactValue(phone);
     const hasValidItems = items.every(item =>
       item.itemType !== '' &&
       item.quantity >= 1
@@ -303,27 +303,27 @@ export default function CustomerFormPage() {
             </div>
           </div>
 
-          {/* Phone Input */}
+          {/* Contact Input */}
           <div className="flex flex-col gap-2">
             <label className="text-[#111318] dark:text-gray-200 text-sm font-medium">
-              Nomor WhatsApp <span className="text-red-500">*</span>
+              Kontak <span className="text-red-500">*</span>
             </label>
             <div className="relative flex items-center">
               <input
-                type="tel"
+                type="text"
                 value={phone}
                 onChange={(e) => { setPhone(e.target.value); setError(null); }}
                 className="w-full h-12 pl-4 pr-12 rounded-xl border border-[#dbdfe6] dark:border-[#2a3441] bg-white dark:bg-[#1a2230] text-[#111318] dark:text-white placeholder:text-[#616f89] dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 focus:border-[#1152d4] transition-all"
-                placeholder="0812xxxx..."
+                placeholder="Nomor WA / Instagram / LinkedIn / kontak lain"
                 required
               />
               <div className="absolute right-4 text-[#616f89] dark:text-gray-500 flex items-center pointer-events-none">
                 <span className="material-symbols-outlined text-xl">call</span>
               </div>
             </div>
-            {phone && !isValidPhoneNumber(phone) && (
-              <p className="text-red-500 text-xs mt-1">Format nomor tidak valid</p>
-            )}
+            <p className="text-[#616f89] dark:text-gray-500 text-xs mt-1">
+              Bisa diisi nomor WhatsApp, username Instagram, LinkedIn, atau kontak lain.
+            </p>
           </div>
 
           {/* Address Input (Optional) */}

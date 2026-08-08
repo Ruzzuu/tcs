@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
-import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidPhoneNumber } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidContactValue } from '@/lib/utils';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import PhoneAutocomplete from '@/components/PhoneAutocomplete';
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
 
   // Form validation
   const isFormValid = useMemo(() => {
-    const hasValidCustomer = formData.name.trim().length >= 2 && isValidPhoneNumber(formData.phone);
+    const hasValidCustomer = formData.name.trim().length >= 2 && isValidContactValue(formData.phone);
     const hasValidItem = formData.itemType !== '' && formData.quantity >= 1;
     return hasValidCustomer && hasValidItem;
   }, [formData]);
@@ -547,7 +547,7 @@ export default function AdminDashboard() {
     // Search filter
     const matchesSearch = !searchQuery || (
       order.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.phone.includes(searchQuery) ||
+      order.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (SERVICES[order.itemType as ServiceType]?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (order.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -688,25 +688,25 @@ export default function AdminDashboard() {
                   />
                 </div>
 
-                {/* Phone */}
+                {/* Contact */}
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-[#111318] dark:text-gray-200">
-                    Nomor WhatsApp <span className="text-red-500">*</span>
+                    Kontak <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <PhoneAutocomplete
                       value={formData.phone}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="0812xxxx..."
+                      placeholder="Nomor WA / Instagram / LinkedIn / kontak lain"
                       required
                     />
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#616f89] dark:text-gray-500 pointer-events-none">
                       <span className="material-symbols-outlined text-xl">call</span>
                     </div>
                   </div>
-                  {formData.phone && !isValidPhoneNumber(formData.phone) && (
-                    <p className="text-red-500 text-xs">Format nomor tidak valid</p>
-                  )}
+                  <p className="text-[#616f89] dark:text-gray-500 text-xs">
+                    Bisa diisi nomor WhatsApp, username Instagram, LinkedIn, atau kontak lain.
+                  </p>
                 </div>
 
                 {/* Address */}

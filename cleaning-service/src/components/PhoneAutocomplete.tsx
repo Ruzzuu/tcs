@@ -1,30 +1,30 @@
 'use client';
 
 // ============================================
-// PHONE AUTOCOMPLETE COMPONENT
+// CONTACT AUTOCOMPLETE COMPONENT
 // ============================================
 
 import React, { useState, useEffect, useRef } from 'react';
 import { PhoneAutocompleteProps, PhoneCacheData } from '@/types';
 
-const CACHE_KEY = 'admin_phone_cache';
+const CACHE_KEY = 'admin_contact_cache';
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
 export default function PhoneAutocomplete({
   value,
   onChange,
-  placeholder = '0812xxxx...',
+  placeholder = 'Nomor WA / Instagram / LinkedIn / kontak lain',
   required = false,
   className = ''
 }: PhoneAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [allPhones, setAllPhones] = useState<string[]>([]);
+  const [allContacts, setAllContacts] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load phone numbers from cache or API
+  // Load saved contacts from cache or API
   useEffect(() => {
     const loadPhones = async () => {
       // Check localStorage first
@@ -37,8 +37,8 @@ export default function PhoneAutocomplete({
           
           // Check if cache is still valid (less than 1 hour old)
           if (now - cacheData.timestamp < CACHE_DURATION) {
-            setAllPhones(cacheData.phones);
-            console.log('📱 Loaded', cacheData.phones.length, 'phones from cache');
+            setAllContacts(cacheData.phones);
+            console.log('📇 Loaded', cacheData.phones.length, 'contacts from cache');
             return;
           }
         } catch (error) {
@@ -52,23 +52,23 @@ export default function PhoneAutocomplete({
         console.log('🔄 Fetching phones from API...');
         const response = await fetch('/api/admin/phones');
         if (response.ok) {
-          const phones: string[] = await response.json();
+            const contacts: string[] = await response.json();
           
           // Remove duplicates using Set
-          const uniquePhones = Array.from(new Set(phones));
+          const uniqueContacts = Array.from(new Set(contacts));
           
-          setAllPhones(uniquePhones);
-          console.log('✅ Loaded', uniquePhones.length, 'phones from API');
+          setAllContacts(uniqueContacts);
+          console.log('✅ Loaded', uniqueContacts.length, 'contacts from API');
           
           // Save to localStorage with timestamp
           const cacheData: PhoneCacheData = {
-            phones: uniquePhones,
+            phones: uniqueContacts,
             timestamp: Date.now()
           };
           localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         }
       } catch (error) {
-        console.error('Error fetching phone numbers:', error);
+        console.error('Error fetching contacts:', error);
       } finally {
         setIsLoading(false);
       }
@@ -79,9 +79,9 @@ export default function PhoneAutocomplete({
 
   // Filter suggestions based on input value
   useEffect(() => {
-    if (value && allPhones.length > 0) {
-      const filtered = allPhones.filter(phone => 
-        phone.toLowerCase().startsWith(value.toLowerCase())
+    if (value && allContacts.length > 0) {
+      const filtered = allContacts.filter(contact => 
+        contact.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filtered);
       setShowDropdown(filtered.length > 0);
@@ -89,7 +89,7 @@ export default function PhoneAutocomplete({
       setSuggestions([]);
       setShowDropdown(false);
     }
-  }, [value, allPhones]);
+  }, [value, allContacts]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -106,11 +106,11 @@ export default function PhoneAutocomplete({
   }, []);
 
   // Handle suggestion click
-  const handleSuggestionClick = (phone: string) => {
+  const handleSuggestionClick = (contact: string) => {
     // Create a synthetic event to match the onChange prop type
     const syntheticEvent = {
-      target: { value: phone },
-      currentTarget: { value: phone }
+      target: { value: contact },
+      currentTarget: { value: contact }
     } as React.ChangeEvent<HTMLInputElement>;
     
     onChange(syntheticEvent);
@@ -129,7 +129,7 @@ export default function PhoneAutocomplete({
     <div ref={wrapperRef} className={`relative ${className}`}>
       <input
         ref={inputRef}
-        type="tel"
+        type="text"
         value={value}
         onChange={onChange}
         onFocus={handleFocus}
@@ -149,14 +149,14 @@ export default function PhoneAutocomplete({
       {/* Dropdown suggestions */}
       {showDropdown && suggestions.length > 0 && (
         <div className="absolute z-50 w-full mt-1 max-h-60 overflow-y-auto bg-white dark:bg-[#101622] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
-          {suggestions.map((phone, index) => (
+          {suggestions.map((contact, index) => (
             <button
-              key={`${phone}-${index}`}
+              key={`${contact}-${index}`}
               type="button"
-              onClick={() => handleSuggestionClick(phone)}
+              onClick={() => handleSuggestionClick(contact)}
               className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-[#111318] dark:text-white transition-colors first:rounded-t-xl last:rounded-b-xl"
             >
-              {phone}
+              {contact}
             </button>
           ))}
         </div>

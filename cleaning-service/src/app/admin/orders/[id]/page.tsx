@@ -10,7 +10,8 @@ import {
   formatPhoneNumber, 
   getStatusColor, 
   getStatusLabel,
-  generateStatusBasedWhatsAppLink
+  generateStatusBasedWhatsAppLink,
+  isWhatsAppCompatibleContact
 } from '@/lib/utils';
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
@@ -749,21 +750,32 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Phone */}
-          <a
-            href={generateStatusBasedWhatsAppLink(order)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
-          >
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="text-[#1152d4] bg-[#1152d4]/10 flex items-center justify-center rounded-lg shrink-0 size-10">
-                <span className="material-symbols-outlined text-[20px]">call</span>
+          {/* Contact */}
+          {isWhatsAppCompatibleContact(order.phone) ? (
+            <a
+              href={generateStatusBasedWhatsAppLink(order)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="text-[#1152d4] bg-[#1152d4]/10 flex items-center justify-center rounded-lg shrink-0 size-10">
+                  <span className="material-symbols-outlined text-[20px]">call</span>
+                </div>
+                <p className="text-[#111318] dark:text-gray-200 text-base font-medium">{formatPhoneNumber(order.phone)}</p>
               </div>
-              <p className="text-[#111318] dark:text-gray-200 text-base font-medium">{formatPhoneNumber(order.phone)}</p>
+              <span className="material-symbols-outlined text-gray-400 dark:text-gray-500 group-hover:text-[#25D366]">chat</span>
+            </a>
+          ) : (
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="text-[#1152d4] bg-[#1152d4]/10 flex items-center justify-center rounded-lg shrink-0 size-10">
+                  <span className="material-symbols-outlined text-[20px]">alternate_email</span>
+                </div>
+                <p className="text-[#111318] dark:text-gray-200 text-base font-medium break-all">{order.phone}</p>
+              </div>
             </div>
-            <span className="material-symbols-outlined text-gray-400 dark:text-gray-500 group-hover:text-[#25D366]">chat</span>
-          </a>
+          )}
 
           {/* Address */}
           {order.address && (

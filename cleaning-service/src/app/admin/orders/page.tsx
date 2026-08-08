@@ -320,16 +320,16 @@ export default function AdminForm() {
             </div>
           </div>
 
-          {/* Nomor WhatsApp */}
+          {/* Kontak */}
           <div className="flex flex-col gap-2">
             <label className="text-[#111318] dark:text-gray-200 text-sm font-medium">
-              Nomor WhatsApp <span className="text-red-500">*</span>
+              Kontak <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <PhoneAutocomplete
                 value={formData.whatsapp}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, whatsapp: e.target.value })}
-                placeholder="0812xxxx..."
+                placeholder="Nomor WA / Instagram / LinkedIn / kontak lain"
                 required
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#616f89] dark:text-gray-500 pointer-events-none">

@@ -7,45 +7,43 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import PhoneNumber from '@/lib/models/PhoneNumber';
 import { SERVICES } from '@/lib/services';
-import { generateOrderNumber, isValidPhoneNumber } from '@/lib/utils';
+import { generateOrderNumber, isValidContactValue } from '@/lib/utils';
 import { ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { createOrderItem } from '@/lib/orderUtils';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
 
-// Phone numbers to exclude from auto-saving
-const EXCLUDED_PHONES = [
+// Legacy phone numbers to exclude from auto-saving suggestions
+const EXCLUDED_CONTACTS = [
   '81515263851',
   '085859461424',
   '085731854878'
 ];
 
-// Helper function to auto-save phone number
-async function autoSavePhoneNumber(phone: string) {
+// Helper function to auto-save contact values for autocomplete suggestions.
+// Uses the legacy PhoneNumber collection name for backwards compatibility.
+async function autoSaveContact(contact: string) {
   try {
-    // Clean phone for comparison
-    const cleanPhone = phone.replace(/^0/, '');
+    const cleanContact = contact.replace(/^0/, '');
     
-    // Check if phone is excluded
-    const isExcluded = EXCLUDED_PHONES.some(excluded => {
+    const isExcluded = EXCLUDED_CONTACTS.some(excluded => {
       const cleanExcluded = excluded.replace(/^0/, '');
-      return cleanPhone === cleanExcluded || phone === excluded;
+      return cleanContact === cleanExcluded || contact === excluded;
     });
     
     if (isExcluded) {
-      console.log('⏭️  Phone number is excluded, skipping auto-save:', phone);
+      console.log('⏭️  Contact is excluded, skipping auto-save:', contact);
       return;
     }
 
-    // Check if phone already exists
-    const existing = await PhoneNumber.findOne({ phone });
+    const existing = await PhoneNumber.findOne({ phone: contact });
     if (!existing) {
-      await PhoneNumber.create({ phone });
-      console.log('💾 Auto-saved new phone number:', phone);
+      await PhoneNumber.create({ phone: contact });
+      console.log('💾 Auto-saved new contact:', contact);
     }
   } catch (error) {
     // Log error but don't fail the order creation
-    console.error('⚠️  Failed to auto-save phone number:', error);
+    console.error('⚠️  Failed to auto-save contact:', error);
   }
 }
 
@@ -190,9 +188,9 @@ export async function POST(request: NextRequest) {
       errors.push('Nama minimal 2 karakter');
     }
 
-    // Phone validation
-    if (!phone || typeof phone !== 'string' || !isValidPhoneNumber(phone)) {
-      errors.push('Nomor WhatsApp tidak valid');
+    // Contact validation: required, but can be phone, social username, URL, etc.
+    if (!phone || typeof phone !== 'string' || !isValidContactValue(phone)) {
+      errors.push('Kontak wajib diisi minimal 3 karakter');
     }
 
     // Items validation - more defensive
@@ -301,9 +299,9 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Order created:', order.orderNumber);
 
-    // Auto-save phone number to autocomplete list (async, non-blocking)
-    autoSavePhoneNumber(phone.trim()).catch(err => 
-      console.error('Failed to auto-save phone:', err)
+    // Auto-save contact to autocomplete list (async, non-blocking)
+    autoSaveContact(phone.trim()).catch(err => 
+      console.error('Failed to auto-save contact:', err)
     );
 
     return NextResponse.json({

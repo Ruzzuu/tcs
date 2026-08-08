@@ -1,5 +1,5 @@
 // ============================================
-// MIGRATE PHONES API - Trigger Migration
+// MIGRATE CONTACTS API - Trigger Migration
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,32 +8,32 @@ import Order from '@/lib/models/Order';
 import PhoneNumber from '@/lib/models/PhoneNumber';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
 
-// Phone numbers to exclude from migration
+// Legacy phone numbers to exclude from migration
 const EXCLUDED_PHONES = [
   '81515263851',
   '085859461424',
   '085731854878'
 ];
 
-// POST /api/admin/migrate-phones - Run phone migration
+// POST /api/admin/migrate-phones - Rebuild saved contact suggestions from orders
 export async function POST(request: NextRequest) {
   try {
     if (!(await isAdminAuthenticated(request))) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    console.log('🔄 Starting phone numbers migration...');
+    console.log('🔄 Starting contact suggestions migration...');
     
     await connectDB();
     console.log('✅ Connected to database');
 
-    // Get all distinct phone numbers from approved orders
+    // Get all distinct contact values from approved orders
     const phones = await Order.distinct('phone', {
       'verification.status': 'approved',
       deleted: { $ne: true }
     });
 
-    console.log(`📊 Found ${phones.length} total phone numbers in orders`);
+    console.log(`📊 Found ${phones.length} total contacts in orders`);
 
     // Filter out excluded phones and empty values
     const validPhones = phones.filter((phone: string) => {
@@ -49,13 +49,13 @@ export async function POST(request: NextRequest) {
       return !isExcluded;
     });
 
-    console.log(`✅ Filtered to ${validPhones.length} valid phone numbers (excluded ${phones.length - validPhones.length})`);
+    console.log(`✅ Filtered to ${validPhones.length} valid contacts (excluded ${phones.length - validPhones.length})`);
 
-    // Clear existing phone numbers collection
+    // Clear existing saved contacts collection
     const deleteResult = await PhoneNumber.deleteMany({});
-    console.log(`🗑️  Cleared ${deleteResult.deletedCount} existing phone numbers`);
+    console.log(`🗑️  Cleared ${deleteResult.deletedCount} existing contacts`);
 
-    // Insert phone numbers
+    // Insert saved contacts
     const phoneDocuments = validPhones.map(phone => ({ phone }));
     
     let insertedCount = 0;
@@ -65,12 +65,12 @@ export async function POST(request: NextRequest) {
           ordered: false,
         });
         insertedCount = Array.isArray(result) ? result.length : 0;
-        console.log(`✅ Inserted ${insertedCount} phone numbers into database`);
+        console.log(`✅ Inserted ${insertedCount} contacts into database`);
       } catch (err: any) {
         // Handle duplicate key errors gracefully
         if (err.code === 11000) {
           insertedCount = phoneDocuments.length - (err.writeErrors?.length || 0);
-          console.log(`⚠️  Some duplicate phones were skipped, inserted ${insertedCount} unique numbers`);
+          console.log(`⚠️  Some duplicate contacts were skipped, inserted ${insertedCount} unique contacts`);
         } else {
           throw err;
         }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Verify final count
     const finalCount = await PhoneNumber.countDocuments();
-    console.log(`📊 Final phone numbers count: ${finalCount}`);
+    console.log(`📊 Final contacts count: ${finalCount}`);
 
     return NextResponse.json({
       success: true,

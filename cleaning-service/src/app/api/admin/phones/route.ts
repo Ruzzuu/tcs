@@ -1,5 +1,5 @@
 // ============================================
-// ADMIN PHONES API - Manage Phone Numbers
+// ADMIN CONTACTS API - Manage saved contacts
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,7 +7,7 @@ import connectDB from '@/lib/mongodb';
 import PhoneNumber from '@/lib/models/PhoneNumber';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
 
-// GET /api/admin/phones - Get all phone numbers
+// GET /api/admin/phones - Get all saved contacts
 export async function GET(request: NextRequest) {
   try {
     if (!(await isAdminAuthenticated(request))) {
@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Get all phone numbers from PhoneNumber collection
+    // Get all saved contacts from the legacy PhoneNumber collection
     const phoneDocuments = await PhoneNumber.find({})
-      .sort({ phone: -1 }) // Sort descending (higher numbers first)
+      .sort({ phone: -1 })
       .select('phone -_id')
       .lean();
 
@@ -26,15 +26,15 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(phones);
   } catch (error) {
-    console.error('Error fetching phone numbers:', error);
+    console.error('Error fetching contacts:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch phone numbers' },
+      { error: 'Failed to fetch contacts' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/admin/phones - Add a new phone number
+// POST /api/admin/phones - Add a new saved contact
 export async function POST(request: NextRequest) {
   try {
     if (!(await isAdminAuthenticated(request))) {
@@ -47,21 +47,21 @@ export async function POST(request: NextRequest) {
 
     if (!phone || !phone.trim()) {
       return NextResponse.json(
-        { error: 'Phone number is required' },
+        { error: 'Contact is required' },
         { status: 400 }
       );
     }
 
-    // Check if phone already exists
+    // Check if contact already exists
     const existing = await PhoneNumber.findOne({ phone: phone.trim() });
     if (existing) {
       return NextResponse.json(
-        { error: 'Phone number already exists' },
+        { error: 'Contact already exists' },
         { status: 409 }
       );
     }
 
-    // Create new phone number
+    // Create new saved contact
     const newPhone = await PhoneNumber.create({ phone: phone.trim() });
 
     return NextResponse.json({ 
@@ -69,15 +69,15 @@ export async function POST(request: NextRequest) {
       phone: newPhone.phone 
     }, { status: 201 });
   } catch (error) {
-    console.error('Error adding phone number:', error);
+    console.error('Error adding contact:', error);
     return NextResponse.json(
-      { error: 'Failed to add phone number' },
+      { error: 'Failed to add contact' },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/admin/phones - Delete a phone number
+// DELETE /api/admin/phones - Delete a saved contact
 export async function DELETE(request: NextRequest) {
   try {
     if (!(await isAdminAuthenticated(request))) {
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!phone) {
       return NextResponse.json(
-        { error: 'Phone number is required' },
+        { error: 'Contact is required' },
         { status: 400 }
       );
     }
@@ -100,19 +100,19 @@ export async function DELETE(request: NextRequest) {
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { error: 'Phone number not found' },
+        { error: 'Contact not found' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Phone number deleted' 
+      message: 'Contact deleted' 
     });
   } catch (error) {
-    console.error('Error deleting phone number:', error);
+    console.error('Error deleting contact:', error);
     return NextResponse.json(
-      { error: 'Failed to delete phone number' },
+      { error: 'Failed to delete contact' },
       { status: 500 }
     );
   }
