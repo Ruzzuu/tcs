@@ -44,6 +44,7 @@ const TCS_PRICES: ServicePriceMap = {
   repaint_leather: 100000,
   repaint_canvas: 100000,
   repaint_suede: 100000,
+  lem: 30000,
 };
 
 const REKAN_PRICES: ServicePriceMap = {

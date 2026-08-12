@@ -131,6 +131,12 @@ export const SERVICES: Record<ServiceType, ServiceConfig> = {
     nameEn: 'Repaint Suede',
     price: ACTIVE_TENANT.servicePrices.repaint_suede,
     icon: 'palette'
+  },
+  lem: {
+    name: 'Lem',
+    nameEn: 'Glue Repair',
+    price: ACTIVE_TENANT.servicePrices.lem,
+    icon: 'adhesive_bandage'
   }
 };
 
@@ -153,7 +159,7 @@ export const SERVICE_CATEGORIES = [
   {
     name: 'Treatment',
     services: (
-      ['unyellowing', 'sewing', 'whitening', 'repaint_leather', 'repaint_canvas', 'repaint_suede'] as ServiceType[]
+      ['unyellowing', 'sewing', 'whitening', 'repaint_leather', 'repaint_canvas', 'repaint_suede', 'lem'] as ServiceType[]
     )
       .filter(isVisibleService)
       .map(key => ({ value: key, label: SERVICES[key].name, price: SERVICES[key].price }))
@@ -188,5 +194,6 @@ export const SERVICE_COLORS: Record<ServiceType, string> = {
   whitening: '#A855F7',
   repaint_leather: '#8B4513',
   repaint_canvas: '#14B8A6',
-  repaint_suede: '#0EA5E9'
+  repaint_suede: '#0EA5E9',
+  lem: '#F97316'
 };

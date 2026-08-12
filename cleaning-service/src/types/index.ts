@@ -83,7 +83,8 @@ export type ServiceType =
   | 'whitening'
   | 'repaint_leather'
   | 'repaint_canvas'
-  | 'repaint_suede';
+  | 'repaint_suede'
+  | 'lem';
 
 export type OrderStatus = 'pending' | 'finished' | 'rejected';
 
