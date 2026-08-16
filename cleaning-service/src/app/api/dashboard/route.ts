@@ -5,9 +5,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
-import { SERVICE_COLORS } from '@/lib/services';
+import { SERVICES, SERVICE_COLORS } from '@/lib/services';
 import { ServiceType } from '@/types';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // GET /api/dashboard - Get dashboard data with pagination
 export async function GET(request: NextRequest) {
@@ -19,14 +23,17 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10', 10) || 10));
     const statusFilter = searchParams.get('status') || 'all';
     const sortBy = searchParams.get('sort') || 'createdAt:desc';
     const requestType = searchParams.get('type') || 'all'; // 'all' | 'analytics' | 'orders'
+    const search = searchParams.get('search')?.trim().slice(0, 100) || '';
+    const date = searchParams.get('date')?.trim() || '';
 
     // Parse sort
-    const [sortField, sortOrder] = sortBy.split(':');
+    const [requestedSortField, sortOrder] = sortBy.split(':');
+    const sortField = requestedSortField === 'finishedAt' ? 'finishedAt' : 'createdAt';
     const sortDirection = sortOrder === 'asc' ? 1 : -1;
 
     const now = new Date();
@@ -39,6 +46,43 @@ export async function GET(request: NextRequest) {
     };
     if (statusFilter !== 'all') {
       ordersFilter.status = statusFilter;
+    }
+
+    if (search) {
+      const escapedSearch = escapeRegex(search);
+      const searchRegex = new RegExp(escapedSearch, 'i');
+      const normalizedSearch = search.toLowerCase();
+      const matchingServiceTypes = Object.entries(SERVICES)
+        .filter(([serviceType, service]) =>
+          serviceType.toLowerCase().includes(normalizedSearch) ||
+          service.name.toLowerCase().includes(normalizedSearch) ||
+          service.nameEn.toLowerCase().includes(normalizedSearch)
+        )
+        .map(([serviceType]) => serviceType);
+
+      ordersFilter.$or = [
+        { name: searchRegex },
+        { phone: searchRegex },
+        { orderNumber: searchRegex },
+        { notes: searchRegex },
+        { customItemType: searchRegex },
+        { 'items.notes': searchRegex },
+        { 'items.customItemType': searchRegex },
+        ...(matchingServiceTypes.length > 0
+          ? [
+              { itemType: { $in: matchingServiceTypes } },
+              { 'items.serviceType': { $in: matchingServiceTypes } },
+            ]
+          : []),
+      ];
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const startDate = new Date(`${date}T00:00:00.000+07:00`);
+      if (!Number.isNaN(startDate.getTime())) {
+        const endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+        ordersFilter.createdAt = { $gte: startDate, $lt: endDate };
+      }
     }
 
     const analyticsMatch = { 'verification.status': 'approved', deleted: { $ne: true } };
@@ -77,7 +121,14 @@ export async function GET(request: NextRequest) {
     if (requestType !== 'analytics') {
       [totalOrders, recentOrders] = await Promise.all([
         Order.countDocuments(ordersFilter),
-        Order.find(ordersFilter).sort({ [sortField]: sortDirection }).skip((page - 1) * limit).limit(limit).lean()
+        Order.find(ordersFilter)
+          .select('_id orderNumber name phone items itemType customItemType quantity finalPrice estimatedPrice status createdAt finishedAt proofOfWork.beforePhotos proofOfWork.afterPhotos')
+          .slice('proofOfWork.beforePhotos', 3)
+          .slice('proofOfWork.afterPhotos', 3)
+          .sort({ [sortField]: sortDirection })
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .lean()
       ]);
     }
 
@@ -110,7 +161,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const totalPages = Math.ceil(totalOrders / limit);
+    const totalPages = Math.max(1, Math.ceil(totalOrders / limit));
 
     // Build response — analytics fields and orders fields are separate
     const analyticsPayload = requestType !== 'orders' ? {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { DashboardData, Order, OrderStatus, CloudinaryImage } from '@/types';
 import { formatCurrency, formatDate, formatDateShort, formatRelativeTime, formatDateTimeFull, getInitials, getAvatarColor, getStatusColor, getStatusLabel, isValidContactValue } from '@/lib/utils';
@@ -89,9 +89,6 @@ function OrderCard({ order, onDelete, deletingId }: { order: Order; onDelete: (o
       if (url) afterPhotos.push({ url, type: 'after' });
     });
   }
-  
-  // Get nota image URL
-  const notaUrl = order.notaImage?.url || null;
   
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm gap-3">
@@ -228,6 +225,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -236,6 +234,7 @@ export default function AdminDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
+  const ordersRequestIdRef = useRef(0);
   const PAGE_SIZE = 10;
 
   // Add Order Form State
@@ -289,21 +288,33 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const fetchData = useCallback(async (page = 1, status: OrderStatus | 'all' = 'all') => {
+  const fetchData = useCallback(async (
+    page = 1,
+    status: OrderStatus | 'all' = 'all',
+    search = '',
+    date = '',
+    signal?: AbortSignal
+  ) => {
+    const requestId = ++ordersRequestIdRef.current;
+
     try {
       setLoading(true);
+      setError(null);
+
       const params = new URLSearchParams({
         type: 'orders',
         page: page.toString(),
         limit: PAGE_SIZE.toString(),
         sort: status === 'finished' ? 'finishedAt:desc' : 'createdAt:desc'
       });
-      if (status !== 'all') {
-        params.append('status', status);
-      }
+      if (status !== 'all') params.set('status', status);
+      if (search) params.set('search', search);
+      if (date) params.set('date', date);
       
-      const response = await fetch(`/api/dashboard?${params}`);
+      const response = await fetch(`/api/dashboard?${params}`, { signal });
       const result = await response.json();
+
+      if (requestId !== ordersRequestIdRef.current) return;
       
       if (result.success) {
         // Merge orders into data, preserving analytics fields already loaded
@@ -321,10 +332,15 @@ export default function AdminDashboard() {
       } else {
         setError(result.error || 'Failed to load dashboard');
       }
-    } catch {
-      setError('Failed to connect to server');
+    } catch (fetchError) {
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') return;
+      if (requestId === ordersRequestIdRef.current) {
+        setError('Failed to connect to server');
+      }
     } finally {
-      setLoading(false);
+      if (requestId === ordersRequestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [PAGE_SIZE]);
 
@@ -333,8 +349,19 @@ export default function AdminDashboard() {
   }, [fetchAnalytics]);
 
   useEffect(() => {
-    fetchData(currentPage, statusFilter);
-  }, [currentPage, statusFilter, fetchData]);
+    const timeoutId = window.setTimeout(() => {
+      setCurrentPage(1);
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchData(currentPage, statusFilter, debouncedSearchQuery, dateFilter, controller.signal);
+    return () => controller.abort();
+  }, [currentPage, statusFilter, debouncedSearchQuery, dateFilter, fetchData]);
 
   // Handle multiple image upload for form
   const handleFormImageUpload = async (files: FileList | File[]) => {
@@ -471,7 +498,7 @@ export default function AdminDashboard() {
       if (result.success) {
         resetForm();
         fetchAnalytics(); // update KPI counts + charts
-        fetchData(currentPage, statusFilter); // refresh order list
+        fetchData(currentPage, statusFilter, debouncedSearchQuery, dateFilter); // refresh order list
       } else {
         setFormError(result.error || 'Gagal menambahkan pesanan');
       }
@@ -516,7 +543,7 @@ export default function AdminDashboard() {
       if (result.success) {
         // Refetch both: analytics (counts change) and order list
         fetchAnalytics();
-        await fetchData(currentPage, statusFilter);
+        await fetchData(currentPage, statusFilter, debouncedSearchQuery, dateFilter);
       } else {
         alert(result.error || 'Gagal menghapus pesanan');
       }
@@ -542,28 +569,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Filter recent orders by search, date, and status
-  const filteredOrders = data?.recentOrders.filter(order => {
-    // Search filter
-    const matchesSearch = !searchQuery || (
-      order.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (SERVICES[order.itemType as ServiceType]?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (order.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (order.customItemType || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    // Status filter
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
-    // Date filter
-    const matchesDate = !dateFilter || (
-      new Date(order.createdAt).toISOString().split('T')[0] === dateFilter
-    );
-    
-    return matchesSearch && matchesStatus && matchesDate;
-  }) || [];
+  // Search, status, and date filters are applied by MongoDB before pagination.
+  const filteredOrders = data?.recentOrders || [];
 
   if (loading && !data) {
     return <DashboardSkeleton />;
@@ -575,7 +582,7 @@ export default function AdminDashboard() {
         <span className="material-symbols-outlined text-6xl text-red-400 mb-4">error</span>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-4">{error}</p>
         <button
-          onClick={() => fetchData(currentPage, statusFilter)}
+          onClick={() => fetchData(currentPage, statusFilter, debouncedSearchQuery, dateFilter)}
           className="px-6 py-2 bg-[#1152d4] text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           Coba Lagi
@@ -912,7 +919,7 @@ export default function AdminDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all"
-              placeholder="Cari nama, telepon, atau nomor order..."
+              placeholder="Cari nama, kontak, layanan, atau nomor order..."
             />
           </div>
           <div className="relative group w-48 sm:w-52 shrink-0">
@@ -927,7 +934,10 @@ export default function AdminDashboard() {
             <input
               type="date"
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className={`w-full pl-10 pr-10 py-3 rounded-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-[#1a202c] text-sm text-[#111318] dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1152d4] outline-none shadow-sm transition-all cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer ${
                 dateFilter 
                   ? '[&::-webkit-datetime-edit-text]:text-[#111318] [&::-webkit-datetime-edit-month-field]:text-[#111318] [&::-webkit-datetime-edit-day-field]:text-[#111318] [&::-webkit-datetime-edit-year-field]:text-[#111318] dark:[&::-webkit-datetime-edit-text]:text-white dark:[&::-webkit-datetime-edit-month-field]:text-white dark:[&::-webkit-datetime-edit-day-field]:text-white dark:[&::-webkit-datetime-edit-year-field]:text-white'
@@ -936,7 +946,10 @@ export default function AdminDashboard() {
             />
             {dateFilter && (
               <button
-                onClick={() => setDateFilter('')}
+                onClick={() => {
+                  setDateFilter('');
+                  setCurrentPage(1);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors z-10"
               >
                 <span className="material-symbols-outlined text-[18px]">close</span>
@@ -967,8 +980,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Orders List */}
-        <div className="flex flex-col gap-3">
-          {filteredOrders.length === 0 ? (
+        {loading && data && (
+          <div className="flex items-center gap-2 mb-3 text-sm text-[#1152d4]">
+            <span className="inline-block w-4 h-4 border-2 border-[#1152d4]/30 border-t-[#1152d4] rounded-full animate-spin" />
+            Memperbarui hasil...
+          </div>
+        )}
+        <div className={`flex flex-col gap-3 transition-opacity ${loading && data ? 'opacity-60' : 'opacity-100'}`}>
+          {filteredOrders.length === 0 && !loading ? (
             <div className="text-center py-12 text-gray-400">
               <span className="material-symbols-outlined text-4xl mb-2">inbox</span>
               <p>{searchQuery ? 'Tidak ada hasil' : 'Belum ada pesanan'}</p>

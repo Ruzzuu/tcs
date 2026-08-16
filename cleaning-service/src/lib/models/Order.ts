@@ -213,6 +213,7 @@ const OrderSchema = new Schema<OrderDocument>(
 // Compound indexes for common queries
 OrderSchema.index({ 'verification.status': 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ 'verification.status': 1, status: 1, finishedAt: -1 });
 OrderSchema.index({ name: 'text', phone: 'text' }); // Text search
 
 // Static methods
