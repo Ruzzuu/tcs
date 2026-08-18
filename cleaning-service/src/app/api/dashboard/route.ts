@@ -30,6 +30,15 @@ export async function GET(request: NextRequest) {
     const requestType = searchParams.get('type') || 'all'; // 'all' | 'analytics' | 'orders'
     const search = searchParams.get('search')?.trim().slice(0, 100) || '';
     const date = searchParams.get('date')?.trim() || '';
+    const serviceMonth = searchParams.get('serviceMonth')?.trim() || '';
+
+    const serviceMonthMatch = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(serviceMonth);
+    if (serviceMonth && !serviceMonthMatch) {
+      return NextResponse.json(
+        { success: false, error: 'Format bulan layanan tidak valid' },
+        { status: 400 }
+      );
+    }
 
     // Parse sort
     const [requestedSortField, sortOrder] = sortBy.split(':');
@@ -86,6 +95,18 @@ export async function GET(request: NextRequest) {
     }
 
     const analyticsMatch = { 'verification.status': 'approved', deleted: { $ne: true } };
+    const serviceDistributionMatch: Record<string, unknown> = { ...analyticsMatch };
+
+    if (serviceMonthMatch) {
+      const year = Number(serviceMonthMatch[1]);
+      const month = Number(serviceMonthMatch[2]);
+      const nextMonthYear = month === 12 ? year + 1 : year;
+      const nextMonth = month === 12 ? 1 : month + 1;
+      const startDate = new Date(`${year}-${String(month).padStart(2, '0')}-01T00:00:00.000+07:00`);
+      const endDate = new Date(`${nextMonthYear}-${String(nextMonth).padStart(2, '0')}-01T00:00:00.000+07:00`);
+
+      serviceDistributionMatch.createdAt = { $gte: startDate, $lt: endDate };
+    }
 
     // Run analytics queries only when needed
     let kpiResult: any[] = [];
@@ -99,7 +120,7 @@ export async function GET(request: NextRequest) {
           { $group: { _id: null, total: { $sum: 1 }, pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } }, finished: { $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] } } } }
         ]),
         Order.aggregate([
-          { $match: analyticsMatch },
+          { $match: serviceDistributionMatch },
           { $project: { itemsToCount: { $cond: { if: { $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }] }, then: '$items', else: [{ serviceType: '$itemType', quantity: { $ifNull: ['$quantity', 1] } }] } } } },
           { $unwind: '$itemsToCount' },
           { $group: { _id: '$itemsToCount.serviceType', count: { $sum: { $ifNull: ['$itemsToCount.quantity', 1] } } } },
