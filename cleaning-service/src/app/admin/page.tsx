@@ -223,11 +223,17 @@ function DashboardSkeleton() {
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [serviceDistributionLoading, setServiceDistributionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  const [servicePeriod, setServicePeriod] = useState<'all' | 'monthly'>('all');
+  const [selectedServiceMonth, setSelectedServiceMonth] = useState(() => {
+    const nowInWIB = new Date(Date.now() + 7 * 60 * 60 * 1000);
+    return nowInWIB.toISOString().slice(0, 7);
+  });
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Pagination state
@@ -235,6 +241,7 @@ export default function AdminDashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const ordersRequestIdRef = useRef(0);
+  const analyticsRequestIdRef = useRef(0);
   const PAGE_SIZE = 10;
 
   // Add Order Form State
@@ -271,10 +278,19 @@ export default function AdminDashboard() {
   }, [formData.itemType, formData.quantity]);
 
   const fetchAnalytics = useCallback(async () => {
+    const requestId = ++analyticsRequestIdRef.current;
+
     try {
-      const response = await fetch('/api/dashboard?type=analytics');
+      setServiceDistributionLoading(true);
+
+      const params = new URLSearchParams({ type: 'analytics' });
+      if (servicePeriod === 'monthly') {
+        params.set('serviceMonth', selectedServiceMonth);
+      }
+
+      const response = await fetch(`/api/dashboard?${params}`);
       const result = await response.json();
-      if (result.success) {
+      if (requestId === analyticsRequestIdRef.current && result.success) {
         // Destructure out recentOrders so it can never overwrite the orders list
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { recentOrders: _omit, ...analyticsFields } = result.data as any;
@@ -285,8 +301,12 @@ export default function AdminDashboard() {
       }
     } catch {
       // Analytics fetch failure is non-critical
+    } finally {
+      if (requestId === analyticsRequestIdRef.current) {
+        setServiceDistributionLoading(false);
+      }
     }
-  }, []);
+  }, [selectedServiceMonth, servicePeriod]);
 
   const fetchData = useCallback(async (
     page = 1,
@@ -636,14 +656,46 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 gap-4">
           {/* Service Distribution Pie Chart */}
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start mb-6">
               <div>
                 <p className="text-[#111318] dark:text-white text-base font-bold">Layanan</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">Distribusi jenis barang</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                  {servicePeriod === 'all'
+                    ? 'Distribusi semua jasa yang masuk'
+                    : `Distribusi jasa periode ${new Date(`${selectedServiceMonth}-01T00:00:00.000+07:00`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}`}
+                </p>
               </div>
-              <span className="material-symbols-outlined text-gray-400">pie_chart</span>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <select
+                  value={servicePeriod}
+                  onChange={(event) => setServicePeriod(event.target.value as 'all' | 'monthly')}
+                  aria-label="Periode distribusi layanan"
+                  className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 dark:border-gray-700 dark:bg-[#0f1724] dark:text-gray-200"
+                >
+                  <option value="all">Semua Data</option>
+                  <option value="monthly">Per Bulan</option>
+                </select>
+                {servicePeriod === 'monthly' && (
+                  <input
+                    type="month"
+                    value={selectedServiceMonth}
+                    onChange={(event) => {
+                      if (event.target.value) setSelectedServiceMonth(event.target.value);
+                    }}
+                    aria-label="Pilih bulan layanan"
+                    className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 dark:border-gray-700 dark:bg-[#0f1724] dark:text-gray-200"
+                  />
+                )}
+                <span className="material-symbols-outlined text-gray-400">pie_chart</span>
+              </div>
             </div>
-            <PieChart data={data?.serviceDistribution || []} />
+            {serviceDistributionLoading ? (
+              <div className="flex h-32 items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#1152d4]" />
+              </div>
+            ) : (
+              <PieChart data={data?.serviceDistribution || []} />
+            )}
           </div>
         </div>
       </section>
