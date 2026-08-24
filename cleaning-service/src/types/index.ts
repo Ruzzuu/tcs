@@ -8,6 +8,8 @@ export interface CloudinaryImage {
   publicId: string;
 }
 
+export type DiscoverySource = 'friend' | 'instagram' | 'google_maps' | 'other';
+
 // Order Item - represents a single item in an order
 export interface OrderItem {
   _id?: string;
@@ -28,6 +30,8 @@ export interface Order {
   name: string;
   phone: string;
   address: string;
+  discoverySources?: DiscoverySource[];
+  discoverySourceOther?: string;
   itemType?: ServiceType;
   quantity?: number;
   items?: OrderItem[];

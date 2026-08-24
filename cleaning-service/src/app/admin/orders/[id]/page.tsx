@@ -16,6 +16,7 @@ import {
 import { SERVICES } from '@/lib/services';
 import { ServiceType } from '@/types';
 import { ACTIVE_TENANT } from '@/config/tenant';
+import { DISCOVERY_SOURCE_LABELS } from '@/lib/discoverySources';
 
 // Fullscreen Image Viewer Modal with Pinch-to-Zoom
 interface ImageViewerModalProps {
@@ -1026,6 +1027,35 @@ export default function OrderDetailPage() {
                 <p className="text-sm text-amber-900 dark:text-amber-200 whitespace-pre-wrap break-words">
                   {order.customerNotes}
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discovery Source */}
+      {order.discoverySources && order.discoverySources.length > 0 && (
+        <div className="px-4 mt-6">
+          <h3 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-3">
+            Sumber Informasi
+          </h3>
+          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-[#1152d4] dark:bg-blue-900/30 dark:text-blue-400">
+                <span className="material-symbols-outlined text-[20px]">campaign</span>
+              </div>
+              <div className="flex flex-1 flex-wrap gap-2">
+                {order.discoverySources.map((source) => (
+                  <span
+                    key={source}
+                    className="rounded-full border border-blue-200 bg-white px-3 py-1 text-sm font-medium text-blue-800 dark:border-blue-700 dark:bg-[#1a2230] dark:text-blue-300"
+                  >
+                    {DISCOVERY_SOURCE_LABELS[source]}
+                    {source === 'other' && order.discoverySourceOther
+                      ? `: ${order.discoverySourceOther}`
+                      : ''}
+                  </span>
+                ))}
               </div>
             </div>
           </div>

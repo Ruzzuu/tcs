@@ -4,8 +4,9 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SERVICES, SERVICE_CATEGORIES } from '@/lib/services';
 import { formatCurrency, isValidContactValue } from '@/lib/utils';
-import { ServiceType } from '@/types';
+import { DiscoverySource, ServiceType } from '@/types';
 import { ACTIVE_TENANT } from '@/config/tenant';
+import { DISCOVERY_SOURCE_OPTIONS } from '@/lib/discoverySources';
 
 // Version check for deployment verification
 const APP_VERSION = '2.0.2-debug-multi-submit';
@@ -39,6 +40,8 @@ export default function CustomerFormPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [discoverySources, setDiscoverySources] = useState<DiscoverySource[]>([]);
+  const [discoverySourceOther, setDiscoverySourceOther] = useState('');
   
   // Multi-item state
   const [items, setItems] = useState<OrderItem[]>([
@@ -102,6 +105,15 @@ export default function CustomerFormPage() {
   const removeItem = (id: number) => {
     if (items.length <= 1) return;
     setItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const toggleDiscoverySource = (source: DiscoverySource) => {
+    setDiscoverySources((currentSources) =>
+      currentSources.includes(source)
+        ? currentSources.filter((currentSource) => currentSource !== source)
+        : [...currentSources, source]
+    );
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -182,6 +194,10 @@ export default function CustomerFormPage() {
         name: name.trim(),
         phone: phone.trim(),
         address: address?.trim() || '',
+        discoverySources,
+        discoverySourceOther: discoverySources.includes('other')
+          ? discoverySourceOther.trim()
+          : '',
         items: validItems.map(item => ({
           itemType: item.itemType as string,
           quantity: Number(item.quantity) || 1,
@@ -344,6 +360,47 @@ export default function CustomerFormPage() {
               </div>
             </div>
           </div>
+
+          {/* Discovery Source (Optional) */}
+          <fieldset className="flex flex-col gap-3">
+            <legend className="text-[#111318] dark:text-gray-200 text-sm font-medium">
+              Tahu {ACTIVE_TENANT.shortName} dari mana?{' '}
+              <span className="text-[#616f89] font-normal text-xs ml-1">(Opsional)</span>
+            </legend>
+            <p className="text-[#616f89] dark:text-gray-500 text-xs">
+              Bisa pilih lebih dari satu.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {DISCOVERY_SOURCE_OPTIONS.map((option) => (
+                <label
+                  key={option.value}
+                  className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-all ${
+                    discoverySources.includes(option.value)
+                      ? 'border-[#1152d4] bg-[#1152d4]/10 text-[#1152d4] dark:bg-[#1152d4]/20 dark:text-blue-300'
+                      : 'border-[#dbdfe6] bg-white text-[#111318] hover:border-[#1152d4]/50 dark:border-[#2a3441] dark:bg-[#1a2230] dark:text-gray-200'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={discoverySources.includes(option.value)}
+                    onChange={() => toggleDiscoverySource(option.value)}
+                    className="size-4 rounded border-gray-300 text-[#1152d4] focus:ring-[#1152d4]"
+                  />
+                  <span className="font-medium">{option.label}</span>
+                </label>
+              ))}
+            </div>
+            {discoverySources.includes('other') && (
+              <input
+                type="text"
+                value={discoverySourceOther}
+                onChange={(event) => setDiscoverySourceOther(event.target.value)}
+                maxLength={120}
+                className="h-12 w-full rounded-xl border border-[#dbdfe6] bg-white px-4 text-[#111318] placeholder:text-[#616f89] focus:border-[#1152d4] focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 dark:border-[#2a3441] dark:bg-[#1a2230] dark:text-white dark:placeholder:text-gray-500"
+                placeholder="Tuliskan sumber lainnya (boleh kosong)"
+              />
+            )}
+          </fieldset>
 
           <div className="h-px bg-[#dbdfe6] dark:bg-[#2a3441] w-full my-2"></div>
 

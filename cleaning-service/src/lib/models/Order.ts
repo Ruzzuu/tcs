@@ -4,6 +4,7 @@
 
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { Order as OrderType, ServiceType, OrderStatus, VerificationStatus, OrderItem } from '@/types';
+import { DISCOVERY_SOURCE_VALUES } from '@/lib/discoverySources';
 
 // Document interface
 export interface OrderDocument extends Omit<OrderType, '_id'>, Document {}
@@ -174,6 +175,17 @@ const OrderSchema = new Schema<OrderDocument>(
     customerNotes: {
       type: String,
       default: ''
+    },
+
+    // How the customer learned about the business
+    discoverySources: {
+      type: [{ type: String, enum: DISCOVERY_SOURCE_VALUES }],
+      default: undefined
+    },
+    discoverySourceOther: {
+      type: String,
+      trim: true,
+      maxlength: 120
     },
     
     // Admin notes (internal)

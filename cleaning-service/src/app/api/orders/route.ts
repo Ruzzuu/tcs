@@ -8,10 +8,11 @@ import Order from '@/lib/models/Order';
 import PhoneNumber from '@/lib/models/PhoneNumber';
 import { SERVICES } from '@/lib/services';
 import { generateOrderNumber, isValidContactValue } from '@/lib/utils';
-import { ServiceType } from '@/types';
+import { DiscoverySource, ServiceType } from '@/types';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { createOrderItem } from '@/lib/orderUtils';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
+import { DISCOVERY_SOURCE_VALUES } from '@/lib/discoverySources';
 
 // Legacy phone numbers to exclude from auto-saving suggestions
 const EXCLUDED_CONTACTS = [
@@ -160,7 +161,15 @@ export async function POST(request: NextRequest) {
     console.log(`📥 [${requestId}] Body type:`, typeof body);
     console.log(`📥 [${requestId}] Body keys:`, Object.keys(body || {}));
     
-    const { name, phone, address, items: submittedItems, proofOfWork } = body;
+    const {
+      name,
+      phone,
+      address,
+      items: submittedItems,
+      proofOfWork,
+      discoverySources,
+      discoverySourceOther
+    } = body;
 
     console.log(`📦 [${requestId}] Extracted data:`, {
       name: name ? `"${name}"` : 'undefined',
@@ -182,6 +191,8 @@ export async function POST(request: NextRequest) {
 
     // Validation
     const errors: string[] = [];
+    let normalizedDiscoverySources: DiscoverySource[] = [];
+    let normalizedDiscoverySourceOther = '';
 
     // Name validation
     if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -191,6 +202,30 @@ export async function POST(request: NextRequest) {
     // Contact validation: required, but can be phone, social username, URL, etc.
     if (!phone || typeof phone !== 'string' || !isValidContactValue(phone)) {
       errors.push('Kontak wajib diisi minimal 3 karakter');
+    }
+
+    // Discovery source is optional, but must use known values when provided.
+    if (discoverySources !== undefined) {
+      if (!Array.isArray(discoverySources)) {
+        errors.push('Format sumber informasi tidak valid');
+      } else if (discoverySources.some(
+        (source) => typeof source !== 'string' || !DISCOVERY_SOURCE_VALUES.includes(source as DiscoverySource)
+      )) {
+        errors.push('Pilihan sumber informasi tidak valid');
+      } else {
+        normalizedDiscoverySources = Array.from(new Set(discoverySources)) as DiscoverySource[];
+      }
+    }
+
+    if (discoverySourceOther !== undefined) {
+      if (typeof discoverySourceOther !== 'string') {
+        errors.push('Keterangan sumber lainnya tidak valid');
+      } else {
+        normalizedDiscoverySourceOther = discoverySourceOther.trim();
+        if (normalizedDiscoverySourceOther.length > 120) {
+          errors.push('Keterangan sumber lainnya maksimal 120 karakter');
+        }
+      }
     }
 
     // Items validation - more defensive
@@ -288,6 +323,17 @@ export async function POST(request: NextRequest) {
       finalPrice: subtotal,
       customerNotes: orderItems.map((i: any) => i.notes).filter(Boolean).join('; ')
     };
+
+    if (normalizedDiscoverySources.length > 0) {
+      orderData.discoverySources = normalizedDiscoverySources;
+    }
+
+    if (
+      normalizedDiscoverySources.includes('other') &&
+      normalizedDiscoverySourceOther
+    ) {
+      orderData.discoverySourceOther = normalizedDiscoverySourceOther;
+    }
 
     // Add proof of work photos if provided
     if (proofOfWork && (proofOfWork.beforePhotos?.length > 0 || proofOfWork.afterPhotos?.length > 0)) {
