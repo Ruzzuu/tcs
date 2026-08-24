@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ACTIVE_TENANT } from "@/config/tenant";
+import PWAUpdater from "@/components/PWAUpdater";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased bg-[#f6f6f8] dark:bg-[#101622] min-h-screen`}
       >
+        <PWAUpdater />
         {children}
       </body>
     </html>
