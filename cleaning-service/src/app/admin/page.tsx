@@ -343,6 +343,12 @@ export default function AdminDashboard() {
           : {
               total: 0, pending: 0, inProgress: 0, delivered: 0,
               pickedUp: 0, finished: 0, serviceDistribution: [], incomeTrend: [],
+              discoverySourceDistribution: [],
+              discoverySourceSummary: {
+                totalCustomers: 0,
+                answeredCustomers: 0,
+                unansweredCustomers: 0,
+              },
               recentOrders: result.data.recentOrders
             }
         );

@@ -6,8 +6,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/lib/models/Order';
 import { SERVICES, SERVICE_COLORS } from '@/lib/services';
-import { ServiceType } from '@/types';
+import { DISCOVERY_SOURCE_LABELS, DISCOVERY_SOURCE_VALUES } from '@/lib/discoverySources';
+import type { DiscoverySource, ServiceType } from '@/types';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
+
+type DiscoverySourceAggregate = {
+  distribution: Array<{ _id: DiscoverySource; count: number }>;
+  summary: Array<{ totalCustomers: number; answeredCustomers: number }>;
+};
 
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -112,9 +118,10 @@ export async function GET(request: NextRequest) {
     let kpiResult: any[] = [];
     let serviceDistribution: any[] = [];
     let incomeTrend: any[] = [];
+    let discoverySourceResult: DiscoverySourceAggregate[] = [];
 
     if (requestType !== 'orders') {
-      [kpiResult, serviceDistribution, incomeTrend] = await Promise.all([
+      [kpiResult, serviceDistribution, incomeTrend, discoverySourceResult] = await Promise.all([
         Order.aggregate([
           { $match: analyticsMatch },
           { $group: { _id: null, total: { $sum: 1 }, pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } }, finished: { $sum: { $cond: [{ $eq: ['$status', 'finished'] }, 1, 0] } } } }
@@ -131,6 +138,63 @@ export async function GET(request: NextRequest) {
           { $match: { 'verification.status': 'approved', status: 'finished', finishedAt: { $gte: sevenDaysAgo }, deleted: { $ne: true } } },
           { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$finishedAt' } }, amount: { $sum: { $ifNull: ['$finalPrice', '$estimatedPrice'] } } } },
           { $sort: { _id: 1 } }
+        ]),
+        Order.aggregate<DiscoverySourceAggregate>([
+          { $match: analyticsMatch },
+          {
+            $project: {
+              customerKey: {
+                $toLower: {
+                  $trim: { input: { $ifNull: ['$phone', ''] } }
+                }
+              },
+              discoverySources: {
+                $filter: {
+                  input: { $ifNull: ['$discoverySources', []] },
+                  as: 'source',
+                  cond: { $in: ['$$source', DISCOVERY_SOURCE_VALUES] }
+                }
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$customerKey',
+              sourceSelections: { $push: '$discoverySources' }
+            }
+          },
+          {
+            $project: {
+              discoverySources: {
+                $reduce: {
+                  input: '$sourceSelections',
+                  initialValue: [],
+                  in: { $setUnion: ['$$value', '$$this'] }
+                }
+              }
+            }
+          },
+          {
+            $facet: {
+              distribution: [
+                { $unwind: '$discoverySources' },
+                { $group: { _id: '$discoverySources', count: { $sum: 1 } } }
+              ],
+              summary: [
+                {
+                  $group: {
+                    _id: null,
+                    totalCustomers: { $sum: 1 },
+                    answeredCustomers: {
+                      $sum: {
+                        $cond: [{ $gt: [{ $size: '$discoverySources' }, 0] }, 1, 0]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
         ])
       ]);
     }
@@ -184,6 +248,32 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.max(1, Math.ceil(totalOrders / limit));
 
+    const rawDiscoveryDistribution = discoverySourceResult[0]?.distribution || [];
+    const rawDiscoverySummary = discoverySourceResult[0]?.summary?.[0] || {
+      totalCustomers: 0,
+      answeredCustomers: 0,
+    };
+    const discoverySourceSummary = {
+      totalCustomers: rawDiscoverySummary.totalCustomers,
+      answeredCustomers: rawDiscoverySummary.answeredCustomers,
+      unansweredCustomers:
+        rawDiscoverySummary.totalCustomers - rawDiscoverySummary.answeredCustomers,
+    };
+    const discoverySourceDistribution = DISCOVERY_SOURCE_VALUES.map((source) => {
+      const count = rawDiscoveryDistribution.find(
+        (item) => item._id === source
+      )?.count || 0;
+
+      return {
+        source,
+        label: DISCOVERY_SOURCE_LABELS[source],
+        count,
+        percentage: discoverySourceSummary.answeredCustomers > 0
+          ? Math.round((count / discoverySourceSummary.answeredCustomers) * 100)
+          : 0,
+      };
+    }).sort((a, b) => b.count - a.count);
+
     // Build response — analytics fields and orders fields are separate
     const analyticsPayload = requestType !== 'orders' ? {
       total: kpiData.total,
@@ -194,6 +284,8 @@ export async function GET(request: NextRequest) {
       finished: kpiData.finished,
       serviceDistribution: serviceDistributionWithColors,
       incomeTrend: incomeTrendFormatted,
+      discoverySourceDistribution,
+      discoverySourceSummary,
     } : {};
 
     const ordersPayload = requestType !== 'analytics' ? { recentOrders } : {};

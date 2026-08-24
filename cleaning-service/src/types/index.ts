@@ -120,5 +120,16 @@ export interface DashboardData {
   finished: number;
   serviceDistribution: Array<{ name: string; value: number; color: string }>;
   incomeTrend: Array<{ day: string; date: string; amount: number }>;
+  discoverySourceDistribution: Array<{
+    source: DiscoverySource;
+    label: string;
+    count: number;
+    percentage: number;
+  }>;
+  discoverySourceSummary: {
+    totalCustomers: number;
+    answeredCustomers: number;
+    unansweredCustomers: number;
+  };
   recentOrders: Order[];
 }

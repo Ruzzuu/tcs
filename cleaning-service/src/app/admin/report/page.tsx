@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency, formatDateGMT7 } from '@/lib/utils';
+import type { DiscoverySource } from '@/types';
 
 const MONTH_NAMES = [
   'Januari', 'Februari', 'Maret', 'April',
@@ -44,6 +45,51 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
   );
 }
 
+type DiscoverySourceDatum = {
+  source: DiscoverySource;
+  label: string;
+  count: number;
+  percentage: number;
+};
+
+type DiscoverySourceSummary = {
+  totalCustomers: number;
+  answeredCustomers: number;
+  unansweredCustomers: number;
+};
+
+function DiscoverySourceChart({ data }: { data: DiscoverySourceDatum[] }) {
+  const maxCount = Math.max(...data.map((item) => item.count), 1);
+
+  return (
+    <div className="space-y-4">
+      {data.map((item) => {
+        const barWidth = (item.count / maxCount) * 100;
+
+        return (
+          <div key={item.source}>
+            <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
+              <span className="font-semibold text-[#111318] dark:text-gray-200">
+                {item.label}
+              </span>
+              <span className="whitespace-nowrap text-gray-500 dark:text-gray-400">
+                <span className="font-bold text-[#111318] dark:text-white">{item.count}</span>
+                {' customer · '}{item.percentage}%
+              </span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+              <div
+                className="h-full rounded-full bg-[#1152d4] transition-all duration-300"
+                style={{ width: item.count > 0 ? `${Math.max(barWidth, 2)}%` : '0%' }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ReportPage() {
   const { } = useAuth();
   const [isLocked, setIsLocked] = useState(true);
@@ -60,6 +106,12 @@ export default function ReportPage() {
 
   const [trendData, setTrendData] = useState<Array<{ day: string; amount: number; date: string }>>([]);
   const [trendLoading, setTrendLoading] = useState(true);
+  const [discoverySourceData, setDiscoverySourceData] = useState<DiscoverySourceDatum[]>([]);
+  const [discoverySourceSummary, setDiscoverySourceSummary] = useState<DiscoverySourceSummary>({
+    totalCustomers: 0,
+    answeredCustomers: 0,
+    unansweredCustomers: 0,
+  });
 
   const [selectedYearForYearly, setSelectedYearForYearly] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
@@ -79,6 +131,12 @@ export default function ReportPage() {
       
       if (result.success && result.data?.incomeTrend) {
         setTrendData(result.data.incomeTrend);
+        setDiscoverySourceData(result.data.discoverySourceDistribution || []);
+        setDiscoverySourceSummary(result.data.discoverySourceSummary || {
+          totalCustomers: 0,
+          answeredCustomers: 0,
+          unansweredCustomers: 0,
+        });
       }
     } catch (error) {
       console.error('Failed to fetch trend data:', error);
@@ -358,6 +416,50 @@ export default function ReportPage() {
               </div>
             ) : (
               <BarChart data={trendData} />
+            )}
+          </div>
+
+          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[#111318] dark:text-white text-base font-bold">Customer Tahu dari Mana</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                  Sumber informasi customer unik sepanjang waktu
+                </p>
+              </div>
+              <span className="material-symbols-outlined text-gray-400">campaign</span>
+            </div>
+            {trendLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+              </div>
+            ) : discoverySourceSummary.answeredCustomers > 0 ? (
+              <>
+                <DiscoverySourceChart data={discoverySourceData} />
+                <div className="mt-6 rounded-xl bg-blue-50 px-4 py-3 dark:bg-blue-950/30">
+                  <p className="text-xs font-semibold text-blue-900 dark:text-blue-200">
+                    {discoverySourceSummary.answeredCustomers} dari {discoverySourceSummary.totalCustomers} customer mengisi sumber informasi
+                  </p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-blue-700 dark:text-blue-300">
+                    Persentase dihitung dari customer yang menjawab. Total dapat melebihi 100% karena customer bisa memilih lebih dari satu sumber.
+                  </p>
+                  {discoverySourceSummary.unansweredCustomers > 0 && (
+                    <p className="mt-1 text-[11px] text-blue-700 dark:text-blue-300">
+                      {discoverySourceSummary.unansweredCustomers} customer belum mengisi.
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-center">
+                <span className="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3">
+                  campaign
+                </span>
+                <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Sumber Customer</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                  Data akan muncul setelah customer mengisi “Tahu dari mana?”
+                </p>
+              </div>
             )}
           </div>
 
