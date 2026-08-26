@@ -3,6 +3,11 @@ import connectDB from '@/lib/mongodb';
 import Rekap from '@/lib/models/Rekap';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
 
+type RekapWeekEntry = {
+  createdAt: Date;
+  amount: number;
+};
+
 export async function GET(request: NextRequest) {
   try {
     if (!(await isAdminAuthenticated(request))) {
@@ -18,6 +23,7 @@ export async function GET(request: NextRequest) {
     if (action === 'available') {
       const yearParam = searchParams.get('year');
       const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+      const includeData = searchParams.get('includeData') === 'true';
       
       const availableWeeks = await Rekap.aggregate([
         {
@@ -48,35 +54,47 @@ export async function GET(request: NextRequest) {
         {
           $group: {
             _id: null,
-            dates: { $push: '$createdAt' }
+            entries: {
+              $push: {
+                createdAt: '$createdAt',
+                amount: '$amount'
+              }
+            }
           }
         }
       ]);
-      
-      if (!availableWeeks.length || !availableWeeks[0].dates.length) {
+
+      if (!availableWeeks.length || !availableWeeks[0].entries.length) {
         return NextResponse.json({
           success: true,
           data: {
             year,
-            availableWeeks: []
+            availableWeeks: [],
+            ...(includeData ? { selectedWeek: null, selectedWeekData: null } : {})
           }
         });
       }
-      
+
       // Calculate week numbers from dates
       const weekSet = new Set<number>();
-      availableWeeks[0].dates.forEach((date: Date) => {
-        const weekNum = getCurrentWeek(new Date(date));
+      const entries = availableWeeks[0].entries as RekapWeekEntry[];
+      entries.forEach((entry) => {
+        const weekNum = getCurrentWeek(new Date(entry.createdAt));
         weekSet.add(weekNum);
       });
-      
+
       const sortedWeeks = Array.from(weekSet).sort((a, b) => a - b);
-      
+      const selectedWeek = sortedWeeks[sortedWeeks.length - 1];
+
       return NextResponse.json({
         success: true,
         data: {
           year,
-          availableWeeks: sortedWeeks
+          availableWeeks: sortedWeeks,
+          ...(includeData ? {
+            selectedWeek,
+            selectedWeekData: buildWeekDataFromEntries(entries, year, selectedWeek)
+          } : {})
         }
       });
     }
@@ -161,7 +179,7 @@ export async function GET(request: NextRequest) {
       }
     });
     
-  } catch (error: any) {
+  } catch (error) {
     console.error('GET /api/income/weekly error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch weekly income data' },
@@ -216,4 +234,42 @@ function getWeekDateRange(year: number, week: number): { startDate: Date; endDat
   endDate.setUTCHours(23, 59, 59, 999);
   
   return { startDate, endDate };
+}
+
+function buildWeekDataFromEntries(
+  entries: RekapWeekEntry[],
+  year: number,
+  weekNumber: number
+) {
+  const { startDate, endDate } = getWeekDateRange(year, weekNumber);
+  const dailyTotals = new Map<string, number>();
+
+  entries.forEach((entry) => {
+    const entryDate = new Date(entry.createdAt);
+    if (entryDate < startDate || entryDate > endDate) return;
+
+    const dateKey = entryDate.toISOString().split('T')[0];
+    dailyTotals.set(dateKey, (dailyTotals.get(dateKey) || 0) + entry.amount);
+  });
+
+  const dayLabels = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  const weekData = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + index);
+    const dateKey = date.toISOString().split('T')[0];
+
+    return {
+      day: dayLabels[date.getUTCDay()],
+      amount: dailyTotals.get(dateKey) || 0,
+      date: dateKey
+    };
+  });
+
+  return {
+    weekNumber,
+    year,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    weekData
+  };
 }

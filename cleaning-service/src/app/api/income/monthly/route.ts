@@ -24,52 +24,16 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const yearParam = searchParams.get('year');
-    
-    const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
-    
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
-    
-    const yearlyData = await Rekap.aggregate([
-      {
-        $match: {
-          immutable: true,
-          createdAt: {
-            $gte: startDate,
-            $lte: endDate
-          }
-        }
-      },
-      {
-        $lookup: {
-          from: 'orders',
-          localField: 'orderId',
-          foreignField: '_id',
-          as: 'order'
-        }
-      },
-      {
-        $unwind: '$order'
-      },
-      {
-        $match: {
-          'order.deleted': { $ne: true }
-        }
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: '%Y-%m', date: '$createdAt' }
-          },
-          total: { $sum: '$amount' }
-        }
-      },
-      {
-        $sort: { _id: 1 }
-      }
-    ]);
-    
-    const availableYears = await Rekap.aggregate([
+    const requestedYear = yearParam ? parseInt(yearParam, 10) : null;
+
+    if (yearParam && (!/^\d{4}$/.test(yearParam) || Number.isNaN(requestedYear))) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid year parameter' },
+        { status: 400 }
+      );
+    }
+
+    const fetchAvailableYears = () => Rekap.aggregate([
       {
         $match: {
           immutable: true
@@ -86,33 +50,86 @@ export async function GET(request: NextRequest) {
         $sort: { _id: 1 }
       }
     ]);
-    
-    const yearsList = availableYears.map(item => parseInt(item._id));
-    
-    let selectedYearData = null;
-    
-    if (yearParam) {
-      const yearNumber = parseInt(yearParam);
-      
-      const monthlyIncome = yearlyData
+
+    const fetchYearlyData = (year: number) => {
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      return Rekap.aggregate([
+        {
+          $match: {
+            immutable: true,
+            createdAt: {
+              $gte: startDate,
+              $lte: endDate
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orderId',
+            foreignField: '_id',
+            as: 'order'
+          }
+        },
+        {
+          $unwind: '$order'
+        },
+        {
+          $match: {
+            'order.deleted': { $ne: true }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: '%Y-%m', date: '$createdAt' }
+            },
+            total: { $sum: '$amount' }
+          }
+        },
+        {
+          $sort: { _id: 1 }
+        }
+      ]);
+    };
+
+    let availableYears;
+    let selectedYear = requestedYear;
+    let yearlyData;
+
+    if (selectedYear !== null) {
+      [availableYears, yearlyData] = await Promise.all([
+        fetchAvailableYears(),
+        fetchYearlyData(selectedYear)
+      ]);
+    } else {
+      availableYears = await fetchAvailableYears();
+      const latestAvailableYear = availableYears[availableYears.length - 1]?._id;
+      selectedYear = latestAvailableYear ? parseInt(latestAvailableYear, 10) : null;
+      yearlyData = selectedYear !== null ? await fetchYearlyData(selectedYear) : [];
+    }
+
+    const yearsList = availableYears.map(item => parseInt(item._id, 10));
+    const selectedYearData = selectedYear !== null
+      ? {
+        year: selectedYear,
+        monthlyIncome: yearlyData
         .filter(item => {
-          const [itemYear, itemMonth] = item._id.split('-');
-          return parseInt(itemYear) === yearNumber;
+          const [itemYear] = item._id.split('-');
+          return parseInt(itemYear, 10) === selectedYear;
         })
         .map(item => {
-          const [itemYear, itemMonth] = item._id.split('-');
+          const [, itemMonth] = item._id.split('-');
           return {
-            month: parseInt(itemMonth),
-            monthName: getMonthName(parseInt(itemMonth)),
+            month: parseInt(itemMonth, 10),
+            monthName: getMonthName(parseInt(itemMonth, 10)),
             amount: item.total
           };
-        });
-      
-      selectedYearData = {
-        year: yearNumber,
-        monthlyIncome
-      };
-    }
+        })
+      }
+      : null;
     
     return NextResponse.json({
       success: true,

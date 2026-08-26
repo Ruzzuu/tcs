@@ -1,26 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency, formatDateGMT7 } from '@/lib/utils';
 import type { DiscoverySource } from '@/types';
-
-const MONTH_NAMES = [
-  'Januari', 'Februari', 'Maret', 'April',
-  'Mei', 'Juni', 'Juli', 'Agustus',
-  'September', 'Oktober', 'November', 'Desember'
-];
-
-function getMonthName(month: number): string {
-  return MONTH_NAMES[month - 1] || '';
-}
 
 function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
   const maxAmount = Math.max(...data.map(d => d.amount), 1);
 
   return (
     <div className="space-y-3">
-      {data.map((item, index) => {
+      {data.map((item) => {
         const percentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
         
         return (
@@ -58,6 +48,86 @@ type DiscoverySourceSummary = {
   unansweredCustomers: number;
 };
 
+type TrendDatum = {
+  day: string;
+  amount: number;
+  date: string;
+};
+
+type WeeklyData = {
+  weekNumber: number;
+  year: number;
+  startDate: string;
+  endDate: string;
+  weekData: TrendDatum[];
+};
+
+type MonthlyIncomeDatum = {
+  month: number;
+  monthName: string;
+  amount: number;
+};
+
+type YearlyData = {
+  year: number;
+  monthlyIncome: MonthlyIncomeDatum[];
+};
+
+type OverviewCache = {
+  trendData: TrendDatum[];
+  discoverySourceData: DiscoverySourceDatum[];
+  discoverySourceSummary: DiscoverySourceSummary;
+};
+
+type WeeklyBootstrapCache = {
+  availableWeeks: number[];
+  selectedWeek: number | null;
+  weeklyData: WeeklyData | null;
+};
+
+type YearlyBootstrapCache = {
+  availableYears: number[];
+  selectedYear: number | null;
+  yearlyData: YearlyData | null;
+};
+
+const REPORT_CACHE_VERSION = 'v1';
+const OVERVIEW_CACHE_KEY = `report:${REPORT_CACHE_VERSION}:overview`;
+const weeklyBootstrapCacheKey = (year: number) =>
+  `report:${REPORT_CACHE_VERSION}:weekly:${year}:bootstrap`;
+const weeklyDataCacheKey = (year: number, week: number) =>
+  `report:${REPORT_CACHE_VERSION}:weekly:${year}:${week}`;
+const YEARLY_BOOTSTRAP_CACHE_KEY = `report:${REPORT_CACHE_VERSION}:yearly:bootstrap`;
+const yearlyDataCacheKey = (year: number) =>
+  `report:${REPORT_CACHE_VERSION}:yearly:${year}`;
+
+const EMPTY_DISCOVERY_SUMMARY: DiscoverySourceSummary = {
+  totalCustomers: 0,
+  answeredCustomers: 0,
+  unansweredCustomers: 0,
+};
+
+function readSessionCache<T>(key: string): T | null {
+  try {
+    const cachedValue = sessionStorage.getItem(key);
+    return cachedValue ? JSON.parse(cachedValue) as T : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionCache<T>(key: string, value: T): void {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // The report still works when browser storage is unavailable or full.
+  }
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'AbortError';
+}
+
 function DiscoverySourceChart({ data }: { data: DiscoverySourceDatum[] }) {
   const maxCount = Math.max(...data.map((item) => item.count), 1);
 
@@ -91,221 +161,224 @@ function DiscoverySourceChart({ data }: { data: DiscoverySourceDatum[] }) {
 }
 
 export default function ReportPage() {
-  const { } = useAuth();
+  useAuth();
   const [isLocked, setIsLocked] = useState(true);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
 
+  const selectedYear = new Date().getFullYear();
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [availableWeeks, setAvailableWeeks] = useState<number[]>([]);
-  const [weeklyData, setWeeklyData] = useState<any>(null);
-  const [weeklyLoading, setWeeklyLoading] = useState(false);
+  const [weeklyData, setWeeklyData] = useState<WeeklyData | null>(null);
+  const [weeklyLoading, setWeeklyLoading] = useState(true);
 
-  const [trendData, setTrendData] = useState<Array<{ day: string; amount: number; date: string }>>([]);
+  const [trendData, setTrendData] = useState<TrendDatum[]>([]);
   const [trendLoading, setTrendLoading] = useState(true);
   const [discoverySourceData, setDiscoverySourceData] = useState<DiscoverySourceDatum[]>([]);
-  const [discoverySourceSummary, setDiscoverySourceSummary] = useState<DiscoverySourceSummary>({
-    totalCustomers: 0,
-    answeredCustomers: 0,
-    unansweredCustomers: 0,
-  });
+  const [discoverySourceSummary, setDiscoverySourceSummary] =
+    useState<DiscoverySourceSummary>(EMPTY_DISCOVERY_SUMMARY);
 
   const [selectedYearForYearly, setSelectedYearForYearly] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
-  const [yearlyData, setYearlyData] = useState<any>(null);
-  const [yearlyLoading, setYearlyLoading] = useState(false);
+  const [yearlyData, setYearlyData] = useState<YearlyData | null>(null);
+  const [yearlyLoading, setYearlyLoading] = useState(true);
+  const weeklyRequestId = useRef(0);
+  const yearlyRequestId = useRef(0);
 
   useEffect(() => {
     const unlocked = sessionStorage.getItem('reportUnlocked') === 'true';
     setIsLocked(!unlocked);
   }, []);
 
-  const fetchTrendData = async () => {
-    setTrendLoading(true);
-    try {
-      const response = await fetch('/api/dashboard?type=analytics');
-      const result = await response.json();
-      
-      if (result.success && result.data?.incomeTrend) {
-        setTrendData(result.data.incomeTrend);
-        setDiscoverySourceData(result.data.discoverySourceDistribution || []);
-        setDiscoverySourceSummary(result.data.discoverySourceSummary || {
-          totalCustomers: 0,
-          answeredCustomers: 0,
-          unansweredCustomers: 0,
+  useEffect(() => {
+    if (isLocked) return;
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const loadOverview = async () => {
+      const cachedOverview = readSessionCache<OverviewCache>(OVERVIEW_CACHE_KEY);
+      if (cachedOverview) {
+        setTrendData(cachedOverview.trendData);
+        setDiscoverySourceData(cachedOverview.discoverySourceData);
+        setDiscoverySourceSummary(cachedOverview.discoverySourceSummary);
+        setTrendLoading(false);
+      } else {
+        setTrendLoading(true);
+      }
+
+      try {
+        const response = await fetch('/api/dashboard?type=report', { signal });
+        const result = await response.json();
+        if (!result.success || !result.data?.incomeTrend || signal.aborted) return;
+
+        const overview: OverviewCache = {
+          trendData: result.data.incomeTrend,
+          discoverySourceData: result.data.discoverySourceDistribution || [],
+          discoverySourceSummary:
+            result.data.discoverySourceSummary || EMPTY_DISCOVERY_SUMMARY,
+        };
+
+        setTrendData(overview.trendData);
+        setDiscoverySourceData(overview.discoverySourceData);
+        setDiscoverySourceSummary(overview.discoverySourceSummary);
+        writeSessionCache(OVERVIEW_CACHE_KEY, overview);
+      } catch (requestError) {
+        if (!isAbortError(requestError)) {
+          console.error('Failed to fetch report overview:', requestError);
+        }
+      } finally {
+        if (!signal.aborted) setTrendLoading(false);
+      }
+    };
+
+    const loadWeeklyBootstrap = async () => {
+      const requestId = ++weeklyRequestId.current;
+      const cacheKey = weeklyBootstrapCacheKey(selectedYear);
+      const cachedWeekly = readSessionCache<WeeklyBootstrapCache>(cacheKey);
+
+      if (cachedWeekly) {
+        setAvailableWeeks(cachedWeekly.availableWeeks);
+        setSelectedWeek(cachedWeekly.selectedWeek);
+        setWeeklyData(cachedWeekly.weeklyData);
+        setWeeklyLoading(false);
+      } else {
+        setWeeklyLoading(true);
+      }
+
+      try {
+        const params = new URLSearchParams({
+          action: 'available',
+          year: selectedYear.toString(),
+          includeData: 'true',
         });
-      }
-    } catch (error) {
-      console.error('Failed to fetch trend data:', error);
-    } finally {
-      setTrendLoading(false);
-    }
-  };
+        const response = await fetch(`/api/income/weekly?${params}`, { signal });
+        const result = await response.json();
+        if (!result.success || signal.aborted || requestId !== weeklyRequestId.current) return;
 
-  const fetchAvailableWeeks = async (year?: number) => {
-    try {
-      const params = new URLSearchParams({ action: 'available' });
-      if (year !== undefined) params.append('year', year.toString());
-      
-      const response = await fetch(`/api/income/weekly?${params}`);
-      const result = await response.json();
-      
-      if (result.success && result.data.availableWeeks.length > 0) {
-        setAvailableWeeks(result.data.availableWeeks);
-        const latestWeek = result.data.availableWeeks[result.data.availableWeeks.length - 1];
-        return latestWeek;
+        const weeklyBootstrap: WeeklyBootstrapCache = {
+          availableWeeks: result.data.availableWeeks || [],
+          selectedWeek: result.data.selectedWeek ?? null,
+          weeklyData: result.data.selectedWeekData ?? null,
+        };
+
+        setAvailableWeeks(weeklyBootstrap.availableWeeks);
+        setSelectedWeek(weeklyBootstrap.selectedWeek);
+        setWeeklyData(weeklyBootstrap.weeklyData);
+        writeSessionCache(cacheKey, weeklyBootstrap);
+
+        if (weeklyBootstrap.selectedWeek !== null && weeklyBootstrap.weeklyData) {
+          writeSessionCache(
+            weeklyDataCacheKey(selectedYear, weeklyBootstrap.selectedWeek),
+            weeklyBootstrap.weeklyData
+          );
+        }
+      } catch (requestError) {
+        if (!isAbortError(requestError)) {
+          console.error('Failed to fetch weekly report:', requestError);
+        }
+      } finally {
+        if (!signal.aborted && requestId === weeklyRequestId.current) {
+          setWeeklyLoading(false);
+        }
+      }
+    };
+
+    const loadYearlyBootstrap = async () => {
+      const requestId = ++yearlyRequestId.current;
+      const cachedYearly = readSessionCache<YearlyBootstrapCache>(
+        YEARLY_BOOTSTRAP_CACHE_KEY
+      );
+
+      if (cachedYearly) {
+        setAvailableYears(cachedYearly.availableYears);
+        setSelectedYearForYearly(cachedYearly.selectedYear);
+        setYearlyData(cachedYearly.yearlyData);
+        setYearlyLoading(false);
       } else {
-        setAvailableWeeks([]);
-        return null;
+        setYearlyLoading(true);
       }
-    } catch (error) {
-      console.error('Failed to fetch available weeks:', error);
-      return null;
-    }
-  };
 
-  const fetchWeeklyData = async (week: number, year?: number) => {
-    setWeeklyLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.append('week', week.toString());
-      if (year !== undefined) params.append('year', year.toString());
-      
-      const response = await fetch(`/api/income/weekly?${params}`);
-      const result = await response.json();
-      
-      if (result.success) {
-        setWeeklyData(result.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch weekly data:', error);
-    } finally {
-      setWeeklyLoading(false);
-    }
-  };
+      try {
+        const response = await fetch('/api/income/monthly', { signal });
+        const result = await response.json();
+        if (!result.success || signal.aborted || requestId !== yearlyRequestId.current) return;
 
-  const fetchAvailableYears = async (year?: number) => {
-    setYearlyLoading(true);
-    try {
-      const params = new URLSearchParams({ year: (year || selectedYearForYearly || new Date().getFullYear()).toString() });
-      
-      const response = await fetch(`/api/income/monthly?${params}`);
-      const result = await response.json();
-      
-      if (result.success && result.data?.availableYears && result.data.availableYears.length > 0) {
-        setAvailableYears(result.data.availableYears);
-        const latestYear = result.data.availableYears[result.data.availableYears.length - 1];
-        setSelectedYearForYearly(latestYear);
-        setYearlyData(null);
-      } else {
-        setAvailableYears([]);
-        setSelectedYearForYearly(null);
-        setYearlyData(null);
-      }
-    } catch (error) {
-      console.error('Failed to fetch available years:', error);
-    } finally {
-      setYearlyLoading(false);
-    }
-  };
+        const selectedYearData = result.data.selectedYearData as YearlyData | null;
+        const yearlyBootstrap: YearlyBootstrapCache = {
+          availableYears: result.data.availableYears || [],
+          selectedYear: selectedYearData?.year ?? null,
+          yearlyData: selectedYearData,
+        };
 
-  const fetchYearlyData = async (year: number) => {
-    setYearlyLoading(true);
-    try {
-      const params = new URLSearchParams({ year: year.toString() });
-      
-      const response = await fetch(`/api/income/monthly?${params}`);
-      const result = await response.json();
-      
-      if (result.success && result.data.selectedYearData) {
-        setYearlyData(result.data.selectedYearData);
-      }
-    } catch (error) {
-      console.error('Failed to fetch yearly data:', error);
-    } finally {
-      setYearlyLoading(false);
-    }
-  };
+        setAvailableYears(yearlyBootstrap.availableYears);
+        setSelectedYearForYearly(yearlyBootstrap.selectedYear);
+        setYearlyData(yearlyBootstrap.yearlyData);
+        writeSessionCache(YEARLY_BOOTSTRAP_CACHE_KEY, yearlyBootstrap);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const initWeeklyData = async () => {
-      const latestWeek = await fetchAvailableWeeks(selectedYear);
-      if (latestWeek !== null && isMounted) {
-        setSelectedWeek(latestWeek);
-        await fetchWeeklyData(latestWeek, selectedYear);
+        if (selectedYearData) {
+          writeSessionCache(yearlyDataCacheKey(selectedYearData.year), selectedYearData);
+        }
+      } catch (requestError) {
+        if (!isAbortError(requestError)) {
+          console.error('Failed to fetch yearly report:', requestError);
+        }
+      } finally {
+        if (!signal.aborted && requestId === yearlyRequestId.current) {
+          setYearlyLoading(false);
+        }
       }
     };
-    
-    initWeeklyData();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedYear]);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const initYearlyData = async () => {
-      await fetchAvailableYears(selectedYearForYearly || undefined);
-    };
-    
-    initYearlyData();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedYearForYearly]);
+    void Promise.allSettled([
+      loadOverview(),
+      loadWeeklyBootstrap(),
+      loadYearlyBootstrap(),
+    ]);
 
-  useEffect(() => {
-    if (!isLocked) {
-      fetchTrendData();
-    }
-  }, [isLocked]);
+    return () => controller.abort();
+  }, [isLocked, selectedYear]);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    if (selectedWeek !== null && availableWeeks.includes(selectedWeek)) {
-      fetchWeeklyData(selectedWeek, selectedYear).then(() => {
-        if (!isMounted) return;
-      });
-    }
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedWeek]);
-
-  useEffect(() => {
-    let isMounted = true;
-    
-    if (selectedYearForYearly !== null && availableYears.includes(selectedYearForYearly)) {
-      fetchYearlyData(selectedYearForYearly).then(() => {
-        if (!isMounted) return;
-      });
-    }
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedYearForYearly]);
-
-  const handleWeekChange = (week: number) => {
+  const handleWeekChange = async (week: number) => {
+    const requestId = ++weeklyRequestId.current;
     setSelectedWeek(week);
-    fetchWeeklyData(week, selectedYear);
+
+    const cacheKey = weeklyDataCacheKey(selectedYear, week);
+    const cachedWeeklyData = readSessionCache<WeeklyData>(cacheKey);
+    if (cachedWeeklyData) {
+      setWeeklyData(cachedWeeklyData);
+      setWeeklyLoading(false);
+    } else {
+      setWeeklyData(null);
+      setWeeklyLoading(true);
+    }
+
+    try {
+      const params = new URLSearchParams({
+        week: week.toString(),
+        year: selectedYear.toString(),
+      });
+      const response = await fetch(`/api/income/weekly?${params}`);
+      const result = await response.json();
+      if (!result.success || requestId !== weeklyRequestId.current) return;
+
+      const nextWeeklyData = result.data as WeeklyData;
+      setWeeklyData(nextWeeklyData);
+      writeSessionCache(cacheKey, nextWeeklyData);
+    } catch (requestError) {
+      console.error('Failed to fetch weekly report:', requestError);
+    } finally {
+      if (requestId === weeklyRequestId.current) setWeeklyLoading(false);
+    }
   };
 
   const handlePrevWeek = () => {
     if (selectedWeek !== null && availableWeeks.length > 0) {
       const currentIndex = availableWeeks.indexOf(selectedWeek);
       if (currentIndex > 0) {
-        handleWeekChange(availableWeeks[currentIndex - 1]);
+        void handleWeekChange(availableWeeks[currentIndex - 1]);
       }
     }
   };
@@ -314,21 +387,47 @@ export default function ReportPage() {
     if (selectedWeek !== null && availableWeeks.length > 0) {
       const currentIndex = availableWeeks.indexOf(selectedWeek);
       if (currentIndex < availableWeeks.length - 1) {
-        handleWeekChange(availableWeeks[currentIndex + 1]);
+        void handleWeekChange(availableWeeks[currentIndex + 1]);
       }
     }
   };
 
-  const handleYearChange = (year: number) => {
+  const handleYearChange = async (year: number) => {
+    const requestId = ++yearlyRequestId.current;
     setSelectedYearForYearly(year);
-    fetchYearlyData(year);
+
+    const cacheKey = yearlyDataCacheKey(year);
+    const cachedYearlyData = readSessionCache<YearlyData>(cacheKey);
+    if (cachedYearlyData) {
+      setYearlyData(cachedYearlyData);
+      setYearlyLoading(false);
+    } else {
+      setYearlyData(null);
+      setYearlyLoading(true);
+    }
+
+    try {
+      const params = new URLSearchParams({ year: year.toString() });
+      const response = await fetch(`/api/income/monthly?${params}`);
+      const result = await response.json();
+      if (!result.success || requestId !== yearlyRequestId.current) return;
+
+      const nextYearlyData = result.data.selectedYearData as YearlyData | null;
+      setAvailableYears(result.data.availableYears || []);
+      setYearlyData(nextYearlyData);
+      if (nextYearlyData) writeSessionCache(cacheKey, nextYearlyData);
+    } catch (requestError) {
+      console.error('Failed to fetch yearly report:', requestError);
+    } finally {
+      if (requestId === yearlyRequestId.current) setYearlyLoading(false);
+    }
   };
 
   const handlePrevYear = () => {
     if (selectedYearForYearly !== null && availableYears.length > 0) {
       const currentIndex = availableYears.indexOf(selectedYearForYearly);
       if (currentIndex > 0) {
-        handleYearChange(availableYears[currentIndex - 1]);
+        void handleYearChange(availableYears[currentIndex - 1]);
       }
     }
   };
@@ -337,7 +436,7 @@ export default function ReportPage() {
     if (selectedYearForYearly !== null && availableYears.length > 0) {
       const currentIndex = availableYears.indexOf(selectedYearForYearly);
       if (currentIndex < availableYears.length - 1) {
-        handleYearChange(availableYears[currentIndex + 1]);
+        void handleYearChange(availableYears[currentIndex + 1]);
       }
     }
   };
@@ -464,7 +563,11 @@ export default function ReportPage() {
           </div>
 
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
-            {availableWeeks.length > 0 ? (
+            {weeklyLoading && availableWeeks.length === 0 ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+              </div>
+            ) : availableWeeks.length > 0 ? (
               <>
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -524,7 +627,11 @@ export default function ReportPage() {
           </div>
 
           <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
-            {availableYears.length > 0 ? (
+            {yearlyLoading && availableYears.length === 0 ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1152d4]"></div>
+              </div>
+            ) : availableYears.length > 0 ? (
               <>
                 <div className="flex justify-between items-start mb-4">
                   <div>

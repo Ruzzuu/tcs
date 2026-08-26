@@ -10,6 +10,25 @@ import { DISCOVERY_SOURCE_LABELS, DISCOVERY_SOURCE_VALUES } from '@/lib/discover
 import type { DiscoverySource, ServiceType } from '@/types';
 import { isAdminAuthenticated } from '@/lib/adminAuth';
 
+type KpiAggregate = {
+  total: number;
+  pending: number;
+  finished: number;
+  inProgress?: number;
+  delivered?: number;
+  pickedUp?: number;
+};
+
+type ServiceDistributionAggregate = {
+  name: ServiceType;
+  value: number;
+};
+
+type IncomeTrendAggregate = {
+  _id: string;
+  amount: number;
+};
+
 type DiscoverySourceAggregate = {
   distribution: Array<{ _id: DiscoverySource; count: number }>;
   summary: Array<{ totalCustomers: number; answeredCustomers: number }>;
@@ -55,7 +74,7 @@ export async function GET(request: NextRequest) {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Build filter for orders list
-    const ordersFilter: any = { 
+    const ordersFilter: Record<string, unknown> = {
       'verification.status': 'approved', 
       deleted: { $ne: true } 
     };
@@ -115,12 +134,81 @@ export async function GET(request: NextRequest) {
     }
 
     // Run analytics queries only when needed
-    let kpiResult: any[] = [];
-    let serviceDistribution: any[] = [];
-    let incomeTrend: any[] = [];
+    let kpiResult: KpiAggregate[] = [];
+    let serviceDistribution: ServiceDistributionAggregate[] = [];
+    let incomeTrend: IncomeTrendAggregate[] = [];
     let discoverySourceResult: DiscoverySourceAggregate[] = [];
 
-    if (requestType !== 'orders') {
+    const fetchIncomeTrend = () => Order.aggregate<IncomeTrendAggregate>([
+      { $match: { 'verification.status': 'approved', status: 'finished', finishedAt: { $gte: sevenDaysAgo }, deleted: { $ne: true } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$finishedAt' } }, amount: { $sum: { $ifNull: ['$finalPrice', '$estimatedPrice'] } } } },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const fetchDiscoverySources = () => Order.aggregate<DiscoverySourceAggregate>([
+      { $match: analyticsMatch },
+      {
+        $project: {
+          customerKey: {
+            $toLower: {
+              $trim: { input: { $ifNull: ['$phone', ''] } }
+            }
+          },
+          discoverySources: {
+            $filter: {
+              input: { $ifNull: ['$discoverySources', []] },
+              as: 'source',
+              cond: { $in: ['$$source', DISCOVERY_SOURCE_VALUES] }
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$customerKey',
+          sourceSelections: { $push: '$discoverySources' }
+        }
+      },
+      {
+        $project: {
+          discoverySources: {
+            $reduce: {
+              input: '$sourceSelections',
+              initialValue: [],
+              in: { $setUnion: ['$$value', '$$this'] }
+            }
+          }
+        }
+      },
+      {
+        $facet: {
+          distribution: [
+            { $unwind: '$discoverySources' },
+            { $group: { _id: '$discoverySources', count: { $sum: 1 } } }
+          ],
+          summary: [
+            {
+              $group: {
+                _id: null,
+                totalCustomers: { $sum: 1 },
+                answeredCustomers: {
+                  $sum: {
+                    $cond: [{ $gt: [{ $size: '$discoverySources' }, 0] }, 1, 0]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]);
+
+    if (requestType === 'report') {
+      [incomeTrend, discoverySourceResult] = await Promise.all([
+        fetchIncomeTrend(),
+        fetchDiscoverySources()
+      ]);
+    } else if (requestType !== 'orders') {
       [kpiResult, serviceDistribution, incomeTrend, discoverySourceResult] = await Promise.all([
         Order.aggregate([
           { $match: analyticsMatch },
@@ -134,76 +222,16 @@ export async function GET(request: NextRequest) {
           { $project: { _id: 0, name: '$_id', value: '$count' } },
           { $sort: { value: -1 } }
         ]),
-        Order.aggregate([
-          { $match: { 'verification.status': 'approved', status: 'finished', finishedAt: { $gte: sevenDaysAgo }, deleted: { $ne: true } } },
-          { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$finishedAt' } }, amount: { $sum: { $ifNull: ['$finalPrice', '$estimatedPrice'] } } } },
-          { $sort: { _id: 1 } }
-        ]),
-        Order.aggregate<DiscoverySourceAggregate>([
-          { $match: analyticsMatch },
-          {
-            $project: {
-              customerKey: {
-                $toLower: {
-                  $trim: { input: { $ifNull: ['$phone', ''] } }
-                }
-              },
-              discoverySources: {
-                $filter: {
-                  input: { $ifNull: ['$discoverySources', []] },
-                  as: 'source',
-                  cond: { $in: ['$$source', DISCOVERY_SOURCE_VALUES] }
-                }
-              }
-            }
-          },
-          {
-            $group: {
-              _id: '$customerKey',
-              sourceSelections: { $push: '$discoverySources' }
-            }
-          },
-          {
-            $project: {
-              discoverySources: {
-                $reduce: {
-                  input: '$sourceSelections',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          },
-          {
-            $facet: {
-              distribution: [
-                { $unwind: '$discoverySources' },
-                { $group: { _id: '$discoverySources', count: { $sum: 1 } } }
-              ],
-              summary: [
-                {
-                  $group: {
-                    _id: null,
-                    totalCustomers: { $sum: 1 },
-                    answeredCustomers: {
-                      $sum: {
-                        $cond: [{ $gt: [{ $size: '$discoverySources' }, 0] }, 1, 0]
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        ])
+        fetchIncomeTrend(),
+        fetchDiscoverySources()
       ]);
     }
 
     // Run orders queries only when needed
     let totalOrders = 0;
-    let recentOrders: any[] = [];
+    let recentOrders: unknown[] = [];
 
-    if (requestType !== 'analytics') {
+    if (requestType !== 'analytics' && requestType !== 'report') {
       [totalOrders, recentOrders] = await Promise.all([
         Order.countDocuments(ordersFilter),
         Order.find(ordersFilter)
@@ -275,7 +303,11 @@ export async function GET(request: NextRequest) {
     }).sort((a, b) => b.count - a.count);
 
     // Build response — analytics fields and orders fields are separate
-    const analyticsPayload = requestType !== 'orders' ? {
+    const analyticsPayload = requestType === 'report' ? {
+      incomeTrend: incomeTrendFormatted,
+      discoverySourceDistribution,
+      discoverySourceSummary,
+    } : requestType !== 'orders' ? {
       total: kpiData.total,
       pending: kpiData.pending,
       inProgress: kpiData.inProgress,
@@ -288,12 +320,14 @@ export async function GET(request: NextRequest) {
       discoverySourceSummary,
     } : {};
 
-    const ordersPayload = requestType !== 'analytics' ? { recentOrders } : {};
+    const ordersPayload = requestType !== 'analytics' && requestType !== 'report'
+      ? { recentOrders }
+      : {};
 
     return NextResponse.json({
       success: true,
       data: { ...analyticsPayload, ...ordersPayload },
-      ...(requestType !== 'analytics' ? {
+      ...(requestType !== 'analytics' && requestType !== 'report' ? {
         meta: { total: totalOrders, page, limit, totalPages }
       } : {})
     });
