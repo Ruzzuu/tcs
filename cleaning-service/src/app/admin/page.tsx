@@ -230,6 +230,7 @@ export default function AdminDashboard() {
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [servicePeriod, setServicePeriod] = useState<'all' | 'monthly'>('all');
+  const [serviceFlow, setServiceFlow] = useState<'incoming' | 'outgoing'>('incoming');
   const [selectedServiceMonth, setSelectedServiceMonth] = useState(() => {
     const nowInWIB = new Date(Date.now() + 7 * 60 * 60 * 1000);
     return nowInWIB.toISOString().slice(0, 7);
@@ -284,6 +285,7 @@ export default function AdminDashboard() {
       setServiceDistributionLoading(true);
 
       const params = new URLSearchParams({ type: 'analytics' });
+      params.set('serviceFlow', serviceFlow);
       if (servicePeriod === 'monthly') {
         params.set('serviceMonth', selectedServiceMonth);
       }
@@ -306,7 +308,7 @@ export default function AdminDashboard() {
         setServiceDistributionLoading(false);
       }
     }
-  }, [selectedServiceMonth, servicePeriod]);
+  }, [selectedServiceMonth, servicePeriod, serviceFlow]);
 
   const fetchData = useCallback(async (
     page = 1,
@@ -666,12 +668,20 @@ export default function AdminDashboard() {
               <div>
                 <p className="text-[#111318] dark:text-white text-base font-bold">Layanan</p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
-                  {servicePeriod === 'all'
-                    ? 'Distribusi semua jasa yang masuk'
-                    : `Distribusi jasa periode ${new Date(`${selectedServiceMonth}-01T00:00:00.000+07:00`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}`}
+                  {serviceFlow === 'incoming' ? 'Jasa masuk' : 'Jasa keluar (selesai)'}
+                  {servicePeriod === 'monthly' && ` · ${new Date(`${selectedServiceMonth}-01T00:00:00.000+07:00`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}`}
                 </p>
               </div>
               <div className="flex items-center gap-2 self-end sm:self-auto">
+                <select
+                  value={serviceFlow}
+                  onChange={(event) => setServiceFlow(event.target.value as 'incoming' | 'outgoing')}
+                  aria-label="Pilih arus layanan"
+                  className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 dark:border-gray-700 dark:bg-[#0f1724] dark:text-gray-200"
+                >
+                  <option value="incoming">Masuk</option>
+                  <option value="outgoing">Keluar</option>
+                </select>
                 <select
                   value={servicePeriod}
                   onChange={(event) => setServicePeriod(event.target.value as 'all' | 'monthly')}

@@ -56,6 +56,14 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')?.trim().slice(0, 100) || '';
     const date = searchParams.get('date')?.trim() || '';
     const serviceMonth = searchParams.get('serviceMonth')?.trim() || '';
+    const serviceFlow = searchParams.get('serviceFlow')?.trim() || 'incoming';
+
+    if (serviceFlow !== 'incoming' && serviceFlow !== 'outgoing') {
+      return NextResponse.json(
+        { success: false, error: 'Jenis arus layanan tidak valid' },
+        { status: 400 }
+      );
+    }
 
     const serviceMonthMatch = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(serviceMonth);
     if (serviceMonth && !serviceMonthMatch) {
@@ -122,6 +130,14 @@ export async function GET(request: NextRequest) {
     const analyticsMatch = { 'verification.status': 'approved', deleted: { $ne: true } };
     const serviceDistributionMatch: Record<string, unknown> = { ...analyticsMatch };
 
+    // Incoming services use the order creation date. Outgoing services only
+    // include completed orders and use the completion date.
+    const serviceDateField = serviceFlow === 'outgoing' ? 'finishedAt' : 'createdAt';
+    if (serviceFlow === 'outgoing') {
+      serviceDistributionMatch.status = 'finished';
+      serviceDistributionMatch.finishedAt = { $exists: true, $ne: null };
+    }
+
     if (serviceMonthMatch) {
       const year = Number(serviceMonthMatch[1]);
       const month = Number(serviceMonthMatch[2]);
@@ -130,7 +146,7 @@ export async function GET(request: NextRequest) {
       const startDate = new Date(`${year}-${String(month).padStart(2, '0')}-01T00:00:00.000+07:00`);
       const endDate = new Date(`${nextMonthYear}-${String(nextMonth).padStart(2, '0')}-01T00:00:00.000+07:00`);
 
-      serviceDistributionMatch.createdAt = { $gte: startDate, $lt: endDate };
+      serviceDistributionMatch[serviceDateField] = { $gte: startDate, $lt: endDate };
     }
 
     // Run analytics queries only when needed
