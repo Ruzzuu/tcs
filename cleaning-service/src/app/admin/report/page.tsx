@@ -73,6 +73,24 @@ type YearlyData = {
   monthlyIncome: MonthlyIncomeDatum[];
 };
 
+type MonthlyCustomerDatum = {
+  month: number;
+  monthName: string;
+  newCustomers: number;
+  returningCustomers: number;
+  totalCustomers: number;
+};
+
+type CustomerYearData = {
+  year: number;
+  monthlyCustomers: MonthlyCustomerDatum[];
+  totals: {
+    newCustomers: number;
+    returningCustomers: number;
+    totalCustomers: number;
+  };
+};
+
 type OverviewCache = {
   trendData: TrendDatum[];
   discoverySourceData: DiscoverySourceDatum[];
@@ -91,6 +109,12 @@ type YearlyBootstrapCache = {
   yearlyData: YearlyData | null;
 };
 
+type CustomerBootstrapCache = {
+  availableYears: number[];
+  selectedYear: number | null;
+  customerData: CustomerYearData | null;
+};
+
 const REPORT_CACHE_VERSION = 'v1';
 const OVERVIEW_CACHE_KEY = `report:${REPORT_CACHE_VERSION}:overview`;
 const weeklyBootstrapCacheKey = (year: number) =>
@@ -100,6 +124,9 @@ const weeklyDataCacheKey = (year: number, week: number) =>
 const YEARLY_BOOTSTRAP_CACHE_KEY = `report:${REPORT_CACHE_VERSION}:yearly:bootstrap`;
 const yearlyDataCacheKey = (year: number) =>
   `report:${REPORT_CACHE_VERSION}:yearly:${year}`;
+const CUSTOMER_BOOTSTRAP_CACHE_KEY = `report:${REPORT_CACHE_VERSION}:customers:bootstrap`;
+const customerDataCacheKey = (year: number) =>
+  `report:${REPORT_CACHE_VERSION}:customers:${year}`;
 
 const EMPTY_DISCOVERY_SUMMARY: DiscoverySourceSummary = {
   totalCustomers: 0,
@@ -160,6 +187,67 @@ function DiscoverySourceChart({ data }: { data: DiscoverySourceDatum[] }) {
   );
 }
 
+function CustomerMonthlyChart({ data }: { data: MonthlyCustomerDatum[] }) {
+  const maxCount = Math.max(
+    ...data.flatMap((item) => [item.newCustomers, item.returningCustomers]),
+    1
+  );
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-600 dark:text-gray-300">
+        <span className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-sm bg-[#1152d4]" />
+          Pelanggan baru
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-sm bg-emerald-500" />
+          Pelanggan lama
+        </span>
+      </div>
+
+      <div className="overflow-x-auto pb-2">
+        <div className="flex h-64 min-w-[720px] items-end gap-3 border-b border-gray-200 px-2 dark:border-gray-700">
+          {data.map((item) => {
+            const newHeight = (item.newCustomers / maxCount) * 100;
+            const returningHeight = (item.returningCustomers / maxCount) * 100;
+
+            return (
+              <div key={item.month} className="flex min-w-0 flex-1 flex-col items-center">
+                <div className="flex h-52 w-full items-end justify-center gap-1">
+                  <div className="flex h-full w-[42%] flex-col items-center justify-end">
+                    <span className="mb-1 text-[10px] font-bold text-[#1152d4]">
+                      {item.newCustomers}
+                    </span>
+                    <div
+                      className="w-full rounded-t-md bg-[#1152d4] transition-[height] duration-300"
+                      style={{ height: item.newCustomers > 0 ? `${Math.max(newHeight, 4)}%` : '2px' }}
+                      title={`${item.monthName}: ${item.newCustomers} pelanggan baru`}
+                    />
+                  </div>
+                  <div className="flex h-full w-[42%] flex-col items-center justify-end">
+                    <span className="mb-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                      {item.returningCustomers}
+                    </span>
+                    <div
+                      className="w-full rounded-t-md bg-emerald-500 transition-[height] duration-300"
+                      style={{ height: item.returningCustomers > 0 ? `${Math.max(returningHeight, 4)}%` : '2px' }}
+                      title={`${item.monthName}: ${item.returningCustomers} pelanggan lama`}
+                    />
+                  </div>
+                </div>
+                <span className="mt-2 text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                  {item.monthName}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ReportPage() {
   useAuth();
   const [isLocked, setIsLocked] = useState(true);
@@ -184,8 +272,13 @@ export default function ReportPage() {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [yearlyData, setYearlyData] = useState<YearlyData | null>(null);
   const [yearlyLoading, setYearlyLoading] = useState(true);
+  const [selectedCustomerYear, setSelectedCustomerYear] = useState<number | null>(null);
+  const [availableCustomerYears, setAvailableCustomerYears] = useState<number[]>([]);
+  const [customerData, setCustomerData] = useState<CustomerYearData | null>(null);
+  const [customerLoading, setCustomerLoading] = useState(true);
   const weeklyRequestId = useRef(0);
   const yearlyRequestId = useRef(0);
+  const customerRequestId = useRef(0);
 
   useEffect(() => {
     const unlocked = sessionStorage.getItem('reportUnlocked') === 'true';
@@ -332,10 +425,57 @@ export default function ReportPage() {
       }
     };
 
+    const loadCustomerBootstrap = async () => {
+      const requestId = ++customerRequestId.current;
+      const cachedCustomers = readSessionCache<CustomerBootstrapCache>(
+        CUSTOMER_BOOTSTRAP_CACHE_KEY
+      );
+
+      if (cachedCustomers) {
+        setAvailableCustomerYears(cachedCustomers.availableYears);
+        setSelectedCustomerYear(cachedCustomers.selectedYear);
+        setCustomerData(cachedCustomers.customerData);
+        setCustomerLoading(false);
+      } else {
+        setCustomerLoading(true);
+      }
+
+      try {
+        const response = await fetch('/api/customers/monthly', { signal });
+        const result = await response.json();
+        if (!result.success || signal.aborted || requestId !== customerRequestId.current) return;
+
+        const selectedYearData = result.data.selectedYearData as CustomerYearData | null;
+        const customerBootstrap: CustomerBootstrapCache = {
+          availableYears: result.data.availableYears || [],
+          selectedYear: selectedYearData?.year ?? null,
+          customerData: selectedYearData,
+        };
+
+        setAvailableCustomerYears(customerBootstrap.availableYears);
+        setSelectedCustomerYear(customerBootstrap.selectedYear);
+        setCustomerData(customerBootstrap.customerData);
+        writeSessionCache(CUSTOMER_BOOTSTRAP_CACHE_KEY, customerBootstrap);
+
+        if (selectedYearData) {
+          writeSessionCache(customerDataCacheKey(selectedYearData.year), selectedYearData);
+        }
+      } catch (requestError) {
+        if (!isAbortError(requestError)) {
+          console.error('Failed to fetch customer report:', requestError);
+        }
+      } finally {
+        if (!signal.aborted && requestId === customerRequestId.current) {
+          setCustomerLoading(false);
+        }
+      }
+    };
+
     void Promise.allSettled([
       loadOverview(),
       loadWeeklyBootstrap(),
       loadYearlyBootstrap(),
+      loadCustomerBootstrap(),
     ]);
 
     return () => controller.abort();
@@ -438,6 +578,53 @@ export default function ReportPage() {
       if (currentIndex < availableYears.length - 1) {
         void handleYearChange(availableYears[currentIndex + 1]);
       }
+    }
+  };
+
+  const handleCustomerYearChange = async (year: number) => {
+    const requestId = ++customerRequestId.current;
+    setSelectedCustomerYear(year);
+
+    const cacheKey = customerDataCacheKey(year);
+    const cachedCustomerData = readSessionCache<CustomerYearData>(cacheKey);
+    if (cachedCustomerData) {
+      setCustomerData(cachedCustomerData);
+      setCustomerLoading(false);
+    } else {
+      setCustomerData(null);
+      setCustomerLoading(true);
+    }
+
+    try {
+      const params = new URLSearchParams({ year: year.toString() });
+      const response = await fetch(`/api/customers/monthly?${params}`);
+      const result = await response.json();
+      if (!result.success || requestId !== customerRequestId.current) return;
+
+      const nextCustomerData = result.data.selectedYearData as CustomerYearData | null;
+      setAvailableCustomerYears(result.data.availableYears || []);
+      setCustomerData(nextCustomerData);
+      if (nextCustomerData) writeSessionCache(cacheKey, nextCustomerData);
+    } catch (requestError) {
+      console.error('Failed to fetch customer report:', requestError);
+    } finally {
+      if (requestId === customerRequestId.current) setCustomerLoading(false);
+    }
+  };
+
+  const handlePrevCustomerYear = () => {
+    if (selectedCustomerYear === null) return;
+    const currentIndex = availableCustomerYears.indexOf(selectedCustomerYear);
+    if (currentIndex > 0) {
+      void handleCustomerYearChange(availableCustomerYears[currentIndex - 1]);
+    }
+  };
+
+  const handleNextCustomerYear = () => {
+    if (selectedCustomerYear === null) return;
+    const currentIndex = availableCustomerYears.indexOf(selectedCustomerYear);
+    if (currentIndex >= 0 && currentIndex < availableCustomerYears.length - 1) {
+      void handleCustomerYearChange(availableCustomerYears[currentIndex + 1]);
     }
   };
 
@@ -557,6 +744,97 @@ export default function ReportPage() {
                 <p className="text-[#111318] dark:text-white text-base font-bold mb-1">Belum Ada Data Sumber Customer</p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs">
                   Data akan muncul setelah customer mengisi “Tahu dari mana?”
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl bg-white dark:bg-[#1a202c] p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            {customerLoading && availableCustomerYears.length === 0 ? (
+              <div className="flex h-64 items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#1152d4]" />
+              </div>
+            ) : availableCustomerYears.length > 0 && customerData ? (
+              <>
+                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-base font-bold text-[#111318] dark:text-white">
+                      Pelanggan Baru vs Pelanggan Lama
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Pelanggan unik per bulan · {selectedCustomerYear}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <button
+                      onClick={handlePrevCustomerYear}
+                      disabled={customerLoading || selectedCustomerYear === availableCustomerYears[0]}
+                      aria-label="Tahun pelanggan sebelumnya"
+                      className="rounded bg-gray-100 px-2 py-1 text-xs transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+                    >
+                      ←
+                    </button>
+                    <select
+                      value={selectedCustomerYear || ''}
+                      onChange={(event) => handleCustomerYearChange(Number(event.target.value))}
+                      disabled={customerLoading}
+                      aria-label="Pilih tahun laporan pelanggan"
+                      className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50 dark:border-gray-700 dark:bg-[#0f1724]"
+                    >
+                      {availableCustomerYears.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleNextCustomerYear}
+                      disabled={customerLoading || selectedCustomerYear === availableCustomerYears[availableCustomerYears.length - 1]}
+                      aria-label="Tahun pelanggan berikutnya"
+                      className="rounded bg-gray-100 px-2 py-1 text-xs transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+                    >
+                      →
+                    </button>
+                  </div>
+                </div>
+
+                {customerLoading ? (
+                  <div className="flex h-64 items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#1152d4]" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
+                      <div className="rounded-xl bg-gray-50 p-3 dark:bg-gray-800/60">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Total</p>
+                        <p className="mt-1 text-xl font-extrabold text-[#111318] dark:text-white">
+                          {customerData.totals.totalCustomers}
+                        </p>
+                      </div>
+                      <div className="rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">Baru</p>
+                        <p className="mt-1 text-xl font-extrabold text-[#1152d4] dark:text-blue-300">
+                          {customerData.totals.newCustomers}
+                        </p>
+                      </div>
+                      <div className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-950/30">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">Lama</p>
+                        <p className="mt-1 text-xl font-extrabold text-emerald-600 dark:text-emerald-300">
+                          {customerData.totals.returningCustomers}
+                        </p>
+                      </div>
+                    </div>
+                    <CustomerMonthlyChart data={customerData.monthlyCustomers} />
+                    <p className="mt-4 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                      Satu kontak dihitung satu kali setiap bulan. Pelanggan baru adalah kontak yang pertama kali melakukan order valid pada bulan tersebut; order pada bulan berikutnya dihitung sebagai pelanggan lama.
+                    </p>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="flex h-64 flex-col items-center justify-center text-center">
+                <span className="material-symbols-outlined mb-3 text-5xl text-gray-300 dark:text-gray-600">groups</span>
+                <p className="mb-1 text-base font-bold text-[#111318] dark:text-white">Belum Ada Data Pelanggan</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Data akan muncul setelah ada order yang disetujui.
                 </p>
               </div>
             )}
