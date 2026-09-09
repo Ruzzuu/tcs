@@ -15,8 +15,8 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
         
         return (
           <div key={item.day} className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-gray-400 w-8 text-right">{item.day}</span>
-            <div className="flex-1 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
+            <span className="text-[10px] font-bold text-gray-400 w-20 shrink-0 whitespace-nowrap text-right">{item.day}</span>
+            <div className="flex-1 min-w-0 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
               <div
                 className="h-full rounded-md transition-all duration-300"
                 style={{
@@ -25,7 +25,7 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
                 }}
               ></div>
             </div>
-            <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-20 text-right">
+            <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-20 shrink-0 whitespace-nowrap text-right">
               {formatCurrency(item.amount)}
             </span>
           </div>
