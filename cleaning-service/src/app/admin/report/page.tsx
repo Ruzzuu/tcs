@@ -15,7 +15,7 @@ function BarChart({ data }: { data: Array<{ day: string; amount: number }> }) {
         
         return (
           <div key={item.day} className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-gray-400 w-20 shrink-0 whitespace-nowrap text-right">{item.day}</span>
+            <span className="relative z-10 w-24 min-w-[6rem] shrink-0 overflow-visible whitespace-nowrap text-right text-[10px] font-bold text-gray-400 sm:w-28 sm:min-w-[7rem]">{item.day}</span>
             <div className="flex-1 min-w-0 h-7 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden relative">
               <div
                 className="h-full rounded-md transition-all duration-300"
